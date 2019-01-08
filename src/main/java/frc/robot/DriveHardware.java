@@ -1,6 +1,7 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.Talon;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.*;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
@@ -11,12 +12,12 @@ public class DriveHardware {
 	
 	private ADXRS450_Gyro gyro;
 
-	private final Talon rightMaster;
-	private final Talon rightSlave1;
-	private final Talon rightSlave2;
-	private final Talon leftMaster;
-	private final Talon leftSlave1;
-	private final Talon leftSlave2;
+	private final TalonSRX rightMaster;
+	private final TalonSRX rightSlave1;
+	private final TalonSRX rightSlave2;
+	private final TalonSRX leftMaster;
+	private final TalonSRX leftSlave1;
+	private final TalonSRX leftSlave2;
 	private Encoder leftEncoder;
 	private Encoder rightEncoder;
 	
@@ -58,12 +59,12 @@ public class DriveHardware {
 		
 		solenoid = new Solenoid(0, 1);
 
-		leftMaster = new Talon(1);
-		leftSlave1 = new Talon(2);
-		leftSlave2 = new Talon(3);  
-		rightMaster = new Talon(4);
-		rightSlave1 = new Talon(5);
-		rightSlave2 = new Talon(6);
+		leftMaster = new TalonSRX(1);
+		leftSlave1 = new TalonSRX(2);
+		leftSlave2 = new TalonSRX(3);  
+		rightMaster = new TalonSRX(4);
+		rightSlave1 = new TalonSRX(5);
+		rightSlave2 = new TalonSRX(6);
 
 		leftEncoder = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
 		rightEncoder = new Encoder(2, 3, false, Encoder.EncodingType.k4X);
@@ -97,16 +98,16 @@ public class DriveHardware {
 
 	// Setting the left master Talon's speed to the given parameter
 	public void SetLeft(double speed) {
-		leftMaster.set(speed);
-		leftSlave1.set(speed);
-		leftSlave2.set(speed);
+		leftMaster.set(ControlMode.PercentOutput, speed);
+		leftSlave1.set(ControlMode.PercentOutput, speed);
+		leftSlave2.set(ControlMode.PercentOutput, speed);
 	}
 
 	// Setting the right master Talon's speed to the given parameter
 	public void SetRight(double speed) {
-		rightMaster.set(speed);
-		rightSlave1.set(speed);
-		rightSlave2.set(speed);
+		rightMaster.set(ControlMode.PercentOutput, speed);
+		rightSlave1.set(ControlMode.PercentOutput, speed);
+		rightSlave2.set(ControlMode.PercentOutput, speed);
 	}
 
 	// Getting raw position value from the right encoder
@@ -140,12 +141,12 @@ public class DriveHardware {
 		leftSpeed = percentV - percentOmega;
 		rightSpeed = percentV + percentOmega;
 		
-		rightMaster.set(rightSpeed);
-		rightSlave1.set(rightSpeed);
-		rightSlave2.set(rightSpeed);
-		leftMaster.set(leftSpeed);
-		leftSlave1.set(leftSpeed);
-		leftSlave2.set(leftSpeed);
+		rightMaster.set(ControlMode.PercentOutput, rightSpeed);
+		rightSlave1.set(ControlMode.PercentOutput, rightSpeed);
+		rightSlave2.set(ControlMode.PercentOutput, rightSpeed);
+		leftMaster.set(ControlMode.PercentOutput, leftSpeed);
+		leftSlave1.set(ControlMode.PercentOutput, leftSpeed);
+		leftSlave2.set(ControlMode.PercentOutput, leftSpeed);
 	}
 
 	// Method to reset the encoder values
