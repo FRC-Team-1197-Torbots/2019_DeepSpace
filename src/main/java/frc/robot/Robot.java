@@ -11,7 +11,7 @@ public class Robot extends TimedRobot {
 	
 	public Robot() {
 		test = false;
-		hardware = new DriveHardware();
+		hardware = new DriveHardware();																																																																																																					
 		player1 = new Joystick(0);
 		drive = new TorDrive(hardware, player1);
 	}
