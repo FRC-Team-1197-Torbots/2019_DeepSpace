@@ -1,22 +1,25 @@
 package frc.robot;
-//need to fix this
 
-import edu.wpi.first.wpilibj.Talon;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.*;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Encoder;
 
 public class DriveHardware {
 	
 	private ADXRS450_Gyro gyro;
 
-	private final Talon rightMaster;
-	private final Talon rightSlave1;
-	private final Talon rightSlave2;
-	private final Talon leftMaster;
-	private final Talon leftSlave1;
-	private final Talon leftSlave2;
+	private final TalonSRX rightMaster;
+	private final TalonSRX rightSlave1;
+	private final TalonSRX rightSlave2;
+	private final TalonSRX leftMaster;
+	private final TalonSRX leftSlave1;
+	private final TalonSRX leftSlave2;
+	private Encoder leftEncoder;
+	private Encoder rightEncoder;
 	
 	private double leftSpeed;
 	private double rightSpeed;
@@ -56,30 +59,15 @@ public class DriveHardware {
 		
 		solenoid = new Solenoid(0, 1);
 
-		leftMaster = new Talon(1);
-		leftSlave1 = new Talon(2);
-		leftSlave2 = new Talon(3);  
-		rightMaster = new Talon(4);
-		rightSlave1 = new Talon(5);
-		rightSlave2 = new Talon(6);
-		
-		rightMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-		rightMaster.configNominalOutputForward(+0.0f, 0);
-		rightMaster.configNominalOutputReverse(-0.0f, 0);
-		rightMaster.configPeakOutputForward(+12.0f, 0);
-		rightMaster.configPeakOutputReverse(-12.0f, 0);
+		leftMaster = new TalonSRX(1);
+		leftSlave1 = new TalonSRX(2);
+		leftSlave2 = new TalonSRX(3);  
+		rightMaster = new TalonSRX(4);
+		rightSlave1 = new TalonSRX(5);
+		rightSlave2 = new TalonSRX(6);
 
-		rightSlave1.follow(rightMaster);
-		rightSlave2.follow(rightMaster);
-		
-		leftMaster.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 0);
-		leftMaster.configNominalOutputForward(+0.0f, 0);
-		leftMaster.configNominalOutputReverse(-0.0f, 0);
-		leftMaster.configPeakOutputForward(+12.0f, 0);
-		leftMaster.configPeakOutputReverse(-12.0f, 0);
-
-		leftSlave1.follow(leftMaster);
-		leftSlave2.follow(leftMaster);
+		leftEncoder = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
+		rightEncoder = new Encoder(2, 3, false, Encoder.EncodingType.k4X);
 		
 		leftMaster.setInverted(true); // Left master must be attached to the farthest CIM from the output shaft
 		leftSlave1.setInverted(false); 
@@ -111,31 +99,35 @@ public class DriveHardware {
 	// Setting the left master Talon's speed to the given parameter
 	public void SetLeft(double speed) {
 		leftMaster.set(ControlMode.PercentOutput, speed);
+		leftSlave1.set(ControlMode.PercentOutput, speed);
+		leftSlave2.set(ControlMode.PercentOutput, speed);
 	}
 
 	// Setting the right master Talon's speed to the given parameter
 	public void SetRight(double speed) {
 		rightMaster.set(ControlMode.PercentOutput, speed);
+		rightSlave1.set(ControlMode.PercentOutput, speed);
+		rightSlave2.set(ControlMode.PercentOutput, speed);
 	}
 
 	// Getting raw position value from the right encoder
 	public double getRightEncoder() {
-		return rightMaster.getSelectedSensorPosition(0);
+		return rightEncoder.getRaw();
 	}
 
 	// Getting raw position value from the left encoder
 	public double getLeftEncoder() {
-		return leftMaster.getSelectedSensorPosition(0);
+		return leftEncoder.getRaw();
 	}
 
 	// Getting the average encoder position from both encoders
 	public double getAverageEncoderPosition() {
-		return (rightMaster.getSelectedSensorPosition(0) + leftMaster.getSelectedSensorPosition(0)) * 0.5;
+		return (rightEncoder.getRaw() + leftEncoder.getRaw()) * 0.5;
 	}
 
 	// Getting the position from both encoders in meters
 	public double getPosition() {
-		return (rightMaster.getSelectedSensorPosition(0) + leftMaster.getSelectedSensorPosition(0)) * 0.5 / encoderTicksPerMeter; // [meters]
+		return ((rightEncoder.getRaw() + leftEncoder.getRaw()) * 0.5) / encoderTicksPerMeter; // [meters]
 	}
 
 	// Getting the angle in radians from the spartan board
@@ -150,13 +142,17 @@ public class DriveHardware {
 		rightSpeed = percentV + percentOmega;
 		
 		rightMaster.set(ControlMode.PercentOutput, rightSpeed);
+		rightSlave1.set(ControlMode.PercentOutput, rightSpeed);
+		rightSlave2.set(ControlMode.PercentOutput, rightSpeed);
 		leftMaster.set(ControlMode.PercentOutput, leftSpeed);
+		leftSlave1.set(ControlMode.PercentOutput, leftSpeed);
+		leftSlave2.set(ControlMode.PercentOutput, leftSpeed);
 	}
 
 	// Method to reset the encoder values
 	public void resetEncoder() {
-		rightMaster.setSelectedSensorPosition(0, 0, 0);
-		leftMaster.setSelectedSensorPosition(0, 0, 0);
+		leftEncoder.reset();
+		rightEncoder.reset();
 	}
 
 	// Method to reset the spartan board gyro values

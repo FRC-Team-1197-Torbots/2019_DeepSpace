@@ -138,11 +138,11 @@ public abstract class TorTrajectory {
 		// implemented as lists of numbers:
 		List<Double> f1 = new LinkedList<Double>();
 		for(int i = 0; i < f1_length; i++){
-			f1.add(new Double(0));
+			f1.add(0.0);
 		}
 		List<Double> f2 = new LinkedList<Double>();
 		for(int i = 0; i < f2_length; i++){
-			f2.add(new Double(0));
+			f2.add(0.0);
 		}
 		
 		// Inputs and outputs of the filters:
@@ -171,13 +171,13 @@ public abstract class TorTrajectory {
 			}
 
 			// Input goes at the beginning of the filter (end of the list):
-			f1.add(new Double(input));
+			f1.add(input);
 			// Throw away the element at the end of the filter (beginning of the list)
 			f1.remove(0);
 			//  Output is the average of the elements in the first filter:
 			FL1out = average(f1);
 			// Repeat this procedure for the second filter:
-			f2.add(new Double(FL1out));
+			f2.add(FL1out);
 			f2.remove(0);
 			FL2out = average(f2);
 			
@@ -191,7 +191,7 @@ public abstract class TorTrajectory {
 			
 			motion.add(new MotionState1D(pos, vel, acc));
 			t += (long)(dt * 1000);
-			time.add(new Long(t));
+			time.add(t);
 		}
 	}
 	

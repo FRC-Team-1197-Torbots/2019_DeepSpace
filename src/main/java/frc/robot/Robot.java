@@ -25,11 +25,11 @@ public class Robot extends TimedRobot {
 	}
 	@Override
 	public void autonomousPeriodic() {
-		drive.Run(test, false);//IT ISNT TELEOP IN AUTO PERIODIC
+		drive.Run(test, true);//IT IS NOW TELEOP IN AUTO
 	}
 	@Override
 	public void teleopPeriodic() {
-		drive.Run(test, true);//IT ISNT TELEOP IN AUTO PERIODIC
+		drive.Run(test, true);//IT IS TELEOP
 	}
 	@Override
 	public void testPeriodic() {
