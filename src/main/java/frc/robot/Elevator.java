@@ -14,7 +14,7 @@ public class Elevator {
     final double kD = 0.0;
     final double pidOnTolerance = 0.3;//this is in meters and should be kind of large as we are using bang bang till PID turns on
     final double encoderTicksPerMeter = 1.0;//this is how many ticks there are per meter the elevator goes up
-    final double lowHatch = 1.0;
+    final double lowHatch = 1.0;//these three are the heights of what we want to go to
     final double intakeHatch = 2.0;
     final double highHatch = 3.0;
     final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0
