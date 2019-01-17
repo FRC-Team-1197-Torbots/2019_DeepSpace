@@ -134,10 +134,12 @@ public class MotionProfileDriveController extends DriveController {
 		positionPID = new BantorPID(positionkV, positionkA, PositionkP, PositionkI, PositionkD,
 				VelocitykP, VelocitykI, VelocitykD,
 				dt, positionTolerance, velocityTolerance);
+		positionPID.reset();
 		
 		headingPID = new BantorDriveHeadingPID(headingkV, headingkA, HeadingkP, HeadingkI, HeadingkD,
 				OmegakP, OmegakI, OmegakD,
 				dt, headingTolerance, omegaTolerance);
+		headingPID.reset();
 		
 		//instantiates all the derivatives that will find the current values
 		findCurrentVelocity = new TorDerivative(dt);
