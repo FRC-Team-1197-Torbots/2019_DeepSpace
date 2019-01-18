@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Solenoid;
 
-public class Elevator {
+public class hatchElevator {
     private final boolean testMode = true;
 
     private long currentTime;
@@ -83,7 +83,7 @@ public class Elevator {
 
     public theElevator elevator = theElevator.IDLE;
 
-    public Elevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player2, boolean talon2Inverted, Solenoid piston) {
+    public hatchElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player2, boolean talon2Inverted, Solenoid piston) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
