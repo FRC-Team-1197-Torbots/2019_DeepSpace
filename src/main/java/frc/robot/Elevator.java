@@ -41,8 +41,8 @@ public class Elevator {
     private final double intakeHatchPosition = 2.0;
     private final double highHatchPosition = 3.0;
     private final double lowHatchExtendPosition = 0.8;//should be lower than lowHatchPosition
-    private final double intakeHatchExtendPosition = 2.2;//should be higher than intakeHatchPosition
-    private final double highHatchExtendPosition = 2.8;//should be low than highHatchPosition
+    private final double intakeHatchExtendPosition = 1.8;//should be lower than intakeHatchPosition
+    private final double highHatchExtendPosition = 2.8;//should be lower than highHatchPosition
     private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
