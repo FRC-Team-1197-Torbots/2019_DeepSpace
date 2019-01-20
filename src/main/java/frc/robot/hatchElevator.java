@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.Solenoid;
 public class hatchElevator {
     private final boolean testMode = true;
 
+    private double currentRunningSpeed;
+
     private long currentTime;
 	private long startTime = (long)(Timer.getFPGATimestamp() * 1000);
 	private double timeInterval = 0.005;
@@ -103,7 +105,7 @@ public class hatchElevator {
 		findCurrentVelocity.resetValue(0);
     }
 
-    public void update() {
+    public void update(boolean running, boolean limitSwitchBeingHit) {
 		currentTime = (long)(Timer.getFPGATimestamp() * 1000);
 		
 		//this starting boolean makes it so that it will still do the first value in the trajectory
@@ -187,6 +189,11 @@ public class hatchElevator {
                 PIDRun();//this only updates what value the elevator should be going
                 stateRun();
                 handleSolenoid();
+                if(running && !limitSwitchBeingHit) {
+                    talon1.set(ControlMode.PercentOutput, currentRunningSpeed);
+                } else {
+                    talon1.set(ControlMode.PercentOutput, 0);
+                }
             }        
         }
     }
@@ -326,7 +333,7 @@ public class hatchElevator {
     }
 
     public void setPercentSpeed(double speed) {
-        talon1.set(ControlMode.PercentOutput, speed);
+        currentRunningSpeed = speed;
     }
 
     public double height() {
