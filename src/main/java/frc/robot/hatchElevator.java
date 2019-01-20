@@ -55,6 +55,9 @@ public class hatchElevator {
     -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
 
+    private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
+    //if it is false then it will only use PID for power
+
     private int initialTicks;
     private double currentTarget;
 
@@ -258,9 +261,17 @@ public class hatchElevator {
             case goTolowHatchPID:
                 if(Math.abs(height() - currentTarget) > pidGoTolerance) {
                     if((height() - currentTarget) > 0) {
-                        setPercentSpeed(-absoluteMaxDownwardVelocity);
+                        if(powerDrive) {
+                            setPercentSpeed(-absoluteMaxDownwardVelocity);
+                        } else {
+                            setPercentSpeed(controlPower);
+                        }
                     } else {
-                        setPercentSpeed(absoluteMaxUpwardVelocity);
+                        if(powerDrive) {
+                            setPercentSpeed(absoluteMaxUpwardVelocity);
+                        } else {
+                            setPercentSpeed(controlPower);
+                        }
                     }
                 } else {
                     setPercentSpeed(controlPower);
@@ -270,9 +281,17 @@ public class hatchElevator {
             case goTointakeHatchPID:
                 if(Math.abs(height() - currentTarget) > pidGoTolerance) {
                     if((height() - currentTarget) > 0) {
-                        setPercentSpeed(-absoluteMaxDownwardVelocity);
+                        if(powerDrive) {
+                            setPercentSpeed(-absoluteMaxDownwardVelocity);
+                        } else {
+                            setPercentSpeed(controlPower);
+                        }
                     } else {
-                        setPercentSpeed(absoluteMaxUpwardVelocity);
+                        if(powerDrive) {
+                            setPercentSpeed(absoluteMaxUpwardVelocity);
+                        } else {
+                            setPercentSpeed(controlPower);
+                        }
                     }
                 } else {
                     setPercentSpeed(controlPower);
@@ -282,9 +301,17 @@ public class hatchElevator {
             case goToHighHatchPID:
                 if(Math.abs(height() - currentTarget) > pidGoTolerance) {
                     if((height() - currentTarget) > 0) {
-                        setPercentSpeed(-absoluteMaxDownwardVelocity);
+                        if(powerDrive) {
+                            setPercentSpeed(-absoluteMaxDownwardVelocity);
+                        } else {
+                            setPercentSpeed(controlPower);
+                        }
                     } else {
-                        setPercentSpeed(absoluteMaxUpwardVelocity);
+                        if(powerDrive) {
+                            setPercentSpeed(absoluteMaxUpwardVelocity);
+                        } else {
+                            setPercentSpeed(controlPower);
+                        }
                     }
                 } else {
                     setPercentSpeed(controlPower);
