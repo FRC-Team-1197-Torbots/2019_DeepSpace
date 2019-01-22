@@ -4,8 +4,8 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.hatchElevator.theElevator;
 
 public class ballElevator {
     //test or not?
@@ -73,6 +73,7 @@ public class ballElevator {
     private TalonSRX intakeMotor2;
     private Encoder encoder;
     private Joystick player2;
+    private Solenoid upPiston;
 
     public static enum theElevator {
         IDLE, lowBallPID,
@@ -85,7 +86,7 @@ public class ballElevator {
     public theElevator elevator = theElevator.IDLE;
 
     public ballElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player2, 
-        boolean talon2Inverted, TalonSRX intakeMotor1, TalonSRX intakeMotor2, boolean intakeMotor2Inverted) {
+        boolean talon2Inverted, TalonSRX intakeMotor1, TalonSRX intakeMotor2, boolean intakeMotor2Inverted, Solenoid upPiston) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
@@ -96,6 +97,7 @@ public class ballElevator {
         this.intakeMotor2 = intakeMotor2;
         this.intakeMotor2.follow(this.intakeMotor1);
         this.intakeMotor2.setInverted(intakeMotor2Inverted);
+        this.upPiston = upPiston;
 
         //this is the PID
         positionPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP,
@@ -177,7 +179,21 @@ public class ballElevator {
                         }
                     }
                 }
+
+                if(running) {
+                    handlePneumatics();
+                }
             }        
+        }
+    }
+
+    public void handlePneumatics() {
+        //this is as very simple class that just makes the piston for the elvator always out
+        //only pulls up for high hatch because that is when it is needed
+        if(elevator == theElevator.goToHighBallPID || elevator == theElevator.highBallPID) {
+            upPiston.set(true);
+        } else {
+            upPiston.set(false);
         }
     }
 
