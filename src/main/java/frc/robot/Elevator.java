@@ -3,31 +3,38 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 public class Elevator {
     //this elevator has the hatch elevator and the ball elevator in it
     private hatchElevator hatchElevator;
     private ballElevator ballElevator;
+    private groundIntake groundIntake;
 
     //hardware
     private TalonSRX talon1;//this talon is the "drive talon for the elevator"
     private TalonSRX talon2;//this is the second one
     private TalonSRX ballIntake1;
     private TalonSRX ballIntake2;
+    private TalonSRX groundTalon1;
+    private TalonSRX groundTalon2;
     private Encoder encoder;
     private Solenoid hatchPiston;
     private Solenoid ballUpPiston;
     private DigitalInput limitSwitch;
+    private AnalogPotentiometer fourtwenty;
 
     //our controller
     private Joystick player2;
-    private Joystick player1;
 
     private final boolean talon2Inverted = false;
     private final boolean intakeMotor2Inverted = false;
 
     public Elevator(Joystick player1) {
+        groundTalon1 = new TalonSRX(13);
+        groundTalon2 = new TalonSRX(14);
+        fourtwenty = new AnalogPotentiometer(1, 360, 0);
         talon1 = new TalonSRX(7);
         talon2 = new TalonSRX(8);
         ballIntake1 = new TalonSRX(9);
@@ -39,7 +46,7 @@ public class Elevator {
         hatchElevator = new hatchElevator(talon1, talon2, encoder, player2, talon2Inverted, hatchPiston);
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, 
                                             ballIntake1, ballIntake2, intakeMotor2Inverted, ballUpPiston);
-        this.player1 = player1;
+        groundIntake = new groundIntake(talon1, talon2, groundTalon1, groundTalon2, player1, player2, fourtwenty, encoder);
     }
 
     public void init() {
@@ -48,6 +55,7 @@ public class Elevator {
     }
 
     public void update() {
+        groundIntake.update(player2.getRawButton(9), true);
         if(getRightBumper()) {//ball
             ballElevator.update(true, limitSwitch.get());
             hatchElevator.update(false, limitSwitch.get());
