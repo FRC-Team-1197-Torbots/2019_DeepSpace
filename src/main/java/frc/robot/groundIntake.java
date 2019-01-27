@@ -1,6 +1,10 @@
 package frc.robot;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 public class groundIntake {
@@ -15,17 +19,80 @@ public class groundIntake {
     private TalonSRX groundTalon2;
     private Joystick player1;
     private Joystick player2;
+    private Encoder encoder;
     private Potentiometer fourtwenty;//ITS THE POT
+    private double currentTime = Timer.getFPGATimestamp();
+    private double lastTime = currentTime;
+    private boolean highEnough = false;
+    private double currentHeight;
+    private TorDerivative findCurrentVelocity;
+    private TorDerivative groundfindCurrentVelocity;
+    private BantorPID positionPID;
+    private BantorPID groundPositionPID;
+    private double currentVelocity;
+    private double groundcurrentVelocity;
+    private double controlPower;//this is the amount of power the PID is giving out
+    
+    private double groundCurrentTarget;
+
+    private double groundCurrentAngle;
+    private double groundstartAngle;
+    private double groundControlPower;
+
+    /*
+    tuneable stuff--------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    */
+    private final double neededHeight = 1;//in meters
+    private final double currentTarget = 1.2;//this is the height the elevator will PID to
+    private final double groundIntakeDownAngle = 90;
+    private final double groundIntakeInAngle = -10;
+    private final double groundDiagonalAngle = 45;
+
+    private final double positionkP = 0.0;
+    private final double positionkI = 0.0;
+    private final double positionkD = 0.0;
+    private final double positionTolerance = 0.01;//for thePID
+    private final double velocitykP = 0.0;//velocity stuff probably not needed at all and should keep 0
+    private final double velocitykI = 0.0;
+    private final double velocitykD = 0.0;
+    private final double kV = 0.0;
+    private final double kA = 0.0;//this should definitely stay at 0
+    private final double pidGoTolerance = 0.05;//this is in meters and should be kind of large as we are using bang bang till PID turns on
+    private final double velocityTolerance = 0.0;
+    private final double targetVelocity = 0.0;//probably won't need
+    private final double targetAcceleration = 0.0;//probably won't need
+    private final double dt = 0.005;
+    private final double encoderTicksPerMeter = 1.0;//this is how many ticks there are per meter the elevator goes up
+    private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
+    private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
+
+    private final double groundpositionkP = 0.0;
+    private final double groundpositionkI = 0.0;
+    private final double groundpositionkD = 0.0;
+    private final double groundpositionTolerance = 0.01;//for thePID
+    private final double groundvelocitykP = 0.0;//velocity stuff probably not needed at all and should keep 0
+    private final double groundvelocitykI = 0.0;
+    private final double groundvelocitykD = 0.0;
+    private final double groundkV = 0.0;
+    private final double groundkA = 0.0;//this should definitely stay at 0
+    private final double groundpidGoTolerance = 0.05;//this is in meters and should be kind of large as we are using bang bang till PID turns on
+    private final double groundvelocityTolerance = 0.0;
+    private final double groundtargetVelocity = 0.0;//probably won't need
+    private final double groundtargetAcceleration = 0.0;//probably won't need
+    /*
+    ----------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    */
+    private int initialTicks;
 
     //the state machine
     public static enum ground {
-        IDLE, DOWN, PULLEDBACK, SHOOTPOS, SHOOTING, DONE;
+        IDLE, GOINGUP, DOWN, PULLEDBACK, SHOOTPOS, SHOOTING;
         private ground () {}
     }
     private ground groundIntake = ground.IDLE;
 
     public groundIntake(TalonSRX elevatorTalon1, TalonSRX elevatorTalon2, TalonSRX groundTalon1, TalonSRX groundTalon2,
-        Joystick player1, Joystick player2, Potentiometer fourtwenty) {
+        Joystick player1, Joystick player2, Potentiometer fourtwenty, Encoder encoder) {
         this.elevatorTalon1 = elevatorTalon1;
         this.elevatorTalon2 = elevatorTalon2;
         this.groundTalon1 = groundTalon1;
@@ -33,19 +100,84 @@ public class groundIntake {
         this.player1 = player1;
         this.player2 = player2;
         this.fourtwenty = fourtwenty;
+        this.encoder = encoder;
+
+        //this is the PID
+        positionPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP,
+            velocitykI, velocitykD, dt, positionTolerance, velocityTolerance);
+        groundPositionPID = new BantorPID(groundkV, groundkA, groundpositionkP, groundpositionkI, groundpositionkD, groundvelocitykP,
+            groundvelocitykI, groundvelocitykD, dt, groundpositionTolerance, groundvelocityTolerance);
+        groundPositionPID.reset();
+        groundfindCurrentVelocity.resetValue(0);
+        positionPID.reset();
+        findCurrentVelocity.resetValue(0);
     }
 
-    public void update(boolean elevatorManualOverriding, boolean running) {
-        
+    public void update(boolean elevatorManualOverriding, boolean running, double height) {
+        currentHeight = height;
+        highEnough = (currentHeight >= neededHeight);
+        if(groundIntake == ground.IDLE) {
+            if(elevatorManualOverriding || highEnough) {
+                groundIntake = ground.DOWN;
+            } else {
+                groundIntake = ground.GOINGUP;
+            }
+        }
+
+        if(running) {
+            elevatorTalon1.set(ControlMode.PercentOutput, controlPower);
+            elevatorTalon2.set(ControlMode.PercentOutput, controlPower);
+            groundTalon1.set(ControlMode.PercentOutput, groundControlPower);
+            groundTalon2.set(ControlMode.PercentOutput, groundControlPower);
+        }
     }
 
     public void stateMachineRun() {
-
+        switch(groundIntake) {
+            case IDLE:
+                break;
+            case DOWN:
+                break;
+            case GOINGUP:
+                if(highEnough) {
+                    groundIntake = ground.DOWN;
+                }
+                break;
+            case PULLEDBACK:
+                break;
+            case SHOOTPOS:
+                break;
+            case SHOOTING:
+                break;
+        }
     }
 
+    public void groundPIDRun() {
+        groundCurrentAngle = fourtwenty.get() - groundstartAngle;
+        groundcurrentVelocity = groundfindCurrentVelocity.estimate(groundCurrentAngle);
+        groundPositionPID.updateTargets(groundCurrentTarget, targetVelocity, targetAcceleration);
+        groundPositionPID.updateCurrentValues(groundCurrentAngle, currentVelocity);
+        groundControlPower = groundPositionPID.update();
+    }
 
+    public void PIDRun() {//finds out the current velocity
+        currentVelocity = findCurrentVelocity.estimate(height());
+        positionPID.updateTargets(currentTarget, targetVelocity, targetAcceleration);
+        positionPID.updateCurrentValues(height(), currentVelocity);
+        controlPower = positionPID.update();
+        if(controlPower > absoluteMaxUpwardVelocity) {
+            controlPower = absoluteMaxUpwardVelocity;
+        } else if(controlPower < -absoluteMaxDownwardVelocity) {
+            controlPower = -absoluteMaxDownwardVelocity;
+        }
+    }
 
+    public double height() {
+        return ((encoder.get() - initialTicks)/encoderTicksPerMeter);
+    }
 
-
-
+    public void init() {
+        initialTicks = encoder.get();
+        groundstartAngle = fourtwenty.get();
+    }
 }
