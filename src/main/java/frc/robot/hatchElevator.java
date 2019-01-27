@@ -99,6 +99,7 @@ public class hatchElevator {
             velocitykI, velocitykD, dt, positionTolerance, velocityTolerance);
         positionPID.reset();
 
+        findCurrentVelocity = new TorDerivative(dt);
 		findCurrentVelocity.resetValue(0);
     }
 

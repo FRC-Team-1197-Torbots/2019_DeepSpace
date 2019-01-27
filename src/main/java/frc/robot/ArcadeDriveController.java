@@ -83,6 +83,7 @@ public class ArcadeDriveController extends DriveController {
 		limeLightPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP, velocitykI, velocitykD, dt,
 				positionTolerance, velocityTolerance);
 		limeLightPID.reset();
+		findCurrentVelocity = new TorDerivative(dt);
 		findCurrentVelocity.resetValue(0);
 	}
 

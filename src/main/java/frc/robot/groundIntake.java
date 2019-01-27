@@ -112,8 +112,10 @@ public class groundIntake {
         groundPositionPID = new BantorPID(groundkV, groundkA, groundpositionkP, groundpositionkI, groundpositionkD, groundvelocitykP,
             groundvelocitykI, groundvelocitykD, dt, groundpositionTolerance, groundvelocityTolerance);
         groundPositionPID.reset();
+        groundfindCurrentVelocity = new TorDerivative(dt);
         groundfindCurrentVelocity.resetValue(0);
         positionPID.reset();
+        findCurrentVelocity = new TorDerivative(dt);
         findCurrentVelocity.resetValue(0);
     }
 

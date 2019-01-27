@@ -139,7 +139,9 @@ public class ballElevator {
         positionPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP,
             velocitykI, velocitykD, dt, positionTolerance, velocityTolerance);
         positionPID.reset();
-
+        
+        findCurrentVelocity = new TorDerivative(dt);
+        overfindCurrentVelocity = new TorDerivative(dt);
         findCurrentVelocity.resetValue(0);
         overfindCurrentVelocity.resetValue(0);
 
