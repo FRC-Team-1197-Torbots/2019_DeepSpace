@@ -83,7 +83,7 @@ public class hatchElevator {
         private theElevator() {}
     }
 
-    public theElevator elevator = theElevator.IDLE;
+    private theElevator elevator = theElevator.IDLE;
 
     public hatchElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player2, boolean talon2Inverted, Solenoid piston) {
         this.talon1 = talon1;

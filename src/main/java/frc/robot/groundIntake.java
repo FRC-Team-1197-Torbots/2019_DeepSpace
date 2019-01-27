@@ -1,5 +1,4 @@
 package frc.robot;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.Joystick;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -18,7 +17,35 @@ public class groundIntake {
     private Joystick player2;
     private Potentiometer fourtwenty;//ITS THE POT
 
-    public groundIntake() {
+    //the state machine
+    public static enum ground {
+        IDLE, DOWN, PULLEDBACK, SHOOTPOS, SHOOTING, DONE;
+        private ground () {}
+    }
+    private ground groundIntake = ground.IDLE;
+
+    public groundIntake(TalonSRX elevatorTalon1, TalonSRX elevatorTalon2, TalonSRX groundTalon1, TalonSRX groundTalon2,
+        Joystick player1, Joystick player2, Potentiometer fourtwenty) {
+        this.elevatorTalon1 = elevatorTalon1;
+        this.elevatorTalon2 = elevatorTalon2;
+        this.groundTalon1 = groundTalon1;
+        this.groundTalon2 = groundTalon2;
+        this.player1 = player1;
+        this.player2 = player2;
+        this.fourtwenty = fourtwenty;
+    }
+
+    public void update(boolean elevatorManualOverriding, boolean running) {
         
     }
+
+    public void stateMachineRun() {
+
+    }
+
+
+
+
+
+
 }

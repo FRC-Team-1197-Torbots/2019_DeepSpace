@@ -1,9 +1,12 @@
 package frc.robot;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -20,9 +23,12 @@ public class ballElevator {
 	private long lastCountedTime;
 	private boolean starting = true;
     private BantorPID positionPID;
+    private BantorPID overPositionPID;
     private double controlPower;//this is the amount of power the PID is giving out
-	private TorDerivative findCurrentVelocity;
-	private double currentVelocity;
+    private TorDerivative findCurrentVelocity;
+    private TorDerivative overfindCurrentVelocity;
+    private double currentVelocity;
+    private double overcurrentVelocity;
 
     /*
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -42,6 +48,22 @@ public class ballElevator {
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need
 
+    private final double overpositionkP = 0.0;
+    private final double overpositionkI = 0.0;
+    private final double overpositionkD = 0.0;
+    private final double overpositionTolerance = 0.01;//for the overPID
+    private final double overvelocitykP = 0.0;//velocity stuff probably not needed at all and should keep 0
+    private final double overvelocitykI = 0.0;
+    private final double overvelocitykD = 0.0;
+    private final double overkV = 0.0;
+    private final double overkA = 0.0;//this should definitely stay at 0
+    private final double overvelocityTolerance = 0.0;
+    private final double overtargetVelocity = 0.0;//probably won't need
+    private final double overtargetAcceleration = 0.0;//probably won't need
+
+    private final double overInAngle = 0;
+    private final double overOutAngle = 45;
+
     private final double encoderTicksPerMeter = 1.0;//this is how many ticks there are per meter the elevator goes up
     private final double lowBallPosition = 1.0;//these three are the heights of what we want to go to
     private final double intakeBallPosition = 2.0;
@@ -51,6 +73,7 @@ public class ballElevator {
 
     private final double intakePower = 0.6;
     private final double outakePower = 0.4;
+    private final double overIntakePower = -1.0;
     private final double highOutakePower = 0.7;
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
@@ -72,9 +95,21 @@ public class ballElevator {
     private TalonSRX talon2;
     private TalonSRX intakeMotor1;
     private TalonSRX intakeMotor2;
+    private TalonSRX overIntake1;//since the 971 intake only matters for this ball elevator
+    //we can instantiate it in here
+    private TalonSRX overIntake2;
+    private TalonSRX overPull;
+    private Potentiometer fourtwenty2;//IT IS THE POT
+
+    private double overstartAngle;
+    private double overcurrentAngle;
+    private double overPower;
+    
     private Encoder encoder;
     private Joystick player2;
     private Solenoid upPiston;
+
+    private double overCurrentTarget;
 
     public static enum theElevator {
         IDLE, lowBallPID,
@@ -105,7 +140,17 @@ public class ballElevator {
             velocitykI, velocitykD, dt, positionTolerance, velocityTolerance);
         positionPID.reset();
 
-		findCurrentVelocity.resetValue(0);
+        findCurrentVelocity.resetValue(0);
+        overfindCurrentVelocity.resetValue(0);
+
+        //for the over the ball intake
+        overIntake1 = new TalonSRX(10);
+        overIntake2 = new TalonSRX(11);
+        overPull = new TalonSRX(12);
+        fourtwenty2 = new AnalogPotentiometer(0, 360, 0);
+        overPositionPID = new BantorPID(overkV, overkA, overpositionkP, overpositionkI, overpositionkD, overvelocitykP,
+        overvelocitykI, overvelocitykD, dt, overpositionTolerance, overvelocityTolerance);
+        overPositionPID.reset();
     }
 
     public void update(boolean running, boolean limitSwitchBeingHit) {
@@ -124,6 +169,7 @@ public class ballElevator {
             if(testMode) {
                 SmartDashboard.putNumber("encoder value", encoder.get());
                 SmartDashboard.putNumber("height", height());
+                SmartDashboard.putNumber("potentiometer", fourtwenty2.get());
             } else {
                 SmartDashboard.putNumber("encoder value", encoder.get());
                 SmartDashboard.putNumber("height", height());
@@ -184,8 +230,33 @@ public class ballElevator {
                 if(running) {
                     handlePneumatics();
                 }
+
+                //we don't need to check if we are running to do the 971 intake
+                //it doesn't get into the way of anything
+                handleOver();
             }        
         }
+    }
+
+    public void handleOver() {
+        overcurrentAngle = fourtwenty2.get() - overstartAngle;
+
+        overcurrentVelocity = overfindCurrentVelocity.estimate(overcurrentAngle);
+
+        if(elevator == theElevator.intakeBallPID || elevator == theElevator.goTointakeBallPID) {
+            overCurrentTarget = overOutAngle;
+            overPull.set(ControlMode.PercentOutput, overIntakePower);
+        } else {
+            overCurrentTarget = overInAngle;
+            overPull.set(ControlMode.PercentOutput, 0);
+        }
+
+        overPositionPID.updateTargets(overCurrentTarget, overtargetVelocity, overtargetAcceleration);
+        overPositionPID.updateCurrentValues(overcurrentAngle, overcurrentVelocity);
+        overPower = overPositionPID.update();
+
+        overIntake1.set(ControlMode.PercentOutput, overPower);
+        overIntake2.set(ControlMode.PercentOutput, -overPower);
     }
 
     public void handlePneumatics() {
@@ -315,6 +386,7 @@ public class ballElevator {
     
     public void init() {
         initialTicks = encoder.get();
+        overstartAngle = fourtwenty2.get();
     }
 
     public void setPercentSpeed(double speed) {
