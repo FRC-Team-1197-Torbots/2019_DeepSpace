@@ -49,8 +49,9 @@ public class ballElevator {
     private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
-    private final double intakeSpeed = 0.6;
-    private final double outakeSpeed = 1.0;
+    private final double intakePower = 0.6;
+    private final double outakePower = 0.4;
+    private final double highOutakePower = 0.7;
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
     //if it is false then it will only use PID for power
@@ -130,12 +131,12 @@ public class ballElevator {
                     elevator == theElevator.goTolowBallPID || elevator == theElevator.goTointakeBallPID)) {
                     
                     lastTimeAPressed = currentTime;
-                    elevator = theElevator.goTolowBallPID;
+                    elevator = theElevator.goTointakeBallPID;
                 } else if(getButtonB() && ((currentTime - lastTimeBPressed) > 250) && !(elevator == theElevator.goToHighBallPID || 
                     elevator == theElevator.goTolowBallPID || elevator == theElevator.goTointakeBallPID)) {
                     
                     lastTimeBPressed = currentTime;
-                    elevator = theElevator.goTointakeBallPID;
+                    elevator = theElevator.goTolowBallPID;
                 } else if(getButtonY() && ((currentTime - lastTimeYPressed) > 250) && !(elevator == theElevator.goToHighBallPID || 
                     elevator == theElevator.goTolowBallPID || elevator == theElevator.goTointakeBallPID)) {
                     
@@ -188,9 +189,9 @@ public class ballElevator {
     }
 
     public void handlePneumatics() {
-        //this is as very simple class that just makes the piston for the elvator always out
-        //only pulls up for high hatch because that is when it is needed
-        if(elevator == theElevator.goToHighBallPID || elevator == theElevator.highBallPID) {
+        //this is as very simple class that just makes the piston for the elvator
+        //turn up when player 2 presses X
+        if(getButtonX()) {
             upPiston.set(true);
         } else {
             upPiston.set(false);
@@ -200,19 +201,27 @@ public class ballElevator {
     public void handleIntake() {
         //this handles the intake motors intake motor speed to be set
         if(elevator == theElevator.IDLE) {
-            intakeMotorSpeed = outakeSpeed;
+            intakeMotorSpeed = outakePower;
         } else if(elevator == theElevator.lowBallPID) {
-            intakeMotorSpeed = outakeSpeed;
+            intakeMotorSpeed = outakePower;
         } else if(elevator == theElevator.intakeBallPID) {
-            intakeMotorSpeed = -intakeSpeed;
+            intakeMotorSpeed = -intakePower;
         } else if(elevator == theElevator.highBallPID) {
-            intakeMotorSpeed = outakeSpeed;
+            if(getButtonX()) {
+                intakeMotorSpeed = highOutakePower;
+            } else {
+                intakeMotorSpeed = outakePower;
+            }
         } else if(elevator == theElevator.goTointakeBallPID) {
-            intakeMotorSpeed = -intakeSpeed;
+            intakeMotorSpeed = -intakePower;
         } else if(elevator == theElevator.goToHighBallPID) {
-            intakeMotorSpeed = outakeSpeed;
+            if(getButtonX()) {
+                intakeMotorSpeed = highOutakePower;
+            } else {
+                intakeMotorSpeed = outakePower;
+            }
         } else if(elevator == theElevator.goTolowBallPID) {
-            intakeMotorSpeed = outakeSpeed;
+            intakeMotorSpeed = outakePower;
         }
     }
 

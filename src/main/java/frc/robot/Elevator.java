@@ -22,11 +22,12 @@ public class Elevator {
 
     //our controller
     private Joystick player2;
+    private Joystick player1;
 
     private final boolean talon2Inverted = false;
     private final boolean intakeMotor2Inverted = false;
 
-    public Elevator() {
+    public Elevator(Joystick player1) {
         talon1 = new TalonSRX(7);
         talon2 = new TalonSRX(8);
         ballIntake1 = new TalonSRX(9);
@@ -38,6 +39,7 @@ public class Elevator {
         hatchElevator = new hatchElevator(talon1, talon2, encoder, player2, talon2Inverted, hatchPiston);
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, 
                                             ballIntake1, ballIntake2, intakeMotor2Inverted, ballUpPiston);
+        this.player1 = player1;
     }
 
     public void init() {

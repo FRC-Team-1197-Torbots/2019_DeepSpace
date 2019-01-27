@@ -15,7 +15,7 @@ public class Robot extends TimedRobot {
 		hardware = new DriveHardware();																																																																																																					
 		player1 = new Joystick(0);
 		drive = new TorDrive(hardware, player1);
-		elevator = new Elevator();
+		elevator = new Elevator(player1);
 	}
 	@Override
 	public void robotInit() {
