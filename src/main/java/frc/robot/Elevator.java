@@ -12,7 +12,8 @@ public class Elevator {
     private hatchElevator hatchElevator;
     private ballElevator ballElevator;
     private groundIntake groundIntake;
-    private manualOverride manualOverride; // instantiate manualOverride
+    private manualOverride manualOverride;
+    private getGroundIntakeOutOfWay getGroundIntakeOutOfWay;
 
     // hardware
     private TalonSRX talon1;// this talon is the "drive talon for the elevator"
@@ -21,6 +22,7 @@ public class Elevator {
     private TalonSRX ballIntake2;
     private TalonSRX groundTalon1;
     private TalonSRX groundTalon2;
+    private Solenoid groundShootPiston;
     private Encoder encoder;
     private Solenoid hatchPiston;
     private Solenoid ballUpPiston;
@@ -34,6 +36,7 @@ public class Elevator {
     private final boolean intakeMotor2Inverted = false;
 
     public Elevator(Joystick player1) {
+        groundShootPiston = new Solenoid(3);
         groundTalon1 = new TalonSRX(13);
         groundTalon2 = new TalonSRX(14);
         fourtwenty = new AnalogPotentiometer(1, 360, 0);
@@ -49,7 +52,10 @@ public class Elevator {
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballIntake1, ballIntake2,
                 intakeMotor2Inverted, ballUpPiston);
         groundIntake = new groundIntake(talon1, talon2, groundTalon1, groundTalon2, player1, player2, fourtwenty,
-                encoder);
+                encoder, groundShootPiston);
+        manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 
+                ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston);
+        getGroundIntakeOutOfWay = new getGroundIntakeOutOfWay(groundTalon1, groundTalon2, groundShootPiston);
     }
 
     public void init() {
@@ -58,7 +64,15 @@ public class Elevator {
     }
 
     public void update() {
-        groundIntake.update(player2.getRawButton(9), true);
+        //we haven't made an autobox yet
+        //if autobox getting button
+        //groundIntakeOutofWay.update(true);
+        //else
+        //groundIntakeOutOfWay.update(false);
+
+        groundIntake.update((Math.abs(getRightTrigger()) > 0.15), true);//right trigger being touched means manual
+        //would be when we add autobox thing
+        //groundIntake.update(player2.getRawButton(9), autobox getting button);
         if (player2.getRawAxis(3) > 0.1) {
             manualOverride.update(true);
         } else {

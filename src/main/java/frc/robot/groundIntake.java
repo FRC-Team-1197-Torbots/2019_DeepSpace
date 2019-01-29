@@ -96,7 +96,7 @@ public class groundIntake {
     private ground groundIntake = ground.IDLE;
 
     public groundIntake(TalonSRX elevatorTalon1, TalonSRX elevatorTalon2, TalonSRX groundTalon1, TalonSRX groundTalon2,
-        Joystick player1, Joystick player2, AnalogPotentiometer fourtwenty, Encoder encoder) {
+        Joystick player1, Joystick player2, AnalogPotentiometer fourtwenty, Encoder encoder, Solenoid groundShootPiston) {
         this.elevatorTalon1 = elevatorTalon1;
         this.elevatorTalon2 = elevatorTalon2;
         this.groundTalon1 = groundTalon1;
@@ -105,6 +105,7 @@ public class groundIntake {
         this.player2 = player2;
         this.fourtwenty = fourtwenty;
         this.encoder = encoder;
+        this.groundShootPiston = groundShootPiston;
 
         //this is the PID
         positionPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP,
