@@ -3,11 +3,7 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -21,21 +17,28 @@ public class manualOverride {
     private TalonSRX talon1;
     private TalonSRX talon2;
     private Joystick player2;
-    private boolean talon2Inverted;
 
     // ball elevator hardware
-    private TalonSRX intakeMotor1;
+    private TalonSRX intakeMotor1;//I would make it a button to go in, a button to go out
     private TalonSRX intakeMotor2;
+    private final double intakeSpeed = 1.0;
+    private final double normalOutakeSpeed = -0.5;
+    private final double hardOutakeSpeed = -1.0;//make it this when we are pointed up with the ball elevator piston
 
     private TalonSRX overIntake1;// since the 971 intake only matters for this ball elevator
-    private Solenoid upPiston;
+    //Brennan - should have 2
+    private Solenoid upPiston;//for the ball intake
+    //make it a button to activate
+    private final double ballRollerIntakeHoldSpeed = 0.2;//do the same as you did for the elevator talons
+    //just use a different axis
+    private double ballRollerSpeed;//do the same as for the elevator
 
     // hatch elevator hardware
-    private Solenoid hatchPiston;
+    private Solenoid hatchPiston;//this will just be one button control
 
     // elevator variables
     private double elevatorAxis; // joystick axis 1 for moving elevator
-    private double elevatorHoldSpeed; // constnat speed that will keep the elevator held in spot
+    private final double elevatorHoldSpeed = 0.1; // constnat speed that will keep the elevator held in spot
 
     public manualOverride(TalonSRX talon1, TalonSRX talon2, Joystick player2, boolean talon2Inverted,
             TalonSRX intakeMotor1, TalonSRX intakeMotor2, boolean intakeMotor2Inverted, Solenoid upPiston,
@@ -55,11 +58,10 @@ public class manualOverride {
 
     public void update(boolean running) {
         elevatorAxis = player2.getRawAxis(1);
-        elevatorHoldSpeed = 0.2; // set constant hold speed when we finish elevator
-        if (running) {
+        if (running) {//we want to double check in here right trigger is being pressed for the manual override
 
             //Elevator movement
-            if (elevatorAxis > 0.1) { // if you move the elevator axis to move the elevator manually,
+            if (Math.abs(elevatorAxis) > 0.15) { // if you move the elevator axis to move the elevator manually,
                 setElevatorSpeed(elevatorAxis + elevatorHoldSpeed);
             } else {
                 setElevatorSpeed(elevatorHoldSpeed);
