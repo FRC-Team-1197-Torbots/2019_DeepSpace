@@ -72,8 +72,8 @@ public class Elevator {
 
         groundIntake.update((Math.abs(getRightTrigger()) > 0.15), true);//right trigger being touched means manual
         //would be when we add autobox thing
-        //groundIntake.update(player2.getRawButton(9), autobox getting button);
-        if (player2.getRawAxis(3) > 0.1) {
+        //groundIntake.update(player2.getRawButton(9), autobox getting button);     
+       if (player2.getRawAxis(3) > 0.1) {
             manualOverride.update(true);
         } else {
             manualOverride.update(false);

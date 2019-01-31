@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static org.junit.Assert.assertEquals;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
@@ -18,6 +20,16 @@ public class manualOverride {
     private TalonSRX talon2;
     private Joystick player2;
 
+   private TalonSRX overIntake1;// since the 971 intake only matters for this ball elevator
+    private TalonSRX overIntake2;
+    //Brennan - should have 2
+
+    private Solenoid upPiston;//for the ball intake
+    //make it a button to activate
+
+ // hatch elevator hardware
+    private Solenoid hatchPiston;//this will just be one button control
+
     // ball elevator hardware
     private TalonSRX intakeMotor1;//I would make it a button to go in, a button to go out
     private TalonSRX intakeMotor2;
@@ -25,20 +37,19 @@ public class manualOverride {
     private final double normalOutakeSpeed = -0.5;
     private final double hardOutakeSpeed = -1.0;//make it this when we are pointed up with the ball elevator piston
 
-    private TalonSRX overIntake1;// since the 971 intake only matters for this ball elevator
-    //Brennan - should have 2
-    private Solenoid upPiston;//for the ball intake
-    //make it a button to activate
-    private final double ballRollerIntakeHoldSpeed = 0.2;//do the same as you did for the elevator talons
-    //just use a different axis
-    private double ballRollerSpeed;//do the same as for the elevator
 
-    // hatch elevator hardware
-    private Solenoid hatchPiston;//this will just be one button control
+    
 
+   
     // elevator variables
     private double elevatorAxis; // joystick axis 1 for moving elevator
     private final double elevatorHoldSpeed = 0.1; // constnat speed that will keep the elevator held in spot
+
+    //ball roller arm variables
+    private double rollerArmAxis;
+    private final double rollerArmHoldSpeed = 0.1;
+    private double ballRollerSpeed;//do the same as for the elevator
+        //need another talon for the motor on the arm for the ball roller
 
     public manualOverride(TalonSRX talon1, TalonSRX talon2, Joystick player2, boolean talon2Inverted,
             TalonSRX intakeMotor1, TalonSRX intakeMotor2, boolean intakeMotor2Inverted, Solenoid upPiston,
@@ -58,6 +69,7 @@ public class manualOverride {
 
     public void update(boolean running) {
         elevatorAxis = player2.getRawAxis(1);
+        rollerArmAxis = player2.getRawAxis(5);
         if (running) {//we want to double check in here right trigger is being pressed for the manual override
 
             //Elevator movement
@@ -67,6 +79,39 @@ public class manualOverride {
                 setElevatorSpeed(elevatorHoldSpeed);
             }
 
+            //if y is pressed, raise the ball intake and extend the piston 
+            if (getButtonY()){
+                upPiston.set(true);
+            } else {
+                upPiston.set(false);
+            }
+
+            // if x is pressed, extend the hatch mechanism
+            if (getButtonX()){
+                hatchPiston.set(true);
+            } else {
+                hatchPiston.set(false);
+            }
+
+            //if a is pressed spin the ball roller in and the ball intake in
+            if (getButtonA()){
+                intakeMotor1.set(ControlMode.PercentOutput, intakeSpeed );
+                intakeMotor2.set(ControlMode.PercentOutput, intakeSpeed);
+                // rollerbar set speed in
+            } else if (getLeftBumper()){ //if left bumper is pressed, outtake the ball
+                intakeMotor1.set(ControlMode.PercentOutput, normalOutakeSpeed); //not sure which speed yet
+                intakeMotor2.set(ControlMode.PercentOutput, normalOutakeSpeed);
+
+            } else {
+                intakeMotor1.set(ControlMode.PercentOutput, 0);
+                intakeMotor2.set(ControlMode.PercentOutput, 0);
+            }
+
+            if (Math.abs(rollerArmAxis) > 0.15) { // if you move the right axis up or down to move the roller arm speed
+                setRollerArmSpeed(rollerArmAxis + rollerArmHoldSpeed);
+            } else {
+                setRollerArmSpeed(rollerArmHoldSpeed);
+            }
 
 
         }
@@ -76,6 +121,11 @@ public class manualOverride {
     public void setElevatorSpeed(double elevatorSpeed) { // method for setting elevator speed
         talon1.set(ControlMode.PercentOutput, elevatorSpeed);
         talon2.set(ControlMode.PercentOutput, elevatorSpeed);
+    }
+
+    public void setRollerArmSpeed(double rollerArmSpeed) { // method for setting ballroller arm speed
+        overIntake1.set(ControlMode.PercentOutput, rollerArmSpeed);
+        overIntake2.set(ControlMode.PercentOutput, rollerArmSpeed);
     }
 
     public double getLeftX() {
@@ -94,7 +144,7 @@ public class manualOverride {
         return player2.getRawAxis(3);
     }
 
-    public boolean getShiftButton() {
+    public boolean getLeftBumper() {
         return player2.getRawButton(5);
     }
 
@@ -117,4 +167,5 @@ public class manualOverride {
     public boolean getButtonY() {
         return player2.getRawButton(4);
     }
+   
 }
