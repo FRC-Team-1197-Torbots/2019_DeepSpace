@@ -31,6 +31,7 @@ public class Elevator {
 
     // our controller
     private Joystick player2;
+    private Joystick autoBox;
 
     private final boolean talon2Inverted = false;
     private final boolean intakeMotor2Inverted = false;
@@ -56,6 +57,9 @@ public class Elevator {
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 
                 ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston);
         getGroundIntakeOutOfWay = new getGroundIntakeOutOfWay(groundTalon1, groundTalon2, groundShootPiston);
+
+        player2 = new Joystick(1);
+        autoBox = new Joystick(2);
     }
 
     public void init() {
@@ -69,12 +73,18 @@ public class Elevator {
         //groundIntakeOutofWay.update(true);
         //else
         //groundIntakeOutOfWay.update(false);
+        if (autoBox.getRawButton(1)){
+            getGroundIntakeOutOfWay.update(true);
+        } else {
+            getGroundIntakeOutOfWay.update(false);
+        }
 
         groundIntake.update((Math.abs(getRightTrigger()) > 0.15), true);//right trigger being touched means manual
         //would be when we add autobox thing
         //groundIntake.update(player2.getRawButton(9), autobox getting button);     
-       if (player2.getRawAxis(3) > 0.1) {
+       if (Math.abs(getRightTrigger()) > 0.1) {
             manualOverride.update(true);
+            
         } else {
             manualOverride.update(false);
             if (getRightBumper()) {// ball

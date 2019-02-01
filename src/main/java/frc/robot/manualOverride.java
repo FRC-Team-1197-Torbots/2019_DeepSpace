@@ -70,6 +70,7 @@ public class manualOverride {
     public void update(boolean running) {
         elevatorAxis = player2.getRawAxis(1);
         rollerArmAxis = player2.getRawAxis(5);
+        
         if (running) {//we want to double check in here right trigger is being pressed for the manual override
 
             //Elevator movement
