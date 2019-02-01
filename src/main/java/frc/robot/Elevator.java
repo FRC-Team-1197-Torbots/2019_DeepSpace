@@ -22,6 +22,9 @@ public class Elevator {
     private TalonSRX ballIntake2;
     private TalonSRX groundTalon1;
     private TalonSRX groundTalon2;
+    private TalonSRX overIntake1;
+    private TalonSRX overIntake2;
+    private TalonSRX overPull;
     private Solenoid groundShootPiston;
     private Encoder encoder;
     private Solenoid hatchPiston;
@@ -49,9 +52,12 @@ public class Elevator {
         hatchPiston = new Solenoid(2);
         ballUpPiston = new Solenoid(3);
         limitSwitch = new DigitalInput(6);
+        overIntake1 = new TalonSRX(11);
+        overIntake2 = new TalonSRX(12);
+        overPull = new TalonSRX(15);
         hatchElevator = new hatchElevator(talon1, talon2, encoder, player2, talon2Inverted, hatchPiston);
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballIntake1, ballIntake2,
-                intakeMotor2Inverted, ballUpPiston);
+                intakeMotor2Inverted, ballUpPiston, overIntake1, overIntake2, overPull);
         groundIntake = new groundIntake(talon1, talon2, groundTalon1, groundTalon2, player1, player2, fourtwenty,
                 encoder, groundShootPiston);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 

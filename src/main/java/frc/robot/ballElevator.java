@@ -122,7 +122,8 @@ public class ballElevator {
     public theElevator elevator = theElevator.IDLE;
 
     public ballElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player2, 
-        boolean talon2Inverted, TalonSRX intakeMotor1, TalonSRX intakeMotor2, boolean intakeMotor2Inverted, Solenoid upPiston) {
+        boolean talon2Inverted, TalonSRX intakeMotor1, TalonSRX intakeMotor2, boolean intakeMotor2Inverted, Solenoid upPiston,
+        TalonSRX overIntake1, TalonSRX overIntake2, TalonSRX overPull) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
@@ -146,9 +147,9 @@ public class ballElevator {
         overfindCurrentVelocity.resetValue(0);
 
         //for the over the ball intake
-        overIntake1 = new TalonSRX(10);
-        overIntake2 = new TalonSRX(11);
-        overPull = new TalonSRX(12);
+        this.overIntake1 = overIntake1;
+        this.overIntake2 = overIntake2;
+        this.overPull = overPull;
         fourtwenty2 = new AnalogPotentiometer(0, 360, 0);
         overPositionPID = new BantorPID(overkV, overkA, overpositionkP, overpositionkI, overpositionkD, overvelocitykP,
         overvelocitykI, overvelocitykD, dt, overpositionTolerance, overvelocityTolerance);
