@@ -137,6 +137,9 @@ public class groundIntake {
             }
         }
 
+        stateMachineRun();
+        groundPIDRun();
+        
         if(running) {
             elevatorTalon1.set(ControlMode.PercentOutput, controlPower);
             elevatorTalon2.set(ControlMode.PercentOutput, controlPower);
