@@ -61,7 +61,7 @@ public class Elevator {
         groundIntake = new groundIntake(talon1, talon2, groundTalon1, groundTalon2, player1, player2, fourtwenty,
                 encoder, groundShootPiston);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 
-                ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston);
+                ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston, overIntake1, overIntake2, overPull);
         getGroundIntakeOutOfWay = new getGroundIntakeOutOfWay(groundTalon1, groundTalon2, groundShootPiston);
 
         player2 = new Joystick(1);
