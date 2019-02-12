@@ -58,8 +58,7 @@ public class Elevator {
         hatchElevator = new hatchElevator(talon1, talon2, encoder, player2, talon2Inverted, hatchPiston);
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballIntake1, ballIntake2,
                 intakeMotor2Inverted, ballUpPiston, overIntake1, overIntake2, overPull);
-        groundIntake = new groundIntake(talon1, talon2, groundTalon1, groundTalon2, player1, player2, fourtwenty,
-                encoder, groundShootPiston);
+        groundIntake = new groundIntake( groundTalon1, player1, player2, fourtwenty, groundShootPiston);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 
                 ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston, overIntake1, overIntake2, overPull);
         getGroundIntakeOutOfWay = new getGroundIntakeOutOfWay(groundTalon1, groundTalon2, groundShootPiston);
