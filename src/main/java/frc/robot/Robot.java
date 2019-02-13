@@ -2,20 +2,21 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.Elevator.*;
 
 public class Robot extends TimedRobot {
 	private DriveHardware hardware;
 	private TorDrive drive;
 	private Joystick player1;
 	private boolean test;
-	// private Elevator elevator;
+	private Elevator elevator;
 	
 	public Robot() {
 		test = false;
 		hardware = new DriveHardware();																																																																																																					
 		player1 = new Joystick(0);
 		drive = new TorDrive(hardware, player1);
-		// elevator = new Elevator(player1);
+		elevator = new Elevator(player1);
 	}
 	@Override
 	public void robotInit() {
@@ -23,23 +24,23 @@ public class Robot extends TimedRobot {
 	}
 	@Override
 	public void autonomousInit() {
-		// elevator.init();
+		elevator.init();
 		hardware.init();
 	}
 	@Override
 	public void autonomousPeriodic() {
 		drive.Run(test, true);//IT IS NOW TELEOP IN AUTO
-		// elevator.update();
+		elevator.update();
 	}
 	@Override
 	public void teleopPeriodic() {
 		drive.Run(test, true);//IT IS TELEOP
-		// elevator.update();
+		elevator.update();
 	}
 	@Override
 	public void testPeriodic() {
 		drive.Run(true, false);//whether or not it is teleop in test mode does not matter
-		// elevator.update();
+		elevator.update();
 	}
 	/*
 	 *  The following are a bunch of accessor methods to obtain input from the controller.

@@ -1,7 +1,5 @@
 package frc.robot.Elevator;
 
-import static org.junit.Assert.assertEquals;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 

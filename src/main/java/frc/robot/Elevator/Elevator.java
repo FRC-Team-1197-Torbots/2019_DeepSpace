@@ -18,19 +18,24 @@ public class Elevator {
     // hardware
     private TalonSRX talon1;// this talon is the "drive talon for the elevator"
     private TalonSRX talon2;// this is the second one
-    private TalonSRX ballIntake1;
-    private TalonSRX ballIntake2;
-    private TalonSRX groundTalon1;
-    private TalonSRX groundTalon2;
-    private TalonSRX overIntake1;
-    private TalonSRX overIntake2;
-    private TalonSRX overPull;
-    private Solenoid groundShootPiston;
-    private Encoder encoder;
-    private Solenoid hatchPiston;
-    private Solenoid ballUpPiston;
-    private DigitalInput limitSwitch;
-    private AnalogPotentiometer fourtwenty;
+    private TalonSRX ballIntake1; //ball intake shooter
+    private TalonSRX ballIntake2; //ball intake shooter motor 2, needs to be flipped
+    private TalonSRX groundTalon1; //ground hatch motor
+    private TalonSRX groundTalon2; 
+    private TalonSRX overIntake1; //ball roller arm motor
+    private TalonSRX overIntake2; //ball roller arm motor
+    private TalonSRX overPull; //ball roller to spin wheels
+
+    private Solenoid groundShootPiston;  // ground hatch fire pistons
+    private Solenoid hatchPiston; // hatch piston for hatch mech
+    private Solenoid ballUpPiston; // piston to angle ball intake 
+
+    private Encoder encoder; //elevator encoder
+  
+    private DigitalInput limitSwitch; // limit switch to stop the elevator
+
+    private AnalogPotentiometer fourtwenty; // pot on the 
+    
 
     // our controller
     private Joystick player2;
@@ -40,21 +45,33 @@ public class Elevator {
     private final boolean intakeMotor2Inverted = false;
 
     public Elevator(Joystick player1) {
-        groundShootPiston = new Solenoid(3);
-        groundTalon1 = new TalonSRX(13);
-        groundTalon2 = new TalonSRX(14);
-        fourtwenty = new AnalogPotentiometer(1, 360, 0);
+    // Talons
         talon1 = new TalonSRX(7);
         talon2 = new TalonSRX(8);
         ballIntake1 = new TalonSRX(9);
         ballIntake2 = new TalonSRX(10);
-        encoder = new Encoder(0, 1);
-        hatchPiston = new Solenoid(2);
-        ballUpPiston = new Solenoid(3);
-        limitSwitch = new DigitalInput(6);
         overIntake1 = new TalonSRX(11);
         overIntake2 = new TalonSRX(12);
-        overPull = new TalonSRX(15);
+        groundTalon1 = new TalonSRX(13);
+        // groundTalon2 = new TalonSRX(14); //not using 2 motors 
+        overPull = new TalonSRX(14);
+
+    // Solenoid
+        hatchPiston = new Solenoid(4);
+        ballUpPiston = new Solenoid(5);
+        groundShootPiston = new Solenoid(6);
+        
+    // Sensors 
+        fourtwenty = new AnalogPotentiometer(1, 360, 0);
+        encoder = new Encoder(4, 5);
+        limitSwitch = new DigitalInput(6);
+         // need to add second pot instantiation
+
+    // Joysticks 
+        player2 = new Joystick(1);
+        autoBox = new Joystick(2);
+
+    // Classes
         hatchElevator = new hatchElevator(talon1, talon2, encoder, player2, talon2Inverted, hatchPiston);
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballIntake1, ballIntake2,
                 intakeMotor2Inverted, ballUpPiston, overIntake1, overIntake2, overPull);
@@ -63,8 +80,7 @@ public class Elevator {
                 ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston, overIntake1, overIntake2, overPull);
         getGroundIntakeOutOfWay = new getGroundIntakeOutOfWay(groundTalon1, groundTalon2, groundShootPiston);
 
-        player2 = new Joystick(1);
-        autoBox = new Joystick(2);
+        
     }
 
     public void init() {
