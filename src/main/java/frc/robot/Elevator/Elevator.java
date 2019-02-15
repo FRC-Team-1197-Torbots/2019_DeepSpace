@@ -3,19 +3,27 @@ package frc.robot.Elevator;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 public class Elevator {
-    // this elevator has the hatch elevator and the ball elevator in it
+    
+
+// ---------------    Classes   ------------------------------------------
+// this elevator has the hatch elevator and the ball elevator in it
     private hatchElevator hatchElevator;
     private ballElevator ballElevator;
     private groundIntake groundIntake;
     private manualOverride manualOverride;
     private getGroundIntakeOutOfWay getGroundIntakeOutOfWay;
+    private Climb climb;
 
-    // hardware
+// ---------------    Hardware   ------------------------------------------
+// Talons
     private TalonSRX talon1;// this talon is the "drive talon for the elevator"
     private TalonSRX talon2;// this is the second one
     private TalonSRX ballIntake1; //ball intake shooter
@@ -25,22 +33,38 @@ public class Elevator {
     private TalonSRX overIntake1; //ball roller arm motor
     private TalonSRX overIntake2; //ball roller arm motor
     private TalonSRX overPull; //ball roller to spin wheels
+    private TalonSRX climberTalon; // wheels on climber to move forware
 
+// Solenoids
+    private Solenoid elevatorShifter; // elevator shifter
     private Solenoid groundShootPiston;  // ground hatch fire pistons
     private Solenoid hatchPiston; // hatch piston for hatch mech
     private Solenoid ballUpPiston; // piston to angle ball intake 
+    private Solenoid climberPiston1;
+    private Solenoid climberPiston2;
 
+// Sensors
     private Encoder encoder; //elevator encoder
   
     private DigitalInput limitSwitch; // limit switch to stop the elevator
 
     private AnalogPotentiometer fourtwenty; // pot on the 
-    
+    private AnalogPotentiometer ballRollerArmPot;
 
-    // our controller
+    private Ultrasonic climbUltrasonic1;
+    private Ultrasonic climbUltrasonic2;
+
+    private AnalogGyro climbGyro;
+    
+    private DigitalOutput light1;
+    private DigitalOutput light2;
+    private DigitalOutput light3;
+
+// Controllers
     private Joystick player2;
     private Joystick autoBox;
 
+// Booleans
     private final boolean talon2Inverted = false;
     private final boolean intakeMotor2Inverted = false;
 
@@ -55,17 +79,27 @@ public class Elevator {
         groundTalon1 = new TalonSRX(13);
         // groundTalon2 = new TalonSRX(14); //not using 2 motors 
         overPull = new TalonSRX(14);
+        climberTalon = new TalonSRX(15);
 
     // Solenoid
-        hatchPiston = new Solenoid(4);
-        ballUpPiston = new Solenoid(5);
-        groundShootPiston = new Solenoid(6);
+        elevatorShifter = new Solenoid(1);
+        hatchPiston = new Solenoid(2);
+        ballUpPiston = new Solenoid(3);
+        groundShootPiston = new Solenoid(4);
+        climberPiston1 = new Solenoid(5);
+        climberPiston2 = new Solenoid(6);
         
     // Sensors 
         fourtwenty = new AnalogPotentiometer(1, 360, 0);
         encoder = new Encoder(4, 5);
         limitSwitch = new DigitalInput(6);
-         // need to add second pot instantiation
+        ballRollerArmPot = new AnalogPotentiometer(0, 360, 0);
+        climbUltrasonic1 = new Ultrasonic(8, 9);
+        climbUltrasonic2 = new Ultrasonic(10, 11);
+        climbGyro = new AnalogGyro(2);
+        light1 = new DigitalOutput(12);
+        light2 = new DigitalOutput(13);
+        light3 = new DigitalOutput(14);
 
     // Joysticks 
         player2 = new Joystick(1);
@@ -79,6 +113,7 @@ public class Elevator {
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 
                 ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston, overIntake1, overIntake2, overPull);
         getGroundIntakeOutOfWay = new getGroundIntakeOutOfWay(groundTalon1, groundTalon2, groundShootPiston);
+        climb = new Climb(talon1, talon2, encoder, climbGyro, climbUltrasonic1, climbUltrasonic2);
 
         
     }
