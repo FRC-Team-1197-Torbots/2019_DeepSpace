@@ -3,9 +3,11 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import frc.robot.PID_Tools.*;
 
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.interfaces.Potentiometer;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -75,8 +77,6 @@ public class ballElevator {
     private final double overIntakePower = -1.0;
     private final double highOutakePower = 0.7;
 
-    private final double encoderTicksPerDegreeForBallRoller = 1;
-
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
     //if it is false then it will only use PID for power
 
@@ -100,7 +100,7 @@ public class ballElevator {
     //we can instantiate it in here
     private TalonSRX overIntake2;
     private TalonSRX overPull;
-    private Encoder ballRollerArmEncoder;
+    private Potentiometer fourtwenty2;//IT IS THE POT
 
     private double overstartAngle;
     private double overcurrentAngle;
@@ -124,7 +124,7 @@ public class ballElevator {
 
     public ballElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player2, 
         boolean talon2Inverted, TalonSRX intakeMotor1, TalonSRX intakeMotor2, boolean intakeMotor2Inverted, Solenoid upPiston,
-        TalonSRX overIntake1, TalonSRX overIntake2, TalonSRX overPull, Encoder ballRollerArmEncoder) {
+        TalonSRX overIntake1, TalonSRX overIntake2, TalonSRX overPull) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
@@ -136,7 +136,6 @@ public class ballElevator {
         this.intakeMotor2.follow(this.intakeMotor1);
         this.intakeMotor2.setInverted(intakeMotor2Inverted);
         this.upPiston = upPiston;
-        this.ballRollerArmEncoder = ballRollerArmEncoder;
 
         //this is the PID
         positionPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP,
@@ -152,6 +151,7 @@ public class ballElevator {
         this.overIntake1 = overIntake1;
         this.overIntake2 = overIntake2;
         this.overPull = overPull;
+        fourtwenty2 = new AnalogPotentiometer(0, 360, 0);
         overPositionPID = new BantorPID(overkV, overkA, overpositionkP, overpositionkI, overpositionkD, overvelocitykP,
         overvelocitykI, overvelocitykD, dt, overpositionTolerance, overvelocityTolerance);
         overPositionPID.reset();
@@ -173,7 +173,7 @@ public class ballElevator {
             if(testMode) {
                 SmartDashboard.putNumber("encoder value", encoder.get());
                 SmartDashboard.putNumber("height", height());
-                SmartDashboard.putNumber("encoder for ball roller", ballRollerArmEncoder.get());
+                SmartDashboard.putNumber("potentiometer", fourtwenty2.get());
             } else {
                 SmartDashboard.putNumber("encoder value", encoder.get());
                 SmartDashboard.putNumber("height", height());
@@ -243,7 +243,7 @@ public class ballElevator {
     }
 
     public void handleOver() {
-        overcurrentAngle = (ballRollerArmEncoder.get() - overstartAngle) / encoderTicksPerDegreeForBallRoller;
+        overcurrentAngle = fourtwenty2.get() - overstartAngle;
 
         overcurrentVelocity = overfindCurrentVelocity.estimate(overcurrentAngle);
 
@@ -388,9 +388,9 @@ public class ballElevator {
         }
     }
     
-    public void init(int initialValue) {
-        initialTicks = encoder.get() - initialValue;
-        overstartAngle = ballRollerArmEncoder.get();
+    public void init() {
+        initialTicks = encoder.get();
+        overstartAngle = fourtwenty2.get();
     }
 
     public void setPercentSpeed(double speed) {

@@ -284,8 +284,8 @@ public class hatchElevator {
         }
     }
     
-    public void init(int initialValue) {
-        initialTicks = encoder.get() - initialValue;
+    public void init() {
+        initialTicks = encoder.get();
     }
 
     public void setPercentSpeed(double speed) {

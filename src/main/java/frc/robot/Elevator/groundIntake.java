@@ -1,6 +1,8 @@
 package frc.robot.Elevator;
 import frc.robot.PID_Tools.*;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.interfaces.Potentiometer;
+// import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -8,7 +10,6 @@ import edu.wpi.first.wpilibj.Solenoid;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import edu.wpi.first.wpilibj.Encoder;
 
 public class groundIntake {
    //it will need both talons to go up. It will need the ground intake talons. It will need the encoder to make sure the elevator
@@ -17,15 +18,17 @@ public class groundIntake {
    //it will need both joysticks
    //it will need a solenoid to outake
 
-   private TalonSRX elevatorTalon1;//talons for the up and down
-   private TalonSRX elevatorTalon2;
+   // private TalonSRX elevatorTalon1;//talons for the up and down
+   // private TalonSRX elevatorTalon2;
    private TalonSRX groundTalon1;
+   // private TalonSRX groundTalon2;
    private Joystick player1;
    private Joystick player2;
-   private Encoder encoder;
+   // private Encoder encoder;
    private AnalogPotentiometer fourtwenty;//ITS THE POT
    private long currentTime = (long)(Timer.getFPGATimestamp() * 1000);
    private long lastTime = currentTime;
+   private long lastTimeRightTriggerPressed = 0;
    private boolean highEnough = false;
    private TorDerivative findCurrentVelocity;
    private TorDerivative groundfindCurrentVelocity;
@@ -64,7 +67,7 @@ public class groundIntake {
    private final double targetVelocity = 0.0;//probably won't need
    private final double targetAcceleration = 0.0;//probably won't need
    private final double dt = 0.005;
-   private final double encoderTicksPerMeter = 1.0;//this is how many ticks there are per meter the elevator goes up
+   // private final double encoderTicksPerMeter = 1.0;//this is how many ticks there are per meter the elevator goes up
    private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
    private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
   
@@ -91,7 +94,7 @@ public class groundIntake {
    /*
    ----------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
    */
-   private int initialTicks;
+   // private int initialTicks;
 
    //the state machine
    public static enum ground {
@@ -101,9 +104,9 @@ public class groundIntake {
    private ground groundIntake = ground.IDLE;
 
    public groundIntake(TalonSRX groundTalon1,
-       Joystick player1, Joystick player2, AnalogPotentiometer fourtwenty, Solenoid groundShootPiston,
-       Encoder ElevatorEncoder) {
+       Joystick player1, Joystick player2, AnalogPotentiometer fourtwenty, Solenoid groundShootPiston) {
        this.groundTalon1 = groundTalon1;
+       // this.groundTalon2 = groundTalon2;
        this.player1 = player1;
        this.player2 = player2;
        this.fourtwenty = fourtwenty;
@@ -128,6 +131,7 @@ public class groundIntake {
 
        if((Math.abs(player1.getRawAxis(3)) > 0.3)
        && (groundIntake == ground.IDLE)) {//right trigger is pressed
+           lastTimeRightTriggerPressed = currentTime;
            if(groundIntake == ground.IDLE) {
                if(elevatorManualOverriding || highEnough) {
                    groundIntake = ground.DOWN;
@@ -142,11 +146,14 @@ public class groundIntake {
 
        if(running) {
            SmartDashboard.putBoolean("key", true);
-           elevatorTalon1.set(ControlMode.PercentOutput, controlPower);
-           elevatorTalon2.set(ControlMode.PercentOutput, controlPower);
+           // elevatorTalon1.set(ControlMode.PercentOutput, controlPower);
+           // elevatorTalon2.set(ControlMode.PercentOutput, controlPower);
 
            SmartDashboard.putNumber("groundControlPower:", groundControlPower);
            groundTalon1.set(ControlMode.PercentOutput, groundControlPower);
+          
+          
+           // groundTalon2.set(ControlMode.PercentOutput, groundControlPower);
        }
 
        SmartDashboard.putBoolean("IDLE:", groundIntake == ground.IDLE);
@@ -220,11 +227,8 @@ public class groundIntake {
    }
 
    public double height() {
-       return ((encoder.get() - initialTicks)/encoderTicksPerMeter);
-   }
-
-   public void init(int initialValue) {
-       initialTicks = encoder.get() - initialValue;
+       // return ((encoder.get() - initialTicks)/encoderTicksPerMeter);
+       return 100000000;//so it thinks its high enough ez
    }
 }
 
