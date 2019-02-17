@@ -3,15 +3,32 @@ package frc.robot.Elevator;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 public class Elevator {
-    
+
+    //this is the state machine for the whole elevator
+    public static enum elevatorState {
+        ZEROING, RUNNING, CLIMBING;
+        private elevatorState() {}
+    }
+
+    public elevatorState elevatorStateMachine = elevatorState.ZEROING;
+
+    //zeroing state tuning-----------
+
+    private final double moveDownZeroSpeed = -0.3;
+    private final int hallEffectSensorOneHeight = 0;//in ticks from this
+    //the top SHOULD be zero
+    private final int hallEffectSensorTwoHeight = -1;//in ticks
+    private final int hallEffectSensorThreeHeight = -2;//in ticks
+
+    //-----------
 
 // ---------------    Classes   ------------------------------------------
 // this elevator has the hatch elevator and the ball elevator in it
@@ -44,21 +61,23 @@ public class Elevator {
     private Solenoid climberPiston2;
 
 // Sensors
+    private DigitalInput hallEffectSensor1;
+    private DigitalInput hallEffectSensor2;
+    private DigitalInput hallEffectSensor3;
+
     private Encoder encoder; //elevator encoder
+    private Encoder ballRollerArmEncoder;
   
     private DigitalInput limitSwitch; // limit switch to stop the elevator
 
     private AnalogPotentiometer fourtwenty; // pot on the 
-    private AnalogPotentiometer ballRollerArmPot;
 
-    private Ultrasonic climbUltrasonic1;
-    private Ultrasonic climbUltrasonic2;
+    private DigitalInput climbSwitch1;
+    private DigitalInput climbSwitch2;
 
     private AnalogGyro climbGyro;
-    
-    private DigitalOutput light1;
-    private DigitalOutput light2;
-    private DigitalOutput light3;
+
+//end of hardware -------------------------------------------
 
 // Controllers
     private Joystick player2;
@@ -77,7 +96,6 @@ public class Elevator {
         overIntake1 = new TalonSRX(11);
         overIntake2 = new TalonSRX(12);
         groundTalon1 = new TalonSRX(13);
-        // groundTalon2 = new TalonSRX(14); //not using 2 motors 
         overPull = new TalonSRX(14);
         climberTalon = new TalonSRX(15);
 
@@ -91,15 +109,16 @@ public class Elevator {
         
     // Sensors 
         fourtwenty = new AnalogPotentiometer(1, 360, 0);
-        encoder = new Encoder(4, 5);
-        limitSwitch = new DigitalInput(6);
-        ballRollerArmPot = new AnalogPotentiometer(0, 360, 0);
-        climbUltrasonic1 = new Ultrasonic(8, 9);
-        climbUltrasonic2 = new Ultrasonic(10, 11);
         climbGyro = new AnalogGyro(2);
-        light1 = new DigitalOutput(12);
-        light2 = new DigitalOutput(13);
-        light3 = new DigitalOutput(14);
+        encoder = new Encoder(3, 4);
+        ballRollerArmEncoder = new Encoder(5, 6);
+        limitSwitch = new DigitalInput(7);
+        climbSwitch1 = new DigitalInput(8);
+        climbSwitch2 = new DigitalInput(9);
+        ballRollerArmEncoder = new Encoder(10, 11);
+        hallEffectSensor1 = new DigitalInput(12);
+        hallEffectSensor2 = new DigitalInput(13);
+        hallEffectSensor3 = new DigitalInput(14);
 
     // Joysticks 
         player2 = new Joystick(1);
@@ -108,46 +127,80 @@ public class Elevator {
     // Classes
         hatchElevator = new hatchElevator(talon1, talon2, encoder, player2, talon2Inverted, hatchPiston);
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballIntake1, ballIntake2,
-                intakeMotor2Inverted, ballUpPiston, overIntake1, overIntake2, overPull);
-        groundIntake = new groundIntake( groundTalon1, player1, player2, fourtwenty, groundShootPiston);
+                intakeMotor2Inverted, ballUpPiston, overIntake1, overIntake2, overPull, ballRollerArmEncoder);
+        groundIntake = new groundIntake( groundTalon1, player1, player2, fourtwenty, groundShootPiston, encoder);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 
                 ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston, overIntake1, overIntake2, overPull);
         getGroundIntakeOutOfWay = new getGroundIntakeOutOfWay(groundTalon1, groundTalon2, groundShootPiston);
-        climb = new Climb(talon1, talon2, encoder, climbGyro, climbUltrasonic1, climbUltrasonic2);
+        climb = new Climb(talon1, talon2, encoder, climbGyro, climbSwitch1, climbSwitch2, climberTalon, climberPiston1, climberPiston2);
 
         
     }
 
+    public boolean climbing() {
+        return autoBox.getRawButton(5);//we need to see
+    }
+
     public void init() {
-        ballElevator.init();
-        hatchElevator.init();
+        elevatorStateMachine = elevatorState.ZEROING;
     }
 
     public void update() {
-        //we haven't made an autobox yet
-        //if autobox getting button
-        //groundIntakeOutofWay.update(true);
-        //else
-        //groundIntakeOutOfWay.update(false);
-        if (autoBox.getRawButton(1)){
-            getGroundIntakeOutOfWay.update(true);
+        if(elevatorStateMachine != elevatorState.CLIMBING) {
+            elevatorShifter.set(true);//high gear
         } else {
-            getGroundIntakeOutOfWay.update(false);
+            elevatorShifter.set(false);
         }
 
-        groundIntake.update(Math.abs(getRightTrigger()) > 0.1, autoBox.getRawButton(1));//button 9 = manual
-        if (Math.abs(getRightTrigger()) > 0.1) {
-            manualOverride.update(true);
-            
-        } else {
-            manualOverride.update(false);
-            if (getRightBumper()) {// ball
-                ballElevator.update(true, limitSwitch.get());
-                hatchElevator.update(false, limitSwitch.get());
-            } else {// hatch
-                ballElevator.update(false, limitSwitch.get());
-                hatchElevator.update(true, limitSwitch.get());
-            }
+
+
+        //we haven't made an autobox yet
+        switch(elevatorStateMachine) {
+            case ZEROING:
+                talon1.set(ControlMode.PercentOutput, moveDownZeroSpeed);
+                talon2.set(ControlMode.PercentOutput, moveDownZeroSpeed);
+                if(hallEffectSensor1.get() || hallEffectSensor2.get() || hallEffectSensor3.get()) {//if one of them hits
+                    if(hallEffectSensor1.get()) {
+                        ballElevator.init(hallEffectSensorOneHeight);
+                        hatchElevator.init(hallEffectSensorOneHeight);
+                    } else if(hallEffectSensor2.get()) {
+                        ballElevator.init(hallEffectSensorTwoHeight);
+                        hatchElevator.init(hallEffectSensorTwoHeight);
+                    } else {
+                        ballElevator.init(hallEffectSensorThreeHeight);
+                        hatchElevator.init(hallEffectSensorThreeHeight);
+                    }
+                    elevatorStateMachine = elevatorState.RUNNING;
+                }
+                break;
+            case RUNNING:
+                if (autoBox.getRawButton(1)){
+                    getGroundIntakeOutOfWay.update(true);
+                } else {
+                    getGroundIntakeOutOfWay.update(false);
+                }
+    
+                groundIntake.update(Math.abs(getRightTrigger()) > 0.1, autoBox.getRawButton(1));
+                if (Math.abs(getRightTrigger()) > 0.1) {
+                    manualOverride.update(true);
+                } else {
+                    manualOverride.update(false);
+                    if (getRightBumper()) {// ball
+                        ballElevator.update(true, limitSwitch.get());
+                        hatchElevator.update(false, limitSwitch.get());
+                    } else {// hatch
+                        ballElevator.update(false, limitSwitch.get());
+                        hatchElevator.update(true, limitSwitch.get());
+                    }
+                }
+
+                if(autoBox.getRawButton(3)) {//climbing button
+                    elevatorStateMachine = elevatorState.CLIMBING;
+                }
+                break;
+            case CLIMBING:
+                //UPDATE CLIMB      
+                break;
         }
     }
 
