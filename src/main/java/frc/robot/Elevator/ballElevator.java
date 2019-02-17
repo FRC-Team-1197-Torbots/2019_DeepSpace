@@ -1,11 +1,14 @@
 package frc.robot.Elevator;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
 import frc.robot.PID_Tools.*;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -97,9 +100,9 @@ public class ballElevator {
     private TalonSRX talon2;
     private TalonSRX intakeMotor1;
     private TalonSRX intakeMotor2;
-    private TalonSRX overIntake1;//since the 971 intake only matters for this ball elevator
+    private VictorSPX overIntake1;//since the 971 intake only matters for this ball elevator
     //we can instantiate it in here
-    private TalonSRX overIntake2;
+    private VictorSPX overIntake2;
     private TalonSRX overPull;
     private Encoder ballRollerArmEncoder;
 
@@ -125,7 +128,7 @@ public class ballElevator {
 
     public ballElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player2, 
         boolean talon2Inverted, TalonSRX intakeMotor1, TalonSRX intakeMotor2, boolean intakeMotor2Inverted, Solenoid upPiston,
-        TalonSRX overIntake1, TalonSRX overIntake2, TalonSRX overPull, Encoder ballRollerArmEncoder) {
+        VictorSPX overIntake1, VictorSPX overIntake2, TalonSRX overPull, Encoder ballRollerArmEncoder) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;

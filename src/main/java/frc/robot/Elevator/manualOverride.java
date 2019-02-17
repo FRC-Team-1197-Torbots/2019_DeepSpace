@@ -2,6 +2,7 @@ package frc.robot.Elevator;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -22,6 +23,8 @@ public class manualOverride {
     // Elevator Gearbox motors
     private TalonSRX talon1;
     private TalonSRX talon2;
+
+    private Solenoid elevatorShifter;
     
     private double elevatorAxis; // joystick axis 1 for moving elevator
     private final double elevatorHoldSpeed = 0.1; // << ADJUST, constant speed that will keep the elevator held in spot
@@ -53,8 +56,8 @@ public class manualOverride {
 
 // -------------   Ball Roller    ------------------------------------
     // Motors for Ball Roller Arm, Ball Roller 
-    private TalonSRX overIntake1; // Ball Roller Arm Motor 1
-    private TalonSRX overIntake2; // Ball Roller Arm Motor 2
+    private VictorSPX overIntake1; // Ball Roller Arm Motor 1
+    private VictorSPX overIntake2; // Ball Roller Arm Motor 2
     private TalonSRX ballRoller; // Motor for spinning Ball Roller Axel
 
     private double rollerArmAxis; // joystick axis 5 for moving the arm
@@ -65,7 +68,7 @@ public class manualOverride {
 
     public manualOverride(TalonSRX talon1, TalonSRX talon2, Joystick player2, boolean talon2Inverted,
             TalonSRX intakeMotor1, TalonSRX intakeMotor2, boolean intakeMotor2Inverted, Solenoid upPiston,
-            Solenoid hatchPiston, TalonSRX overIntake1, TalonSRX overIntake2, TalonSRX ballRoller) {
+            Solenoid hatchPiston, VictorSPX overIntake1, VictorSPX overIntake2, TalonSRX ballRoller, Solenoid elevatorShifter) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.player2 = player2;
@@ -80,6 +83,8 @@ public class manualOverride {
         this.overIntake1 = overIntake1;
         this.overIntake2 = overIntake2;
         this.ballRoller = ballRoller;
+        this.elevatorShifter = elevatorShifter;
+
     }
 
     public void update(boolean running) {
@@ -89,7 +94,7 @@ public class manualOverride {
         
 
         if (running) {//we want to double check in here right trigger is being pressed for the manual override
-
+            elevatorShifter.set(false); //set elevator to low gear
             //Elevator movement
             if (Math.abs(elevatorAxis) > 0.15) { // if you move the elevator axis to move the elevator manually,
                 setElevatorSpeed(elevatorAxis + elevatorHoldSpeed);

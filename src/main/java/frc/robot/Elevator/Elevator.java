@@ -3,13 +3,16 @@ package frc.robot.Elevator;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import frc.robot.TorDrive;
+import frc.robot.Elevator.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 public class Elevator {
 
@@ -48,11 +51,11 @@ public class Elevator {
     private TalonSRX ballIntake2; //ball intake shooter motor 2, needs to be flipped
     private TalonSRX groundTalon1; //ground hatch motor
     private TalonSRX groundTalon2; 
-    private TalonSRX overIntake1; //ball roller arm motor
-    private TalonSRX overIntake2; //ball roller arm motor
     private TalonSRX overPull; //ball roller to spin wheels
     private TalonSRX climberTalon; // wheels on climber to move forware
 
+    private VictorSPX overIntake1; //ball roller arm motor
+    private VictorSPX overIntake2; //ball roller arm motor
 // Solenoids
     private Solenoid elevatorShifter; // elevator shifter
     private Solenoid groundShootPiston;  // ground hatch fire pistons
@@ -95,8 +98,8 @@ public class Elevator {
         talon2 = new TalonSRX(8);
         ballIntake1 = new TalonSRX(9);
         ballIntake2 = new TalonSRX(10);
-        overIntake1 = new TalonSRX(11);
-        overIntake2 = new TalonSRX(12);
+        overIntake1 = new VictorSPX(11);
+        overIntake2 = new VictorSPX(12);
         groundTalon1 = new TalonSRX(13);
         overPull = new TalonSRX(14);
         climberTalon = new TalonSRX(15);
@@ -131,7 +134,7 @@ public class Elevator {
                 intakeMotor2Inverted, ballUpPiston, overIntake1, overIntake2, overPull, ballRollerArmEncoder);
         groundIntake = new groundIntake( groundTalon1, player1, player2, fourtwenty, groundShootPiston, encoder);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 
-                ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston, overIntake1, overIntake2, overPull);
+                ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston, overIntake1, overIntake2, overPull, elevatorShifter);
         getGroundIntakeOutOfWay = new getGroundIntakeOutOfWay(groundTalon1, groundTalon2, groundShootPiston);
         climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, ballUpPiston, climberPiston1, climberPiston2, drive);
 
