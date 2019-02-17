@@ -57,7 +57,7 @@ public class DriveHardware {
 	public DriveHardware() {
 		gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 		
-		solenoid = new Solenoid(0);
+		solenoid = new Solenoid(1);
 
 		leftMaster = new TalonSRX(1);
 		leftSlave1 = new TalonSRX(2);

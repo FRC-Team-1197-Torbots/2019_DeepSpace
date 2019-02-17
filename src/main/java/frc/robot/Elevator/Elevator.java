@@ -69,6 +69,8 @@ public class Elevator {
     private Encoder ballRollerArmEncoder;
   
     private DigitalInput limitSwitch; // limit switch to stop the elevator
+    
+    private DigitalInput ballBreakBeam;
 
     private AnalogPotentiometer fourtwenty; // pot on the 
 
@@ -100,7 +102,7 @@ public class Elevator {
         climberTalon = new TalonSRX(15);
 
     // Solenoid
-        elevatorShifter = new Solenoid(1);
+        elevatorShifter = new Solenoid(0);
         hatchPiston = new Solenoid(2);
         ballUpPiston = new Solenoid(3);
         groundShootPiston = new Solenoid(4);
@@ -110,15 +112,15 @@ public class Elevator {
     // Sensors 
         fourtwenty = new AnalogPotentiometer(1, 360, 0);
         climbGyro = new AnalogGyro(2);
-        encoder = new Encoder(3, 4);
-        ballRollerArmEncoder = new Encoder(5, 6);
-        limitSwitch = new DigitalInput(7);
-        climbSwitch1 = new DigitalInput(8);
-        climbSwitch2 = new DigitalInput(9);
-        ballRollerArmEncoder = new Encoder(10, 11);
-        hallEffectSensor1 = new DigitalInput(12);
-        hallEffectSensor2 = new DigitalInput(13);
-        hallEffectSensor3 = new DigitalInput(14);
+        encoder = new Encoder(4, 5);
+        ballRollerArmEncoder = new Encoder(6, 7);
+        limitSwitch = new DigitalInput(8);
+        ballBreakBeam = new DigitalInput(9);
+        climbSwitch1 = new DigitalInput(10);
+        // climbSwitch2 = new DigitalInput(9);
+        hallEffectSensor1 = new DigitalInput(11);
+        hallEffectSensor2 = new DigitalInput(12);
+        hallEffectSensor3 = new DigitalInput(13);
 
     // Joysticks 
         player2 = new Joystick(1);
@@ -132,7 +134,7 @@ public class Elevator {
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 
                 ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston, overIntake1, overIntake2, overPull);
         getGroundIntakeOutOfWay = new getGroundIntakeOutOfWay(groundTalon1, groundTalon2, groundShootPiston);
-        climb = new Climb(talon1, talon2, encoder, climbGyro, climbSwitch1, climbSwitch2, climberTalon, climberPiston1, climberPiston2);
+        climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, ballUpPiston, climberPiston1, climberPiston2);
 
         
     }
@@ -199,7 +201,8 @@ public class Elevator {
                 }
                 break;
             case CLIMBING:
-                //UPDATE CLIMB      
+                //UPDATE CLIMB 
+                climb.update();     
                 break;
         }
     }
