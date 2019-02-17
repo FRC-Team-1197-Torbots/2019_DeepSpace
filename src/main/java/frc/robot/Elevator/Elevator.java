@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import frc.robot.TorDrive;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -75,7 +76,6 @@ public class Elevator {
     private AnalogPotentiometer fourtwenty; // pot on the 
 
     private DigitalInput climbSwitch1;
-    private DigitalInput climbSwitch2;
 
     private AnalogGyro climbGyro;
 
@@ -89,7 +89,7 @@ public class Elevator {
     private final boolean talon2Inverted = false;
     private final boolean intakeMotor2Inverted = false;
 
-    public Elevator(Joystick player1) {
+    public Elevator(Joystick player1, TorDrive drive) {
     // Talons
         talon1 = new TalonSRX(7);
         talon2 = new TalonSRX(8);
@@ -117,7 +117,6 @@ public class Elevator {
         limitSwitch = new DigitalInput(8);
         ballBreakBeam = new DigitalInput(9);
         climbSwitch1 = new DigitalInput(10);
-        // climbSwitch2 = new DigitalInput(9);
         hallEffectSensor1 = new DigitalInput(11);
         hallEffectSensor2 = new DigitalInput(12);
         hallEffectSensor3 = new DigitalInput(13);
@@ -134,7 +133,7 @@ public class Elevator {
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 
                 ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston, overIntake1, overIntake2, overPull);
         getGroundIntakeOutOfWay = new getGroundIntakeOutOfWay(groundTalon1, groundTalon2, groundShootPiston);
-        climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, ballUpPiston, climberPiston1, climberPiston2);
+        climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, ballUpPiston, climberPiston1, climberPiston2, drive);
 
         
     }
@@ -165,12 +164,15 @@ public class Elevator {
                     if(hallEffectSensor1.get()) {
                         ballElevator.init(hallEffectSensorOneHeight);
                         hatchElevator.init(hallEffectSensorOneHeight);
+                        climb.init(hallEffectSensorOneHeight);
                     } else if(hallEffectSensor2.get()) {
                         ballElevator.init(hallEffectSensorTwoHeight);
                         hatchElevator.init(hallEffectSensorTwoHeight);
+                        climb.init(hallEffectSensorTwoHeight);
                     } else {
                         ballElevator.init(hallEffectSensorThreeHeight);
                         hatchElevator.init(hallEffectSensorThreeHeight);
+                        climb.init(hallEffectSensorThreeHeight);
                     }
                     elevatorStateMachine = elevatorState.RUNNING;
                 }
@@ -202,7 +204,7 @@ public class Elevator {
                 break;
             case CLIMBING:
                 //UPDATE CLIMB 
-                climb.update();     
+                climb.update(true);     
                 break;
         }
     }

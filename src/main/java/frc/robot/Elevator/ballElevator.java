@@ -60,8 +60,9 @@ public class ballElevator {
     private final double overtargetVelocity = 0.0;//probably won't need
     private final double overtargetAcceleration = 0.0;//probably won't need
 
-    private final double overInAngle = 0;
+    private final double overLowLevelAngle = 0;
     private final double overOutAngle = 45;
+    private final double overHighLevelAngle = 40;
 
     private final double encoderTicksPerMeter = 1.0;//this is how many ticks there are per meter the elevator goes up
     private final double lowBallPosition = 1.0;//these three are the heights of what we want to go to
@@ -250,9 +251,15 @@ public class ballElevator {
         if(elevator == theElevator.intakeBallPID || elevator == theElevator.goTointakeBallPID) {
             overCurrentTarget = overOutAngle;
             overPull.set(ControlMode.PercentOutput, overIntakePower);
-        } else {
-            overCurrentTarget = overInAngle;
+        } else if(elevator == theElevator.lowBallPID || elevator == theElevator.goTolowBallPID) {
+            overCurrentTarget = overLowLevelAngle;
             overPull.set(ControlMode.PercentOutput, 0);
+        } else if(elevator == theElevator.highBallPID || elevator == theElevator.goToHighBallPID) {
+            overCurrentTarget = overHighLevelAngle;
+            overPull.set(ControlMode.PercentOutput, 0);
+        } else {
+            overCurrentTarget = overOutAngle;
+            overPull.set(ControlMode.PercentOutput, overIntakePower);
         }
 
         overPositionPID.updateTargets(overCurrentTarget, overtargetVelocity, overtargetAcceleration);

@@ -65,6 +65,10 @@ public class TorDrive {//this is the upper layer of the drive
 		rightOutput = ActiveController.getRightOutput();
 		hardware.setMotorSpeeds(rightOutput, leftOutput);
 	}
+
+	public void Run(double speed) {
+		hardware.setMotorSpeeds(speed, speed);
+	}
 	
 	//we are only running trajectories in MP so that is why it only takes from the MPDC
 	public boolean MPTrajectoryIsComplete() {
