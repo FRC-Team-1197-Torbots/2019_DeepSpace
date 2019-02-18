@@ -24,7 +24,7 @@ public class Elevator {
 
     //zeroing state tuning-----------
 
-    private final double moveDownZeroSpeed = 0.3;
+    private final double moveUpZeroSpeed = 0.3;
     private final int hallEffectSensorOneHeight = 0;//in ticks from this
     //the top SHOULD be zero
     private final int hallEffectSensorTwoHeight = 1;//in ticks
@@ -104,11 +104,11 @@ public class Elevator {
 
     // Solenoid
         elevatorShifter = new Solenoid(0);
-        hatchPiston = new Solenoid(2);
-        ballUpPiston = new Solenoid(3);
+        hatchPiston = new Solenoid(5);
+        ballUpPiston = new Solenoid(6);
         groundShootPiston = new Solenoid(4);
-        climberPiston1 = new Solenoid(5);
-        climberPiston2 = new Solenoid(6);
+        climberPiston1 = new Solenoid(2);
+        climberPiston2 = new Solenoid(3);
         
     // Sensors 
         fourtwenty = new AnalogPotentiometer(1, 360, 0);
@@ -159,8 +159,8 @@ public class Elevator {
         //we haven't made an autobox yet
         switch(elevatorStateMachine) {
             case ZEROING:
-                talon1.set(ControlMode.PercentOutput, moveDownZeroSpeed);
-                talon2.set(ControlMode.PercentOutput, moveDownZeroSpeed);
+                talon1.set(ControlMode.PercentOutput, moveUpZeroSpeed);
+                talon2.set(ControlMode.PercentOutput, moveUpZeroSpeed);
                 if(hallEffectSensor1.get() || hallEffectSensor2.get() || hallEffectSensor3.get()) {//if one of them hits
                     if(hallEffectSensor1.get()) {
                         ballElevator.init(hallEffectSensorOneHeight);
