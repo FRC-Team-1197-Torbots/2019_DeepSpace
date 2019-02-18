@@ -14,10 +14,8 @@ public class DriveHardware {
 
 	private final TalonSRX rightMaster;
 	private final TalonSRX rightSlave1;
-	private final TalonSRX rightSlave2;
 	private final TalonSRX leftMaster;
 	private final TalonSRX leftSlave1;
-	private final TalonSRX leftSlave2;
 	private Encoder leftEncoder;
 	private Encoder rightEncoder;
 	
@@ -60,22 +58,18 @@ public class DriveHardware {
 		solenoid = new Solenoid(1);
 
 		leftMaster = new TalonSRX(1);
-		leftSlave1 = new TalonSRX(2);
-		leftSlave2 = new TalonSRX(3);  
-		rightMaster = new TalonSRX(4);
-		rightSlave1 = new TalonSRX(5);
-		rightSlave2 = new TalonSRX(6);
+		leftSlave1 = new TalonSRX(2);  
+		rightMaster = new TalonSRX(3);
+		rightSlave1 = new TalonSRX(4);
 
 		leftEncoder = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
 		rightEncoder = new Encoder(2, 3, false, Encoder.EncodingType.k4X);
 		
-		leftMaster.setInverted(true); // Left master must be attached to the farthest CIM from the output shaft
+		leftMaster.setInverted(false); // Left master must be attached to the farthest CIM from the output shaft
 		leftSlave1.setInverted(false); 
-		leftSlave2.setInverted(false);
 		
-		rightMaster.setInverted(false); // Right master must be attached to the farthest CIM from the output shaft
+		rightMaster.setInverted(true); // Right master must be attached to the farthest CIM from the output shaft
 		rightSlave1.setInverted(true); 
-		rightSlave2.setInverted(true);
 
 		resetEncoder();
 		resetGyro();
@@ -100,14 +94,12 @@ public class DriveHardware {
 	public void SetLeft(double speed) {
 		leftMaster.set(ControlMode.PercentOutput, speed);
 		leftSlave1.set(ControlMode.PercentOutput, speed);
-		leftSlave2.set(ControlMode.PercentOutput, speed);
 	}
 
 	// Setting the right master Talon's speed to the given parameter
 	public void SetRight(double speed) {
 		rightMaster.set(ControlMode.PercentOutput, speed);
 		rightSlave1.set(ControlMode.PercentOutput, speed);
-		rightSlave2.set(ControlMode.PercentOutput, speed);
 	}
 
 	// Getting raw position value from the right encoder
@@ -143,10 +135,8 @@ public class DriveHardware {
 		
 		rightMaster.set(ControlMode.PercentOutput, rightSpeed);
 		rightSlave1.set(ControlMode.PercentOutput, rightSpeed);
-		rightSlave2.set(ControlMode.PercentOutput, rightSpeed);
 		leftMaster.set(ControlMode.PercentOutput, leftSpeed);
 		leftSlave1.set(ControlMode.PercentOutput, leftSpeed);
-		leftSlave2.set(ControlMode.PercentOutput, leftSpeed);
 	}
 
 	// Method to reset the encoder values
@@ -176,6 +166,7 @@ public class DriveHardware {
 			gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 		}
 		gyro.calibrate();
+		resetEncoder();
 	}
 	
 	public double getAbsoluteMaxVelocity() {

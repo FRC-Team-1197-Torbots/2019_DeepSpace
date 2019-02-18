@@ -83,6 +83,7 @@ public class Climb {
     private final double tiltkI = 0.0;
     private final double tiltkD = 0.0;
     private final double tiltTolerance = 1;// for thePID
+    private final double normalTiltPower = 0.3;
 
     private final double normalkP = 0.0;
     private final double normalkI = 0.0;
@@ -210,7 +211,7 @@ public class Climb {
             climbPiston2.set(true);
 
             // if the position of the elevator is at the bottom, go to drive forward
-            if (height() <= elevatorBottomPosition) {
+            if (Math.abs(height() - elevatorBottomPosition)  < 0.05) {
                 climb = theClimb.driveForward;
             }
 
@@ -272,7 +273,7 @@ public class Climb {
             tiltIntegral += tiltError;
         }
         tiltP = tiltError;
-        controlPower = (tiltP * tiltkP) + (tiltD * tiltkD) + (tiltIntegral * tiltkI);
+        controlPower = (tiltP * tiltkP) + (tiltD * tiltkD) + (tiltIntegral * tiltkI)+ normalTiltPower;
     }
 
     

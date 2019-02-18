@@ -37,7 +37,7 @@ public class hatchElevator {
     private final double velocitykD = 0.0;
     private final double kV = 0.0;
     private final double kA = 0.0;//this should definitely stay at 0
-    private final double pidGoTolerance = 100;//this is in meters and should be kind of large as we are using bang bang till PID turns on
+    private final double pidGoTolerance = 1000;//this is in meters and should be kind of large as we are using bang bang till PID turns on
     private final double velocityTolerance = 0.0;
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need

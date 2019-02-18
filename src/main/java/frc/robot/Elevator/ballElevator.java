@@ -8,9 +8,9 @@ import frc.robot.PID_Tools.*;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 public class ballElevator {
     //test or not?
@@ -31,6 +31,7 @@ public class ballElevator {
     private TorDerivative overfindCurrentVelocity;
     private double currentVelocity;
     private double overcurrentVelocity;
+    private double lastTime = startTime;
 
     /*
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -77,6 +78,7 @@ public class ballElevator {
     private final double intakePower = 0.6;
     private final double outakePower = 0.4;
     private final double overIntakePower = -1.0;
+    private final double overOutakePower = 1.0;
     private final double highOutakePower = 0.7;
 
     private final double encoderTicksPerDegreeForBallRoller = 1;
@@ -105,6 +107,7 @@ public class ballElevator {
     private VictorSPX overIntake2;
     private TalonSRX overPull;
     private Encoder ballRollerArmEncoder;
+    private DigitalInput ballBreakBeam;
 
     private double overstartAngle;
     private double overcurrentAngle;
@@ -128,7 +131,7 @@ public class ballElevator {
 
     public ballElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player2, 
         boolean talon2Inverted, TalonSRX intakeMotor1, TalonSRX intakeMotor2, boolean intakeMotor2Inverted, Solenoid upPiston,
-        VictorSPX overIntake1, VictorSPX overIntake2, TalonSRX overPull, Encoder ballRollerArmEncoder) {
+        VictorSPX overIntake1, VictorSPX overIntake2, TalonSRX overPull, Encoder ballRollerArmEncoder, DigitalInput ballBreakBeam) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
@@ -141,6 +144,7 @@ public class ballElevator {
         this.intakeMotor2.setInverted(intakeMotor2Inverted);
         this.upPiston = upPiston;
         this.ballRollerArmEncoder = ballRollerArmEncoder;
+        this.ballBreakBeam = ballBreakBeam;
 
         //this is the PID
         positionPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP,
@@ -182,17 +186,17 @@ public class ballElevator {
                 SmartDashboard.putNumber("encoder value", encoder.get());
                 SmartDashboard.putNumber("height", height());
                 if(getButtonA() && ((currentTime - lastTimeAPressed) > 250) && !(elevator == theElevator.goToHighBallPID || 
-                    elevator == theElevator.goTolowBallPID || elevator == theElevator.goTointakeBallPID)) {
+                    elevator == theElevator.goTolowBallPID || elevator == theElevator.goTointakeBallPID || elevator == theElevator.intakeBallPID)) {
                     
                     lastTimeAPressed = currentTime;
                     elevator = theElevator.goTointakeBallPID;
                 } else if(getButtonB() && ((currentTime - lastTimeBPressed) > 250) && !(elevator == theElevator.goToHighBallPID || 
-                    elevator == theElevator.goTolowBallPID || elevator == theElevator.goTointakeBallPID)) {
+                    elevator == theElevator.goTolowBallPID || elevator == theElevator.goTointakeBallPID || elevator == theElevator.lowBallPID)) {
                     
                     lastTimeBPressed = currentTime;
                     elevator = theElevator.goTolowBallPID;
                 } else if(getButtonY() && ((currentTime - lastTimeYPressed) > 250) && !(elevator == theElevator.goToHighBallPID || 
-                    elevator == theElevator.goTolowBallPID || elevator == theElevator.goTointakeBallPID)) {
+                    elevator == theElevator.goTolowBallPID || elevator == theElevator.goTointakeBallPID || elevator == theElevator.highBallPID)) {
                     
                     lastTimeYPressed = currentTime;
                     elevator = theElevator.goToHighBallPID;
@@ -256,7 +260,12 @@ public class ballElevator {
             overPull.set(ControlMode.PercentOutput, overIntakePower);
         } else if(elevator == theElevator.lowBallPID || elevator == theElevator.goTolowBallPID) {
             overCurrentTarget = overLowLevelAngle;
-            overPull.set(ControlMode.PercentOutput, 0);
+            if(currentTime - lastTime < 250) {//this basically makes it so that when we intake a ball we spin out
+                //for 0.25 seconds after one is intaked just in case another one is about to come in and get stuck
+                overPull.set(ControlMode.PercentOutput, overOutakePower);
+            } else {
+                overPull.set(ControlMode.PercentOutput, 0);
+            }
         } else if(elevator == theElevator.highBallPID || elevator == theElevator.goToHighBallPID) {
             overCurrentTarget = overHighLevelAngle;
             overPull.set(ControlMode.PercentOutput, 0);
@@ -331,6 +340,10 @@ public class ballElevator {
                 break;
             case intakeBallPID:
                 setPercentSpeed(controlPower);
+                if(ballBreakBeam.get()) {
+                    lastTime = currentTime;
+                    elevator = theElevator.goTolowBallPID;
+                }
                 break;
             case highBallPID:
                 setPercentSpeed(controlPower);

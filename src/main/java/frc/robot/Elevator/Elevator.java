@@ -3,12 +3,10 @@ package frc.robot.Elevator;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import frc.robot.TorDrive;
-import frc.robot.Elevator.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -26,11 +24,11 @@ public class Elevator {
 
     //zeroing state tuning-----------
 
-    private final double moveDownZeroSpeed = -0.3;
+    private final double moveDownZeroSpeed = 0.3;
     private final int hallEffectSensorOneHeight = 0;//in ticks from this
     //the top SHOULD be zero
-    private final int hallEffectSensorTwoHeight = -1;//in ticks
-    private final int hallEffectSensorThreeHeight = -2;//in ticks
+    private final int hallEffectSensorTwoHeight = 1;//in ticks
+    private final int hallEffectSensorThreeHeight = 2;//in ticks
 
     //-----------
 
@@ -94,15 +92,15 @@ public class Elevator {
 
     public Elevator(Joystick player1, TorDrive drive) {
     // Talons
-        talon1 = new TalonSRX(7);
-        talon2 = new TalonSRX(8);
-        ballIntake1 = new TalonSRX(9);
-        ballIntake2 = new TalonSRX(10);
-        overIntake1 = new VictorSPX(11);
-        overIntake2 = new VictorSPX(12);
-        groundTalon1 = new TalonSRX(13);
-        overPull = new TalonSRX(14);
-        climberTalon = new TalonSRX(15);
+        talon1 = new TalonSRX(5);
+        talon2 = new TalonSRX(6);
+        ballIntake1 = new TalonSRX(7);
+        ballIntake2 = new TalonSRX(8);
+        overIntake1 = new VictorSPX(9);
+        overIntake2 = new VictorSPX(10);
+        groundTalon1 = new TalonSRX(11);
+        overPull = new TalonSRX(12);
+        climberTalon = new TalonSRX(13);
 
     // Solenoid
         elevatorShifter = new Solenoid(0);
@@ -118,7 +116,7 @@ public class Elevator {
         encoder = new Encoder(4, 5);
         ballRollerArmEncoder = new Encoder(6, 7);
         limitSwitch = new DigitalInput(8);
-        ballBreakBeam = new DigitalInput(9);
+        ballBreakBeam = new DigitalInput(9);//for the break  beam
         climbSwitch1 = new DigitalInput(10);
         hallEffectSensor1 = new DigitalInput(11);
         hallEffectSensor2 = new DigitalInput(12);
@@ -131,8 +129,8 @@ public class Elevator {
     // Classes
         hatchElevator = new hatchElevator(talon1, talon2, encoder, player2, talon2Inverted, hatchPiston);
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballIntake1, ballIntake2,
-                intakeMotor2Inverted, ballUpPiston, overIntake1, overIntake2, overPull, ballRollerArmEncoder);
-        groundIntake = new groundIntake( groundTalon1, player1, player2, fourtwenty, groundShootPiston, encoder);
+                intakeMotor2Inverted, ballUpPiston, overIntake1, overIntake2, overPull, ballRollerArmEncoder, ballBreakBeam);
+        groundIntake = new groundIntake(groundTalon1, player1, player2, fourtwenty, groundShootPiston, encoder);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 
                 ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston, overIntake1, overIntake2, overPull, elevatorShifter);
         getGroundIntakeOutOfWay = new getGroundIntakeOutOfWay(groundTalon1, groundTalon2, groundShootPiston);
@@ -201,7 +199,7 @@ public class Elevator {
                     }
                 }
 
-                if(autoBox.getRawButton(3)) {//climbing button
+                if(autoBox.getRawButton(1)) {//climbing button
                     elevatorStateMachine = elevatorState.CLIMBING;
                 }
                 break;

@@ -34,7 +34,9 @@ public class Robot extends TimedRobot {
 	}
 	@Override
 	public void teleopPeriodic() {
-		drive.Run(test, true);//IT IS TELEOP
+		if(!elevator.climbing()) {
+			drive.Run(test, true);//IT IS TELEOP
+		}
 		elevator.update();
 	}
 	@Override
