@@ -103,7 +103,7 @@ public class Elevator {
         climberTalon = new TalonSRX(13);
 
     // Solenoid
-        elevatorShifter = new Solenoid(0);
+        elevatorShifter = new Solenoid(1);
         hatchPiston = new Solenoid(5);
         ballUpPiston = new Solenoid(6);
         groundShootPiston = new Solenoid(4);
