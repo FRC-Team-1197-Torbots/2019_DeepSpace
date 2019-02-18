@@ -140,7 +140,7 @@ public class Elevator {
     }
 
     public boolean climbing() {
-        return autoBox.getRawButton(5);//we need to see
+        return autoBox.getRawButton(1);//we need to see
     }
 
     public void init() {
@@ -179,13 +179,13 @@ public class Elevator {
                 }
                 break;
             case RUNNING:
-                if (autoBox.getRawButton(1)){
+                if (autoBox.getRawButton(3)){
                     getGroundIntakeOutOfWay.update(true);
                 } else {
                     getGroundIntakeOutOfWay.update(false);
                 }
     
-                groundIntake.update(Math.abs(getRightTrigger()) > 0.1, autoBox.getRawButton(1));
+                groundIntake.update(Math.abs(getRightTrigger()) > 0.1, autoBox.getRawButton(3));
                 if (Math.abs(getRightTrigger()) > 0.1) {
                     manualOverride.update(true);
                 } else {
