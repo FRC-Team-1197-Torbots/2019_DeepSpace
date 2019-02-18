@@ -49,7 +49,7 @@ public class groundIntake {
 
 
    private final double neededHeight = 1;//in meters
-   private final double currentTarget = 1.2;//this is the height the elevator will PID to
+   private final double currentTarget = neededHeight + 0.02;//this is the height the elevator will PID to
 
    private final double positionkP = 0.0;
    private final double positionkI = 0.0;
