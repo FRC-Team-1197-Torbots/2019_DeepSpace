@@ -203,7 +203,9 @@ public class Climb {
         case setUp:
             upPiston.set(true);
             // go to start climb position
-            climb = theClimb.lift;
+            if(Math.abs(height() - startClimbPosition)  < 0.05) {
+                climb = theClimb.lift;
+            }
             break;
         case lift:
             // keep the gyro at 0 while lifting up
@@ -211,7 +213,7 @@ public class Climb {
             climbPiston2.set(true);
 
             // if the position of the elevator is at the bottom, go to drive forward
-            if (Math.abs(height() - elevatorBottomPosition)  < 0.05) {
+            if (height() <= elevatorBottomPosition) {
                 climb = theClimb.driveForward;
             }
 
