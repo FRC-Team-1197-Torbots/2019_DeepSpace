@@ -144,16 +144,11 @@ public class groundIntake {
        groundPIDRun();
 
        if(running) {
-           SmartDashboard.putBoolean("key", true);
            elevatorTalon1.set(ControlMode.PercentOutput, controlPower);
            elevatorTalon2.set(ControlMode.PercentOutput, controlPower);
 
-           SmartDashboard.putNumber("groundControlPower:", groundControlPower);
            groundTalon1.set(ControlMode.PercentOutput, groundControlPower);
        }
-
-       SmartDashboard.putBoolean("IDLE:", groundIntake == ground.IDLE);
-       SmartDashboard.putBoolean("DOWN:", groundIntake == ground.DOWN);
    }
 
    public void stateMachineRun() {

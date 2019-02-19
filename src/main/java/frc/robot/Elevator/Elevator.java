@@ -90,6 +90,7 @@ public class Elevator {
     // Talons
         talon1 = new TalonSRX(5);
         talon2 = new TalonSRX(6);
+        talon2.follow(talon1);
         ballIntake1 = new TalonSRX(7);
         ballIntake2 = new TalonSRX(8);
         overIntake1 = new VictorSPX(9);
@@ -179,12 +180,12 @@ public class Elevator {
                 } else {
                     manualOverride.update(false);
                     if (getRightBumper()) {// ball
-                        ballElevator.update(true, limitSwitch.get());
-                        hatchElevator.update(false, limitSwitch.get());
+                        ballElevator.update(true, !limitSwitch.get());
+                        hatchElevator.update(false, !limitSwitch.get());
                         SmartDashboard.putString("elevator state", "ball");
                     } else {// hatch
-                        ballElevator.update(false, limitSwitch.get());
-                        hatchElevator.update(true, limitSwitch.get());
+                        ballElevator.update(false, !limitSwitch.get());
+                        hatchElevator.update(true, !limitSwitch.get());
                         SmartDashboard.putString("elevator state", "hatch");
                     }
                 }

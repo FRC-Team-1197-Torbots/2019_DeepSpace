@@ -37,7 +37,7 @@ public class ballElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = 0.05;
+    private final double positionkP = 2.85;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -51,7 +51,7 @@ public class ballElevator {
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need
 
-    private final double overpositionkP = 0.0;
+    private final double overpositionkP = 0.02;
     private final double overpositionkI = 0.0;
     private final double overpositionkD = 0.0;
     private final double overpositionTolerance = 0.01;//for the overPID
@@ -64,22 +64,22 @@ public class ballElevator {
     private final double overtargetVelocity = 0.0;//probably won't need
     private final double overtargetAcceleration = 0.0;//probably won't need
 
-    private final double overLowLevelAngle = 0;
+    private final double overLowLevelAngle = 0; //157
     private final double overOutAngle = 45;
-    private final double overHighLevelAngle = 40;
+    private final double overHighLevelAngle = 22;
 
     private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
     private final double lowBallPosition = -0.4;//these three are the heights of what we want to go to
     private final double intakeBallPosition = -0.5;
-    private final double highBallPosition = -0.2;
+    private final double highBallPosition = -0.01;
     private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
-    private final double intakePower = 0.6;
+    private final double intakePower = -0.6;
     private final double outakePower = 0.4;
     private final double overIntakePower = -1.0;
     private final double overOutakePower = 1.0;
-    private final double highOutakePower = 0.7;
+    private final double highOutakePower = -0.7;
 
     private final double encoderTicksPerDegreeForBallRoller = 0.8111;
 
@@ -166,8 +166,9 @@ public class ballElevator {
     }
 
     public void update(boolean running, boolean limitSwitchBeingHit) {
+        talon2.follow(talon1);
 		currentTime = (long)(Timer.getFPGATimestamp() * 1000);
-		
+		SmartDashboard.putString("ballElevatr state", elevator.toString());
 		//this starting boolean makes it so that it will still do the first value in the trajectory
 		
 		//this handles it so that it will only tick in the time interval so that the derivatives and the integrals are correct
@@ -205,7 +206,7 @@ public class ballElevator {
         
                 //this sets the current target
                 if(elevator == theElevator.IDLE) {
-                    currentTarget = -0.1;//this should just be greater than 0 so it doesn't hit anything
+                    currentTarget = -0.3;//this should just be greater than 0 so it doesn't hit anything
                 } else if(elevator == theElevator.lowBallPID) {
                     currentTarget = lowBallPosition;
                 } else if(elevator == theElevator.intakeBallPID) {
@@ -224,8 +225,10 @@ public class ballElevator {
                 handleIntake();
                 if(running && !limitSwitchBeingHit) {
                     talon1.set(ControlMode.PercentOutput, currentRunningSpeed);
+                    talon2.set(ControlMode.PercentOutput, currentRunningSpeed);
                 } else {
                     talon1.set(ControlMode.PercentOutput, 0);
+                    talon2.set(ControlMode.PercentOutput, 0);
                 }
 
                 if(running) {
@@ -241,18 +244,16 @@ public class ballElevator {
 
                 if(running) {
                     handlePneumatics();
+                    handleOver();
                 }
 
-                //we don't need to check if we are running to do the 971 intake
-                //it doesn't get into the way of anything
-                handleOver();
             }        
         }
     }
 
     public void handleOver() {
         overcurrentAngle = (ballRollerArmEncoder.get() - overstartAngle) / encoderTicksPerDegreeForBallRoller;
-
+        SmartDashboard.putNumber("overcurrentAngle",overcurrentAngle);
         overcurrentVelocity = overfindCurrentVelocity.estimate(overcurrentAngle);
 
         if(elevator == theElevator.intakeBallPID || elevator == theElevator.goTointakeBallPID) {

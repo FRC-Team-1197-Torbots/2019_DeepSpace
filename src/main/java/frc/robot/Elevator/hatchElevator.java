@@ -28,7 +28,7 @@ public class hatchElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = 0.05;
+    private final double positionkP = 2.85;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -43,8 +43,8 @@ public class hatchElevator {
     private final double targetAcceleration = 0.0;//probably won't need
 
     private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
-    private final double intakeHatchPosition = -0.5;
-    private final double highHatchPosition = -0.15;
+    private final double intakeHatchPosition = -0.62;
+    private final double highHatchPosition = -0.01;
     private final double intakeHatchExtendPosition = -0.52;//should be lower than intakeHatchPosition
     private final double highHatchExtendPosition = -0.17;//should be lower than highHatchPosition
     private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
@@ -90,7 +90,6 @@ public class hatchElevator {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
-        this.talon2.follow(talon1);
         this.talon2.setInverted(talon2Inverted);
         this.player2 = player2;
         this.piston = piston;
@@ -105,6 +104,8 @@ public class hatchElevator {
     }
 
     public void update(boolean running, boolean limitSwitchBeingHit) {
+        SmartDashboard.putBoolean("limit switch being hit", limitSwitchBeingHit);
+        talon2.follow(talon1);
 		currentTime = (long)(Timer.getFPGATimestamp() * 1000);
 		
 		//this starting boolean makes it so that it will still do the first value in the trajectory
@@ -114,6 +115,8 @@ public class hatchElevator {
 		((lastCountedTime - startTime) - ((lastCountedTime - startTime) % (dt * 1000))) //subtracts that mod dt times 1000 so that it is floored to the nearest multiple of dt times 1000
 		//then checks if that is greater than the last one to see if it is time to move on to the next tick
 		|| starting) {
+            SmartDashboard.putBoolean("got here 1", true);
+            SmartDashboard.putString("hatch elevator state:", elevator.toString());
 			starting = false;
 			lastCountedTime = currentTime;
 
@@ -121,6 +124,7 @@ public class hatchElevator {
                 SmartDashboard.putNumber("encoder value", encoder.get());
                 SmartDashboard.putNumber("height", height());
             } else {
+                SmartDashboard.putNumber("current running speed:", currentRunningSpeed);
                 SmartDashboard.putNumber("encoder value", encoder.get());
                 SmartDashboard.putNumber("height", height());
                 if(getButtonX()) {
@@ -156,7 +160,7 @@ public class hatchElevator {
         
                 //this sets the current target
                 if(elevator == theElevator.IDLE) {
-                    currentTarget = -0.1;//this should just be greater than 0 so it doesn't hit anything
+                    currentTarget = -0.3;//this should just be greater than 0 so it doesn't hit anything
                 } else if(elevator == theElevator.intakeHatchPID) {
                     currentTarget = intakeHatchPosition;
                 } else if(elevator == theElevator.intakeHatchExtendPID) {
@@ -177,10 +181,14 @@ public class hatchElevator {
                 if(running) {
                     handleSolenoid();
                 }
+                SmartDashboard.putNumber("current running speed:", currentRunningSpeed);
                 if(running && !limitSwitchBeingHit) {
+                    SmartDashboard.putBoolean("got here 2", true);
                     talon1.set(ControlMode.PercentOutput, currentRunningSpeed);
+                    talon2.set(ControlMode.PercentOutput, currentRunningSpeed);
                 } else {
                     talon1.set(ControlMode.PercentOutput, 0);
+                    talon2.set(ControlMode.PercentOutput, 0);
                 }
             }        
         }
