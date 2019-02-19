@@ -162,13 +162,13 @@ public class Elevator {
                     ballElevator.init(hallEffectSensorOneHeight);
                     hatchElevator.init(hallEffectSensorOneHeight);
                     groundIntake.init(hallEffectSensorOneHeight);
+                    climb.init(hallEffectSensorOneHeight);
                     elevatorStateMachine = elevatorState.RUNNING;
                 }
                 break;
             case RUNNING:
                 SmartDashboard.putString("state", "running");
                 if(autoBox.getRawButton(1)) {//climbing button
-                    climb.init(hallEffectSensorOneHeight);
                     elevatorStateMachine = elevatorState.CLIMBING;
                 } else {
                     if (autoBox.getRawButton(3)){
