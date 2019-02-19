@@ -83,7 +83,7 @@ public class Climb {
     private final double tiltkI = 0.0;
     private final double tiltkD = 0.0;
     private final double tiltTolerance = 1;// for thePID
-    private final double normalTiltPower = 0.3;
+    private final double normalTiltPower = -0.5;
 
     private final double normalkP = 0.0;
     private final double normalkI = 0.0;
@@ -182,7 +182,7 @@ public class Climb {
                     
             stateRun();
             if (climb == theClimb.setUp || climb == theClimb.IDLE || climb == theClimb.driveRobot) {
-                currentTarget = startClimbPosition;
+                currentTarget = startClimbPosition - 0.02;
                 normalPidRun();
             } else {
                 currentTarget = elevatorBottomPosition;
