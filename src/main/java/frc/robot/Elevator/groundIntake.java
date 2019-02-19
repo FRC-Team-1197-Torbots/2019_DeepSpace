@@ -66,7 +66,7 @@ public class groundIntake {
    private final double targetVelocity = 0.0;//probably won't need
    private final double targetAcceleration = 0.0;//probably won't need
    private final double dt = 0.005;
-   private final double encoderTicksPerMeter = 1.0;//this is how many ticks there are per meter the elevator goes up
+   private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
    private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
    private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
   
@@ -89,7 +89,7 @@ public class groundIntake {
    private final double groundIntakeDownAngle = 80;
    private final double groundIntakeInAngle = 25;
    private final double groundDiagonalAngle = 40;
-   private final double groundstartAngle = 72;
+   private final double groundstartAngle = 50.077898828536675;
    /*
    ----------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
    */

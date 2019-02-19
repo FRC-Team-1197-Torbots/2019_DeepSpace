@@ -77,7 +77,7 @@ public class Climb {
      */
     // our variables
     // ----------------- PID -----------------------------------------
-    private final double flatGyroValue = 0;//this is the value of the gyro you read when you are flat
+    private double flatGyroValue;
 
     private final double tiltkP = 0.0;
     private final double tiltkI = 0.0;
@@ -90,7 +90,7 @@ public class Climb {
     private final double normalkD = 0.0;
     private final double normalTolerance = 0.01;// for thePID
 
-    private final double encoderTicksPerMeter = 1.0;// this is how many ticks there are per meter the elevator goes up
+    private final double encoderTicksPerMeter = 885;// this is how many ticks there are per meter the elevator goes up
 
     // ----------------- Elevator -----------------------------------------
 
@@ -122,6 +122,10 @@ public class Climb {
 
         private theClimb() {
         }
+    }
+
+    public void init() {
+        flatGyroValue = climbGyro.getAngle();//this is the value of the gyro you read when you are flat
     }
 
     private theClimb climb = theClimb.setUp;

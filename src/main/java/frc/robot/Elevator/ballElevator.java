@@ -68,10 +68,10 @@ public class ballElevator {
     private final double overOutAngle = 45;
     private final double overHighLevelAngle = 40;
 
-    private final double encoderTicksPerMeter = 1.0;//this is how many ticks there are per meter the elevator goes up
-    private final double lowBallPosition = 1.0;//these three are the heights of what we want to go to
-    private final double intakeBallPosition = 2.0;
-    private final double highBallPosition = 3.0;
+    private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
+    private final double lowBallPosition = -0.4;//these three are the heights of what we want to go to
+    private final double intakeBallPosition = -0.5;
+    private final double highBallPosition = -0.2;
     private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
@@ -81,7 +81,7 @@ public class ballElevator {
     private final double overOutakePower = 1.0;
     private final double highOutakePower = 0.7;
 
-    private final double encoderTicksPerDegreeForBallRoller = 1;
+    private final double encoderTicksPerDegreeForBallRoller = 0.8111;
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
     //if it is false then it will only use PID for power
