@@ -12,15 +12,6 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.PID_Tools.*;
 import frc.robot.TorDrive;
 
-/*
-    ***************************** 
-    - Make access to drivetrain and put code in setDriveSpeed method
-
-
-
-    ********************************
-    */
-
 public class Climb {
 
     //this is the drive hardware
