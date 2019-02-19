@@ -139,7 +139,6 @@ public class Elevator {
     }
 
     public void init() {
-        climb.init();
         elevatorStateMachine = elevatorState.ZEROING;
     }
 

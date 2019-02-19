@@ -115,9 +115,6 @@ public class Climb {
         }
     }
 
-    public void init() {
-    }
-
     private theClimb climb = theClimb.setUp;
 
     public Climb(TalonSRX talon1, TalonSRX talon2, TalonSRX climberTalon, Encoder encoder, AnalogGyro climbGyro,
