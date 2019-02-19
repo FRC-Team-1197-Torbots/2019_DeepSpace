@@ -98,8 +98,8 @@ public class Climb {
     private final double elevatorBottomPosition = -0.5;//these are in meters from the first hall effect sensor
 
     // ----------------- Drive -----------------------------------------
-
-    private final double climberTalonSpeed = 0.5;
+    private final double climberTalonLiftSpeed = 0.15;
+    private final double climberTalonDriveSpeed = 0.5;
     private final double drivetrainSpeed = 0.5;
     private final long pistonRetractTime = 1000;
     private final long driveOnPlatformTime = 600;
@@ -125,7 +125,6 @@ public class Climb {
     }
 
     public void init() {
-        flatGyroValue = climbGyro.getAngle();//this is the value of the gyro you read when you are flat
     }
 
     private theClimb climb = theClimb.setUp;
@@ -205,6 +204,8 @@ public class Climb {
         case IDLE:
             break;
         case setUp:
+            flatGyroValue = climbGyro.getAngle();//this is the value of the gyro you read when you are flat
+
             upPiston.set(true);
             // go to start climb position
             if(Math.abs(height() - startClimbPosition)  < 0.05) {
@@ -216,6 +217,7 @@ public class Climb {
             climbPiston1.set(true);
             climbPiston2.set(true);
 
+            climberTalon.set(ControlMode.PercentOutput, climberTalonLiftSpeed);
             // if the position of the elevator is at the bottom, go to drive forward
             if (height() <= elevatorBottomPosition) {
                 climb = theClimb.driveForward;
@@ -224,7 +226,7 @@ public class Climb {
             break;
         case driveForward:
             // run the drive motors and the climber motors
-            climberTalon.set(ControlMode.PercentOutput, climberTalonSpeed);
+            climberTalon.set(ControlMode.PercentOutput, climberTalonDriveSpeed);
             setDriveSpeed(drivetrainSpeed);
             if (climbBreakBeam1.get()) { // if the breakbeam is activated and the CG is on the platform,
                 // set motor speeds to 0
