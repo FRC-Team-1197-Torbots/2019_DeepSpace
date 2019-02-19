@@ -94,7 +94,7 @@ public class Climb {
 
     // ----------------- Elevator -----------------------------------------
 
-    private final double startClimbPosition = -0.1; // this is where the elevator will go to first.
+    private final double startClimbPosition = -0.3429; // this is where the elevator will go to first.
     private final double elevatorBottomPosition = -0.81915;//these are in meters from the first hall effect sensor
 
     // ----------------- Drive -----------------------------------------
