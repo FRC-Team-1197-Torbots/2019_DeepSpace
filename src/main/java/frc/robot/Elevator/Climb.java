@@ -83,7 +83,7 @@ public class Climb {
     private final double tiltkI = 0.0;
     private final double tiltkD = 0.0;
     private final double tiltTolerance = 1;// for thePID
-    private final double normalTiltPower = -0.5;
+    private final double normalTiltPower = -0.7;
 
     private final double normalkP = 0.0;
     private final double normalkI = 0.0;
