@@ -168,36 +168,36 @@ public class Elevator {
                 break;
             case RUNNING:
                 SmartDashboard.putString("state", "running");
-                if (autoBox.getRawButton(3)){
-                    getGroundIntakeOutOfWay.update(true);
-                } else {
-                    getGroundIntakeOutOfWay.update(false);
-                }
-    
-                groundIntake.update(Math.abs(getRightTrigger()) > 0.1, autoBox.getRawButton(3));
-                if (Math.abs(getRightTrigger()) > 0.1) {
-                    manualOverride.update(true);
-                } else {
-                    manualOverride.update(false);
-                    if (getRightBumper()) {// ball
-                        ballElevator.update(true, !limitSwitch.get());
-                        hatchElevator.update(false, !limitSwitch.get());
-                        SmartDashboard.putString("elevator state", "ball");
-                    } else {// hatch
-                        ballElevator.update(false, !limitSwitch.get());
-                        hatchElevator.update(true, !limitSwitch.get());
-                        SmartDashboard.putString("elevator state", "hatch");
-                    }
-                }
-
                 if(autoBox.getRawButton(1)) {//climbing button
                     elevatorStateMachine = elevatorState.CLIMBING;
+                } else {
+                    if (autoBox.getRawButton(3)){
+                        getGroundIntakeOutOfWay.update(true);
+                    } else {
+                        getGroundIntakeOutOfWay.update(false);
+                    }
+        
+                    groundIntake.update(Math.abs(getRightTrigger()) > 0.1, autoBox.getRawButton(3));
+                    if (Math.abs(getRightTrigger()) > 0.1) {
+                        manualOverride.update(true);
+                    } else {
+                        manualOverride.update(false);
+                        if (getRightBumper()) {// ball
+                            ballElevator.update(true, !limitSwitch.get());
+                            hatchElevator.update(false, !limitSwitch.get());
+                            SmartDashboard.putString("elevator state", "ball");
+                        } else {// hatch
+                            ballElevator.update(false, !limitSwitch.get());
+                            hatchElevator.update(true, !limitSwitch.get());
+                            SmartDashboard.putString("elevator state", "hatch");
+                        }
+                    }
                 }
                 break;
             case CLIMBING:
                 SmartDashboard.putString("state", "climbing");
                 //UPDATE CLIMB 
-                climb.update(true);     
+                climb.update(true);
                 break;
         }
     }

@@ -95,13 +95,13 @@ public class Climb {
     // ----------------- Elevator -----------------------------------------
 
     private final double startClimbPosition = -0.1; // this is where the elevator will go to first.
-    private final double elevatorBottomPosition = -0.5;//these are in meters from the first hall effect sensor
+    private final double elevatorBottomPosition = -0.81915;//these are in meters from the first hall effect sensor
 
     // ----------------- Drive -----------------------------------------
     private final double climberTalonLiftSpeed = 0.15;
     private final double climberTalonDriveSpeed = 0.5;
     private final double drivetrainSpeed = 0.5;
-    private final long pistonRetractTime = 1000;
+    private final long pistonRetractTime = 1500;
     private final long driveOnPlatformTime = 600;
 
     /*
