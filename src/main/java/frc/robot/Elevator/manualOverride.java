@@ -39,6 +39,7 @@ public class manualOverride {
 
     //piston to angle ball intake for 2nd rocket level
     private Solenoid upPiston;
+    // private boolean pressedY;
 
     private final double intakeSpeed = 1.0; // << ADJUST, speed to intake the ball
     private final double normalOutakeSpeed = -0.5; // << ADJUST, speed to outtake the ball, cargo Bay

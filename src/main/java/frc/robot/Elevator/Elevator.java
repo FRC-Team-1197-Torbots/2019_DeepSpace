@@ -107,13 +107,13 @@ public class Elevator {
         
     // Sensors 
         fourtwenty = new AnalogPotentiometer(1, 360, 0);
-        climbGyro = new AnalogGyro(2);
+        climbGyro = new AnalogGyro(0);
         encoder = new Encoder(4, 5);
         ballRollerArmEncoder = new Encoder(6, 7);
         limitSwitch = new DigitalInput(8);
         ballBreakBeam = new DigitalInput(9);//for the break  beam
-        climbSwitch1 = new DigitalInput(10);
-        hallEffectSensor1 = new DigitalInput(11);
+        climbSwitch1 = new DigitalInput(23);
+        hallEffectSensor1 = new DigitalInput(22);
 
     // Joysticks 
         player2 = new Joystick(1);
