@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.smartdashboard.*;
 import frc.robot.TorDrive;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -153,16 +154,19 @@ public class Elevator {
         //we haven't made an autobox yet
         switch(elevatorStateMachine) {
             case ZEROING:
+                SmartDashboard.putString("state", "zeroing");
                 talon1.set(ControlMode.PercentOutput, moveUpZeroSpeed);
                 talon2.set(ControlMode.PercentOutput, moveUpZeroSpeed);
-                if(hallEffectSensor1.get() || player2.getRawButton(1)) {
+                if(!hallEffectSensor1.get() || player2.getRawButton(1)) {
                     ballElevator.init(hallEffectSensorOneHeight);
                     hatchElevator.init(hallEffectSensorOneHeight);
+                    groundIntake.init(hallEffectSensorOneHeight);
                     climb.init(hallEffectSensorOneHeight);
                     elevatorStateMachine = elevatorState.RUNNING;
                 }
                 break;
             case RUNNING:
+                SmartDashboard.putString("state", "running");
                 if (autoBox.getRawButton(3)){
                     getGroundIntakeOutOfWay.update(true);
                 } else {
@@ -177,9 +181,11 @@ public class Elevator {
                     if (getRightBumper()) {// ball
                         ballElevator.update(true, limitSwitch.get());
                         hatchElevator.update(false, limitSwitch.get());
+                        SmartDashboard.putString("elevator state", "ball");
                     } else {// hatch
                         ballElevator.update(false, limitSwitch.get());
                         hatchElevator.update(true, limitSwitch.get());
+                        SmartDashboard.putString("elevator state", "hatch");
                     }
                 }
 
@@ -188,6 +194,7 @@ public class Elevator {
                 }
                 break;
             case CLIMBING:
+                SmartDashboard.putString("state", "climbing");
                 //UPDATE CLIMB 
                 climb.update(true);     
                 break;

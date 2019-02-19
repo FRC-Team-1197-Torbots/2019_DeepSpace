@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Solenoid;
 
 public class hatchElevator {
-    private final boolean testMode = true;
+    private final boolean testMode = false;
 
     private double currentRunningSpeed;
 
@@ -28,7 +28,7 @@ public class hatchElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = 0.0;
+    private final double positionkP = 0.05;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -156,7 +156,7 @@ public class hatchElevator {
         
                 //this sets the current target
                 if(elevator == theElevator.IDLE) {
-                    currentTarget = 0.1;//this should just be greater than 0 so it doesn't hit anything
+                    currentTarget = -0.1;//this should just be greater than 0 so it doesn't hit anything
                 } else if(elevator == theElevator.intakeHatchPID) {
                     currentTarget = intakeHatchPosition;
                 } else if(elevator == theElevator.intakeHatchExtendPID) {
@@ -208,6 +208,7 @@ public class hatchElevator {
     }
 
     public void PIDRun() {//finds out the current velocity
+        SmartDashboard.putNumber("hatch current target", currentTarget);
         currentVelocity = findCurrentVelocity.estimate(height());
         positionPID.updateTargets(currentTarget, targetVelocity, targetAcceleration);
         positionPID.updateCurrentValues(height(), currentVelocity);

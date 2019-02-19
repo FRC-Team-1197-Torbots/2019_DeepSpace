@@ -50,7 +50,7 @@ public class groundIntake {
    //this top PID is for the elevator
 
 
-   private final double neededHeight = 1;//in meters
+   private final double neededHeight = -0.02;//in meters
    private final double currentTarget = neededHeight + 0.02;//this is the height the elevator will PID to
 
    private final double positionkP = 0.0;
@@ -110,6 +110,7 @@ public class groundIntake {
        this.player2 = player2;
        this.fourtwenty = fourtwenty;
        this.groundShootPiston = groundShootPiston;
+       this.encoder = ElevatorEncoder;
 
        //this is the PID
        positionPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP,
