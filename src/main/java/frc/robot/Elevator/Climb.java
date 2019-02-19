@@ -216,7 +216,7 @@ public class Climb {
             // run the drive motors and the climber motors
             climberTalon.set(ControlMode.PercentOutput, climberTalonDriveSpeed);
             setDriveSpeed(drivetrainSpeed);
-            if (climbBreakBeam1.get()) { // if the breakbeam is activated and the CG is on the platform,
+            if (!climbBreakBeam1.get()) { // if the breakbeam is activated and the CG is on the platform,
                 // set motor speeds to 0
                 climberTalon.set(ControlMode.PercentOutput, 0);
                 setDriveSpeed(0);
