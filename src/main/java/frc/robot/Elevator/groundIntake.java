@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.Solenoid;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
 import edu.wpi.first.wpilibj.Encoder;
 
 public class groundIntake {
@@ -19,7 +21,7 @@ public class groundIntake {
 
    private TalonSRX elevatorTalon1;//talons for the up and down
    private TalonSRX elevatorTalon2;
-   private TalonSRX groundTalon1;
+   private VictorSPX groundTalon1;
    private Joystick player1;
    private Joystick player2;
    private Encoder encoder;
@@ -100,7 +102,7 @@ public class groundIntake {
    }
    private ground groundIntake = ground.IDLE;
 
-   public groundIntake(TalonSRX groundTalon1,
+   public groundIntake(VictorSPX groundTalon1,
        Joystick player1, Joystick player2, AnalogPotentiometer fourtwenty, Solenoid groundShootPiston,
        Encoder ElevatorEncoder) {
        this.groundTalon1 = groundTalon1;

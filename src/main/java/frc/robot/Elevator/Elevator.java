@@ -26,9 +26,6 @@ public class Elevator {
 
     private final double moveUpZeroSpeed = 0.3;
     private final int hallEffectSensorOneHeight = 0;//in ticks from this
-    //the top SHOULD be zero
-    private final int hallEffectSensorTwoHeight = 1;//in ticks
-    private final int hallEffectSensorThreeHeight = 2;//in ticks
 
     //-----------
 
@@ -47,8 +44,8 @@ public class Elevator {
     private TalonSRX talon2;// this is the second one
     private TalonSRX ballIntake1; //ball intake shooter
     private TalonSRX ballIntake2; //ball intake shooter motor 2, needs to be flipped
-    private TalonSRX groundTalon1; //ground hatch motor
-    private TalonSRX groundTalon2; 
+    private VictorSPX groundTalon1; //ground hatch motor
+    // private VictorSPX groundTalon2; 
     private TalonSRX overPull; //ball roller to spin wheels
     private TalonSRX climberTalon; // wheels on climber to move forware
 
@@ -64,8 +61,6 @@ public class Elevator {
 
 // Sensors
     private DigitalInput hallEffectSensor1;
-    private DigitalInput hallEffectSensor2;
-    private DigitalInput hallEffectSensor3;
 
     private Encoder encoder; //elevator encoder
     private Encoder ballRollerArmEncoder;
@@ -98,7 +93,7 @@ public class Elevator {
         ballIntake2 = new TalonSRX(8);
         overIntake1 = new VictorSPX(9);
         overIntake2 = new VictorSPX(10);
-        groundTalon1 = new TalonSRX(11);
+        groundTalon1 = new VictorSPX(11);
         overPull = new TalonSRX(12);
         climberTalon = new TalonSRX(13);
 
@@ -119,8 +114,6 @@ public class Elevator {
         ballBreakBeam = new DigitalInput(9);//for the break  beam
         climbSwitch1 = new DigitalInput(10);
         hallEffectSensor1 = new DigitalInput(11);
-        hallEffectSensor2 = new DigitalInput(12);
-        hallEffectSensor3 = new DigitalInput(13);
 
     // Joysticks 
         player2 = new Joystick(1);
@@ -133,7 +126,7 @@ public class Elevator {
         groundIntake = new groundIntake(groundTalon1, player1, player2, fourtwenty, groundShootPiston, encoder);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 
                 ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston, overIntake1, overIntake2, overPull, elevatorShifter);
-        getGroundIntakeOutOfWay = new getGroundIntakeOutOfWay(groundTalon1, groundTalon2, groundShootPiston);
+        getGroundIntakeOutOfWay = new getGroundIntakeOutOfWay(groundTalon1, groundShootPiston);
         climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, ballUpPiston, climberPiston1, climberPiston2, drive);
 
         
@@ -161,20 +154,10 @@ public class Elevator {
             case ZEROING:
                 talon1.set(ControlMode.PercentOutput, moveUpZeroSpeed);
                 talon2.set(ControlMode.PercentOutput, moveUpZeroSpeed);
-                if(hallEffectSensor1.get() || hallEffectSensor2.get() || hallEffectSensor3.get()) {//if one of them hits
-                    if(hallEffectSensor1.get()) {
-                        ballElevator.init(hallEffectSensorOneHeight);
-                        hatchElevator.init(hallEffectSensorOneHeight);
-                        climb.init(hallEffectSensorOneHeight);
-                    } else if(hallEffectSensor2.get()) {
-                        ballElevator.init(hallEffectSensorTwoHeight);
-                        hatchElevator.init(hallEffectSensorTwoHeight);
-                        climb.init(hallEffectSensorTwoHeight);
-                    } else {
-                        ballElevator.init(hallEffectSensorThreeHeight);
-                        hatchElevator.init(hallEffectSensorThreeHeight);
-                        climb.init(hallEffectSensorThreeHeight);
-                    }
+                if(hallEffectSensor1.get() || player2.getRawButton(1)) {
+                    ballElevator.init(hallEffectSensorOneHeight);
+                    hatchElevator.init(hallEffectSensorOneHeight);
+                    climb.init(hallEffectSensorOneHeight);
                     elevatorStateMachine = elevatorState.RUNNING;
                 }
                 break;
