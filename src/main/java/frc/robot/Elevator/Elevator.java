@@ -157,7 +157,7 @@ public class Elevator {
                 SmartDashboard.putString("state", "zeroing");
                 talon1.set(ControlMode.PercentOutput, moveUpZeroSpeed);
                 talon2.set(ControlMode.PercentOutput, moveUpZeroSpeed);
-                if(!hallEffectSensor1.get() || player2.getRawButton(1)) {
+                if(!hallEffectSensor1.get() || player2.getRawButton(8)) {
                     ballElevator.init(hallEffectSensorOneHeight);
                     hatchElevator.init(hallEffectSensorOneHeight);
                     groundIntake.init(hallEffectSensorOneHeight);

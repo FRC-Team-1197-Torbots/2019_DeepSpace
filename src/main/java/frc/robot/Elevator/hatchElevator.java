@@ -160,7 +160,7 @@ public class hatchElevator {
         
                 //this sets the current target
                 if(elevator == theElevator.IDLE) {
-                    currentTarget = -0.3;//this should just be greater than 0 so it doesn't hit anything
+                    currentTarget = -0.1;//this should just be greater than 0 so it doesn't hit anything
                 } else if(elevator == theElevator.intakeHatchPID) {
                     currentTarget = intakeHatchPosition;
                 } else if(elevator == theElevator.intakeHatchExtendPID) {

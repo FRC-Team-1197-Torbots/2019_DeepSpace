@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.*;
 
 import frc.robot.PID_Tools.*;
 import frc.robot.TorDrive;
@@ -70,14 +71,14 @@ public class Climb {
     // ----------------- PID -----------------------------------------
     private double flatGyroValue;
 
-    private final double tiltkP = 0.0;
+    private final double tiltkP = 1;
     private final double tiltkI = 0.0;
     private final double tiltkD = 0.0;
     private final double tiltTolerance = 1;// for thePID
-    private final double normalTiltPower = -0.7;
+    private final double normalTiltPower = -0.8;
 
-    private final double normalkP = 0.0;
-    private final double normalkI = 0.0;
+    private final double normalkP = 1;
+    private final double normalkI = 0.001;
     private final double normalkD = 0.0;
     private final double normalTolerance = 0.01;// for thePID
 
@@ -86,14 +87,14 @@ public class Climb {
     // ----------------- Elevator -----------------------------------------
 
     private final double startClimbPosition = -0.3429; // this is where the elevator will go to first.
-    private final double elevatorBottomPosition = -0.81915;//these are in meters from the first hall effect sensor
+    private final double elevatorBottomPosition = -0.825;//these are in meters from the first hall effect sensor
 
     // ----------------- Drive -----------------------------------------
-    private final double climberTalonLiftSpeed = 0.15;
-    private final double climberTalonDriveSpeed = 0.5;
-    private final double drivetrainSpeed = 0.5;
-    private final long pistonRetractTime = 1500;
-    private final long driveOnPlatformTime = 600;
+    private final double climberTalonLiftSpeed = 0.35;
+    private final double climberTalonDriveSpeed = 1;
+    private final double drivetrainSpeed = 0.25;
+    private final long pistonRetractTime = 1000;
+    private final long driveOnPlatformTime = 5;
 
     /*
      * -----------------------------------------------------------------------------
@@ -146,6 +147,8 @@ public class Climb {
     }
 
     public void update(boolean running) {
+        SmartDashboard.putNumber("height in climb:", height());
+        SmartDashboard.putString("Climb state", climb.toString());
         currentTime = (long) (Timer.getFPGATimestamp() * 1000);
 
         // this starting boolean makes it so that it will still do the first value in
@@ -177,7 +180,10 @@ public class Climb {
                 gyroPidRun();
 
             }
+            SmartDashboard.putBoolean("got here 1", true);
             if(running) {
+                SmartDashboard.putBoolean("got here 2", true);
+                SmartDashboard.putNumber("control Power for climb", controlPower);
                 talon1.set(ControlMode.PercentOutput, controlPower);
                 talon2.set(ControlMode.PercentOutput, controlPower);
             }
@@ -197,6 +203,7 @@ public class Climb {
             upPiston.set(true);
             // go to start climb position
             if(Math.abs(height() - startClimbPosition)  < 0.05) {
+                lastTime = currentTime;
                 climb = theClimb.lift;
             }
             break;
@@ -207,7 +214,8 @@ public class Climb {
 
             climberTalon.set(ControlMode.PercentOutput, climberTalonLiftSpeed);
             // if the position of the elevator is at the bottom, go to drive forward
-            if (height() <= elevatorBottomPosition) {
+            if (height() <= elevatorBottomPosition || ((currentTime - lastTime) > 4000)) {
+                lastTime = currentTime;
                 climb = theClimb.driveForward;
             }
 
@@ -216,9 +224,8 @@ public class Climb {
             // run the drive motors and the climber motors
             climberTalon.set(ControlMode.PercentOutput, climberTalonDriveSpeed);
             setDriveSpeed(drivetrainSpeed);
-            if (!climbBreakBeam1.get()) { // if the breakbeam is activated and the CG is on the platform,
+            if (!climbBreakBeam1.get() || ((currentTime - lastTime) > 4000)) { // if the breakbeam is activated and the CG is on the platform,
                 // set motor speeds to 0
-                climberTalon.set(ControlMode.PercentOutput, 0);
                 setDriveSpeed(0);
                 // start retracting the pistons
                 lastTime = currentTime;
@@ -240,6 +247,7 @@ public class Climb {
             // drive robot forward a little bit to stay on platform
             if(currentTime - lastTime > driveOnPlatformTime) {
                 setDriveSpeed(0);
+                climberTalon.set(ControlMode.PercentOutput, 0);
                 climb = theClimb.IDLE;
             }
             break;
@@ -257,6 +265,7 @@ public class Climb {
         }
         normalP = currentNormalError;
         controlPower = (normalP * normalkP) + (normalD * normalkD) + (normalIntegral * normalkI);
+        SmartDashboard.putNumber("control power normal", controlPower);
     }
 
     public void gyroPidRun() {
@@ -269,7 +278,11 @@ public class Climb {
             tiltIntegral += tiltError;
         }
         tiltP = tiltError;
-        controlPower = (tiltP * tiltkP) + (tiltD * tiltkD) + (tiltIntegral * tiltkI)+ normalTiltPower;
+        controlPower = (tiltP * tiltkP) + (tiltD * tiltkD) + (tiltIntegral * tiltkI);
+        if(climb == theClimb.lift) {
+            controlPower += normalTiltPower;
+        }
+        SmartDashboard.putNumber("control power gyro running", controlPower);
     }
 
     
