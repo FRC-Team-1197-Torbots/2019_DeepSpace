@@ -1,12 +1,11 @@
 package frc.robot.Elevator;
 import frc.robot.PID_Tools.*;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Solenoid;
+import com.revrobotics.CANSparkMax;
 
 public class hatchElevator {
     private final boolean testMode = false;
@@ -69,8 +68,8 @@ public class hatchElevator {
     private boolean XPressedLast = false;
 
     //our hardware
-    private TalonSRX talon1;
-    private TalonSRX talon2;
+    private CANSparkMax talon1;
+    private CANSparkMax talon2;
     private Encoder encoder;
     private Joystick player2;
     private Solenoid piston;
@@ -86,7 +85,7 @@ public class hatchElevator {
 
     private theElevator elevator = theElevator.IDLE;
 
-    public hatchElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player2, boolean talon2Inverted, Solenoid piston) {
+    public hatchElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player2, boolean talon2Inverted, Solenoid piston) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
@@ -184,11 +183,11 @@ public class hatchElevator {
                 SmartDashboard.putNumber("current running speed:", currentRunningSpeed);
                 if(running && !limitSwitchBeingHit) {
                     SmartDashboard.putBoolean("got here 2", true);
-                    talon1.set(ControlMode.PercentOutput, currentRunningSpeed);
-                    talon2.set(ControlMode.PercentOutput, currentRunningSpeed);
+                    talon1.set(currentRunningSpeed);
+                    talon2.set(currentRunningSpeed);
                 } else {
-                    talon1.set(ControlMode.PercentOutput, 0);
-                    talon2.set(ControlMode.PercentOutput, 0);
+                    talon1.set(0);
+                    talon2.set(0);
                 }
             }        
         }

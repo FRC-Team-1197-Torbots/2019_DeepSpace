@@ -1,7 +1,7 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.*;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
@@ -11,11 +11,11 @@ import edu.wpi.first.wpilibj.Encoder;
 public class DriveHardware {
 	
 	private ADXRS450_Gyro gyro;
-
-	private final TalonSRX rightMaster;
-	private final TalonSRX rightSlave1;
-	private final TalonSRX leftMaster;
-	private final TalonSRX leftSlave1;
+	
+	private final CANSparkMax rightMaster;
+	private final CANSparkMax rightSlave1;
+	private final CANSparkMax leftMaster;
+	private final CANSparkMax leftSlave1;
 	private Encoder leftEncoder;
 	private Encoder rightEncoder;
 	
@@ -53,14 +53,14 @@ public class DriveHardware {
 	 */
 	
 	public DriveHardware() {
-		gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
+		// gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 		
 		solenoid = new Solenoid(0);
 
-		leftMaster = new TalonSRX(1);
-		leftSlave1 = new TalonSRX(2);  
-		rightMaster = new TalonSRX(3);
-		rightSlave1 = new TalonSRX(4);
+		leftMaster = new CANSparkMax(3, MotorType.kBrushless);
+		leftSlave1 = new CANSparkMax(4, MotorType.kBrushless);  
+		rightMaster = new CANSparkMax(5, MotorType.kBrushless);
+		rightSlave1 = new CANSparkMax(6, MotorType.kBrushless);
 
 		leftEncoder = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
 		rightEncoder = new Encoder(2, 3, false, Encoder.EncodingType.k4X);
@@ -71,8 +71,8 @@ public class DriveHardware {
 		rightMaster.setInverted(true); // Right master must be attached to the farthest CIM from the output shaft
 		rightSlave1.setInverted(true); 
 
-		resetEncoder();
-		resetGyro();
+		// resetEncoder();
+		// resetGyro();
 	}
 
 	public void setMotorSpeeds(double rightSpeed, double leftSpeed) {
@@ -92,14 +92,14 @@ public class DriveHardware {
 
 	// Setting the left master Talon's speed to the given parameter
 	public void SetLeft(double speed) {
-		leftMaster.set(ControlMode.PercentOutput, speed);
-		leftSlave1.set(ControlMode.PercentOutput, speed);
+		leftMaster.set(speed);
+		leftSlave1.set(speed);
 	}
 
 	// Setting the right master Talon's speed to the given parameter
 	public void SetRight(double speed) {
-		rightMaster.set(ControlMode.PercentOutput, speed);
-		rightSlave1.set(ControlMode.PercentOutput, speed);
+		rightMaster.set(speed);
+		rightSlave1.set(speed);
 	}
 
 	// Getting raw position value from the right encoder
@@ -133,10 +133,10 @@ public class DriveHardware {
 		leftSpeed = percentV - percentOmega;
 		rightSpeed = percentV + percentOmega;
 		
-		rightMaster.set(ControlMode.PercentOutput, rightSpeed);
-		rightSlave1.set(ControlMode.PercentOutput, rightSpeed);
-		leftMaster.set(ControlMode.PercentOutput, leftSpeed);
-		leftSlave1.set(ControlMode.PercentOutput, leftSpeed);
+		rightMaster.set(rightSpeed);
+		rightSlave1.set(rightSpeed);
+		leftMaster.set(leftSpeed);
+		leftSlave1.set(leftSpeed);
 	}
 
 	// Method to reset the encoder values

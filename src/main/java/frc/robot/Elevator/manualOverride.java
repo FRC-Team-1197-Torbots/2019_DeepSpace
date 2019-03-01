@@ -3,6 +3,7 @@ package frc.robot.Elevator;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -20,8 +21,8 @@ public class manualOverride {
 
     // ------------- Elevator ------------------------------------
     // Elevator Gearbox motors
-    private TalonSRX talon1;
-    private TalonSRX talon2;
+    private CANSparkMax talon1;
+    private CANSparkMax talon2;
 
     private Solenoid elevatorShifter;
 
@@ -75,7 +76,7 @@ public class manualOverride {
     private final double climberSpeed = 0.2;
     // ---------------------------------------------------------
 
-    public manualOverride(TalonSRX talon1, TalonSRX talon2, Joystick player2, boolean talon2Inverted,
+    public manualOverride(CANSparkMax talon1, CANSparkMax talon2, Joystick player2, boolean talon2Inverted,
             TalonSRX intakeMotor1, TalonSRX intakeMotor2, boolean intakeMotor2Inverted, Solenoid upPiston,
             Solenoid hatchPiston, VictorSPX overIntake1, VictorSPX overIntake2, TalonSRX ballRoller,
             Solenoid elevatorShifter, Solenoid climberPiston1, Solenoid climberPiston2, TalonSRX climberTalon) {
@@ -169,8 +170,8 @@ public class manualOverride {
     }
 
     public void setElevatorSpeed(double elevatorSpeed) { // method for setting elevator speed
-        talon1.set(ControlMode.PercentOutput, elevatorSpeed);
-        talon2.set(ControlMode.PercentOutput, elevatorSpeed);
+        talon1.set(elevatorSpeed);
+        talon2.set(elevatorSpeed);
     }
 
     public void setRollerArmSpeed(double rollerArmSpeed) { // method for setting ballroller arm speed

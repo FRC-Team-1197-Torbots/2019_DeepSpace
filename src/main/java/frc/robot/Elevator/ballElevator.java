@@ -2,6 +2,7 @@ package frc.robot.Elevator;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.revrobotics.CANSparkMax;
 
 import frc.robot.PID_Tools.*;
 
@@ -98,8 +99,8 @@ public class ballElevator {
     private long lastTimeBPressed = 0;
     private long lastTimeYPressed = 0;
     //our hardware
-    private TalonSRX talon1;
-    private TalonSRX talon2;
+    private CANSparkMax talon1;
+    private CANSparkMax talon2;
     private TalonSRX intakeMotor1;
     private TalonSRX intakeMotor2;
     private VictorSPX overIntake1;//since the 971 intake only matters for this ball elevator
@@ -129,7 +130,7 @@ public class ballElevator {
 
     public theElevator elevator = theElevator.IDLE;
 
-    public ballElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player2, 
+    public ballElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player2, 
         boolean talon2Inverted, TalonSRX intakeMotor1, TalonSRX intakeMotor2, boolean intakeMotor2Inverted, Solenoid upPiston,
         VictorSPX overIntake1, VictorSPX overIntake2, TalonSRX overPull, Encoder ballRollerArmEncoder, DigitalInput ballBreakBeam) {
         this.talon1 = talon1;
@@ -224,11 +225,11 @@ public class ballElevator {
                 stateRun();
                 handleIntake();
                 if(running && !limitSwitchBeingHit) {
-                    talon1.set(ControlMode.PercentOutput, currentRunningSpeed);
-                    talon2.set(ControlMode.PercentOutput, currentRunningSpeed);
+                    talon1.set(currentRunningSpeed);
+                    talon2.set(currentRunningSpeed);
                 } else {
-                    talon1.set(ControlMode.PercentOutput, 0);
-                    talon2.set(ControlMode.PercentOutput, 0);
+                    talon1.set(0);
+                    talon2.set(0);
                 }
 
                 if(running) {

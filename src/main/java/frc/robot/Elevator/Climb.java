@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
@@ -21,8 +22,8 @@ public class Climb {
     private int initialTicks;
 
     // Talons
-    private TalonSRX talon1;
-    private TalonSRX talon2;
+    private CANSparkMax talon1;
+    private CANSparkMax talon2;
     private TalonSRX climberTalon;
 
     // solenoids
@@ -118,7 +119,7 @@ public class Climb {
 
     private theClimb climb = theClimb.setUp;
 
-    public Climb(TalonSRX talon1, TalonSRX talon2, TalonSRX climberTalon, Encoder encoder, AnalogGyro climbGyro,
+    public Climb(CANSparkMax talon1, CANSparkMax talon2, TalonSRX climberTalon, Encoder encoder, AnalogGyro climbGyro,
             DigitalInput climbBreakBeam1, Solenoid upPiston, Solenoid climbPiston1, Solenoid climbPiston2, TorDrive drive) {
         // talons
         this.talon1 = talon1;
@@ -184,8 +185,8 @@ public class Climb {
             if(running) {
                 SmartDashboard.putBoolean("got here 2", true);
                 SmartDashboard.putNumber("control Power for climb", controlPower);
-                talon1.set(ControlMode.PercentOutput, controlPower);
-                talon2.set(ControlMode.PercentOutput, controlPower);
+                talon1.set(controlPower);
+                talon2.set(controlPower);
             }
         }
 

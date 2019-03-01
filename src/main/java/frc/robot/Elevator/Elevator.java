@@ -9,9 +9,10 @@ import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import frc.robot.TorDrive;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class Elevator {
 
@@ -41,8 +42,8 @@ public class Elevator {
 
 // ---------------    Hardware   ------------------------------------------
 // Talons
-    private TalonSRX talon1;// this talon is the "drive talon for the elevator"
-    private TalonSRX talon2;// this is the second one
+    private CANSparkMax talon1;// this talon is the "drive talon for the elevator"
+    private CANSparkMax talon2;// this is the second one
     private TalonSRX ballIntake1; //ball intake shooter
     private TalonSRX ballIntake2; //ball intake shooter motor 2, needs to be flipped
     private VictorSPX groundTalon1; //ground hatch motor
@@ -88,8 +89,8 @@ public class Elevator {
 
     public Elevator(Joystick player1, TorDrive drive) {
     // Talons
-        talon1 = new TalonSRX(5);
-        talon2 = new TalonSRX(6);
+        talon1 = new CANSparkMax(5, MotorType.kBrushless);
+        talon2 = new CANSparkMax(6, MotorType.kBrushless);
         talon2.follow(talon1);
         ballIntake1 = new TalonSRX(7);
         ballIntake2 = new TalonSRX(8);
@@ -155,8 +156,8 @@ public class Elevator {
         switch(elevatorStateMachine) {
             case ZEROING:
                 SmartDashboard.putString("state", "zeroing");
-                talon1.set(ControlMode.PercentOutput, moveUpZeroSpeed);
-                talon2.set(ControlMode.PercentOutput, moveUpZeroSpeed);
+                talon1.set(moveUpZeroSpeed);
+                talon2.set(moveUpZeroSpeed);
                 if(!hallEffectSensor1.get() || player2.getRawButton(8)) {
                     ballElevator.init(hallEffectSensorOneHeight);
                     hatchElevator.init(hallEffectSensorOneHeight);
