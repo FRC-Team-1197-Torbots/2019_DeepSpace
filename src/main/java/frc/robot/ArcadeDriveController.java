@@ -99,10 +99,12 @@ public class ArcadeDriveController extends DriveController {
     @Override
     public void run() {
         if(currentInit) {
-            for(double lambda:throttleArray)
-                lambda = 0;
-            for(double lambda:arcadeArray)
-                lambda = 0;
+            for(int x = 0; x < throttleArray.length; x++) {
+                throttleArray[x] = 0;
+            }
+            for(int x = 0; x < arcadeArray.length; x++) {
+                throttleArray[x] = 0;
+            }
             currentInit = false;
         }
         currentTime = (long) (Timer.getFPGATimestamp() * 1000);
