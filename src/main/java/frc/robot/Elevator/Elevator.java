@@ -37,7 +37,6 @@ public class Elevator {
     private ballElevator ballElevator;
     private groundIntake groundIntake;
     private manualOverride manualOverride;
-    private getGroundIntakeOutOfWay getGroundIntakeOutOfWay;
     private Climb climb;
 
 // ---------------    Hardware   ------------------------------------------
@@ -129,7 +128,6 @@ public class Elevator {
         groundIntake = new groundIntake(groundTalon1, player1, player2, fourtwenty, groundShootPiston, encoder);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 
                 ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston, overIntake1, overIntake2, overPull, elevatorShifter, climberPiston1, climberPiston2, climberTalon);
-        getGroundIntakeOutOfWay = new getGroundIntakeOutOfWay(groundTalon1, groundShootPiston);
         climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, ballUpPiston, climberPiston1, climberPiston2, drive);
 
         
@@ -171,12 +169,6 @@ public class Elevator {
                 if(autoBox.getRawButton(1)) {//climbing button
                     elevatorStateMachine = elevatorState.CLIMBING;
                 } else {
-                    if (autoBox.getRawButton(3)){
-                        getGroundIntakeOutOfWay.update(true);
-                    } else {
-                        getGroundIntakeOutOfWay.update(false);
-                    }
-        
                     groundIntake.update(Math.abs(getRightTrigger()) > 0.1, autoBox.getRawButton(3));
                     if (Math.abs(getRightTrigger()) > 0.1) {
                         manualOverride.update(true);
