@@ -4,7 +4,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import frc.robot.PID_Tools.*;
 
-public class ballPID {
+public class ballArm {
     private VictorSPX armTalon1;
     private VictorSPX armTalon2;
     private VictorSPX shootTalon;
@@ -35,7 +35,7 @@ public class ballPID {
     private boolean onTarget = false;
 
 
-    public ballPID(VictorSPX armTalon1, VictorSPX armTalon2, 
+    public ballArm(VictorSPX armTalon1, VictorSPX armTalon2, 
         VictorSPX shootTalon, AnalogPotentiometer fourtwenty) {
             this.armTalon1 = armTalon1;
             this.armTalon2 = armTalon2;
