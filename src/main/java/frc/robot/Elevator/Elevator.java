@@ -72,6 +72,7 @@ public class Elevator {
 //end of hardware -------------------------------------------
 
 // Controllers
+    private Joystick player1;
     private Joystick player2;
     private Joystick autoBox;
 
@@ -81,8 +82,8 @@ public class Elevator {
 
     public Elevator(Joystick player1, TorDrive drive) {
     // Talons
-        talon1 = new CANSparkMax(5, MotorType.kBrushless);
-        talon2 = new CANSparkMax(6, MotorType.kBrushless);
+        talon1 = new CANSparkMax(1, MotorType.kBrushless);
+        talon2 = new CANSparkMax(2, MotorType.kBrushless);
         talon2.follow(talon1);
         ballIntake1 = new TalonSRX(9);
         ballArm1 = new VictorSPX(7);
@@ -105,16 +106,17 @@ public class Elevator {
         hallEffectSensor1 = new DigitalInput(22);
 
     // Joysticks 
+        this.player1 = player1;
         player2 = new Joystick(1);
         autoBox = new Joystick(2);
 
     // Classes
         ballArm = new ballArm(ballArm1, ballArm2, ballIntake1, fourtwenty);
-        hatchElevator = new hatchElevator(talon1, talon2, encoder, player2, talon2Inverted, hatchPiston, ballArm);
+        hatchElevator = new hatchElevator(talon1, talon2, encoder, player1, player2, talon2Inverted, hatchPiston, ballArm);
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballBreakBeam, ballArm);
         groundIntake = new groundIntake(talon1, talon2, ballArm, player2, encoder);
-        manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 
-            intakeMotor2Inverted, hatchPiston, elevatorShifter, climberPiston1, climberPiston2, climberTalon);
+        manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballArm1, ballArm2,
+             elevatorShifter, climberPiston1, climberPiston2, climberTalon);
         climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, climberPiston1, climberPiston2, drive, ballArm);
     }
 

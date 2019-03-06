@@ -1,5 +1,7 @@
 package frc.robot.Elevator;
 
+import static org.junit.Assert.assertEquals;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -7,6 +9,7 @@ import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Talon;
 
 public class manualOverride {
     // it will need joystick player2
@@ -27,12 +30,15 @@ public class manualOverride {
     private Solenoid elevatorShifter;
 
     private double elevatorAxis; // joystick axis 1 for moving elevator
-    private final double elevatorHoldSpeed = 0.1; // << ADJUST, constant speed that will keep the elevator held in spot
+    private final double elevatorHoldSpeed = 0; // << ADJUST, constant speed that will keep the elevator held in spot
     // ---------------------------------------------------------
 
     // ------------- Ball Elevator ------------------------------------
     // Ball Intake/Shooter motors
     private TalonSRX intakeMotor1;
+
+    private VictorSPX ballIntakeArm1;
+    private VictorSPX ballIntakeArm2;
 
     // piston to angle ball intake for 2nd rocket level
     private boolean upPistonActive = false;
@@ -45,8 +51,8 @@ public class manualOverride {
 
     /*
      * // ------------- Hatch Elevator ------------------------------------ //
-     * Piston for extending/retracting Hatch Mechanism private Solenoid
-     * hatchPiston;//this will just be one button control //
+     * Piston for extending/retracting Hatch Mechanism 
+     * private Solenoid hatchPiston;//this will just be one button control //
      * ---------------------------------------------------------
      * 
      */
@@ -69,14 +75,17 @@ public class manualOverride {
     // ---------------------------------------------------------
 
     public manualOverride(CANSparkMax talon1, CANSparkMax talon2, Joystick player2, boolean talon2Inverted,
-            TalonSRX intakeMotor1, boolean intakeMotor2Inverted,
-            Solenoid hatchPiston, Solenoid elevatorShifter, Solenoid climberPiston1, Solenoid climberPiston2, TalonSRX climberTalon) {
+            VictorSPX ballIntakeArm1, VictorSPX ballIntakeArm2, 
+            Solenoid elevatorShifter, Solenoid climberPiston1, Solenoid climberPiston2, TalonSRX climberTalon) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.player2 = player2;
         this.talon2.follow(this.talon1);
         this.talon2.setInverted(talon2Inverted);
-        this.intakeMotor1 = intakeMotor1;
+
+        this.ballIntakeArm1 = ballIntakeArm1;
+        this.ballIntakeArm2 = ballIntakeArm2;
+
         this.elevatorShifter = elevatorShifter;
 
         this.climberPiston1 = climberPiston1;
@@ -102,18 +111,8 @@ public class manualOverride {
             }
 
 
-            // if y is pressed, raise the ball intake and extend the piston
-            if (getButtonY()) {
-                if (climbPistonsActive) {
-                    climberPiston1.set(false);
-                    climberPiston2.set(false);
-                    climbPistonsActive = false;
-                } else {
-                    climberPiston1.set(true);
-                    climberPiston2.set(true);
-                    climbPistonsActive = true;
-                }
-            } else if (climbPistonsActive) {
+            // if y is pressed, extend the piston
+            if (getLeftBumper()) {
                 climberPiston1.set(true);
                 climberPiston2.set(true);
             } else {
@@ -121,12 +120,24 @@ public class manualOverride {
                 climberPiston2.set(false);
             }
 
-
-            if (getLeftBumper()){
+            // manual for driving climber wheels
+            if (getButtonB()){
                 climberTalon.set(ControlMode.PercentOutput, climberSpeed);
             } else {
                 climberTalon.set(ControlMode.PercentOutput, 0);
             }
+
+            /* move ball intake arm 
+            *** currently not using */
+
+            // if (Math.abs(rollerArmAxis) > 0.15) { 
+            //     setBallIntakeArmSpeed(rollerArmAxis * rollerArmAxis);
+            
+            // } else {
+            //     setBallIntakeArmSpeed(0);
+
+            // }
+
 
         }
 
@@ -137,9 +148,13 @@ public class manualOverride {
         talon2.set(elevatorSpeed);
     }
 
-    public void setBallIntakeSpeed(double speed) { // method for setting ballroller arm speed
-        intakeMotor1.set(ControlMode.PercentOutput, speed);
+    public void setBallIntakeArmSpeed(double speed) { // method for setting ballroller arm speed
+        ballIntakeArm1.set(ControlMode.PercentOutput, speed);
+        ballIntakeArm2.set(ControlMode.PercentOutput, speed);
+
     }
+
+    
 
     public double getLeftX() {
         return player2.getRawAxis(0);

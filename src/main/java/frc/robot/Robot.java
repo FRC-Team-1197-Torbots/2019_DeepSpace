@@ -4,6 +4,10 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.Elevator.*;
 
+import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
+
 public class Robot extends TimedRobot {
 	private DriveHardware hardware;
 	private TorDrive drive;
@@ -17,6 +21,27 @@ public class Robot extends TimedRobot {
 		player1 = new Joystick(0);
 		drive = new TorDrive(hardware, player1);
 		elevator = new Elevator(player1, drive);
+
+
+		UsbCamera hatchSideCam = CameraServer.getInstance().startAutomaticCapture(0);
+		hatchSideCam.setBrightness(50);
+		hatchSideCam.setWhiteBalanceAuto();
+		hatchSideCam.setResolution(420, 240);
+		hatchSideCam.setFPS(30);
+		// hatchSideCam.setExposureManual();
+		CvSink cvsink1 = new CvSink("Hatch Side Cam");
+		cvsink1.setSource(hatchSideCam);
+		cvsink1.setEnabled(true);
+
+		UsbCamera cargoSideCam = CameraServer.getInstance().startAutomaticCapture(1);
+		cargoSideCam.setBrightness(50);
+		cargoSideCam.setWhiteBalanceAuto();
+		cargoSideCam.setResolution(420, 240);
+		cargoSideCam.setFPS(30);
+
+		CvSink cvsink2 = new CvSink("Cargo Side Cam");
+		cvsink2.setSource(cargoSideCam);
+		cvsink2.setEnabled(true);
 	}
 	@Override
 	public void robotInit() {

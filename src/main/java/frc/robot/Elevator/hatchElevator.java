@@ -75,6 +75,7 @@ public class hatchElevator {
     private CANSparkMax talon1;
     private CANSparkMax talon2;
     private Encoder encoder;
+    private Joystick player1;
     private Joystick player2;
     private Solenoid piston;
 
@@ -89,11 +90,12 @@ public class hatchElevator {
 
     private theElevator elevator = theElevator.IDLE;
 
-    public hatchElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player2, boolean talon2Inverted, Solenoid piston, ballArm ballArm) {
+    public hatchElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player1, Joystick player2, boolean talon2Inverted, Solenoid piston, ballArm ballArm) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
         this.talon2.setInverted(talon2Inverted);
+        this.player1 = player1;
         this.player2 = player2;
         this.piston = piston;
 
@@ -131,7 +133,7 @@ public class hatchElevator {
                 SmartDashboard.putNumber("current running speed:", currentRunningSpeed);
                 SmartDashboard.putNumber("encoder value", encoder.get());
                 SmartDashboard.putNumber("height", height());
-                if(getButtonX()) {
+                if(getButtonX() || player1.getRawButton(6)) {
                     XPressedLast = true;
                     //button X will be our extend position
                     //if it is intake mode, it will go down and extend
@@ -334,7 +336,7 @@ public class hatchElevator {
 		return player2.getRawAxis(3);
 	}
 
-	public boolean getShiftButton(){
+	public boolean getLeftBumper(){
 		return player2.getRawButton(5);
 	}
 
