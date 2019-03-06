@@ -1,13 +1,14 @@
 package frc.robot.Elevator;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import frc.robot.PID_Tools.*;
 
 public class ballArm {
     private VictorSPX armTalon1;
     private VictorSPX armTalon2;
-    private VictorSPX shootTalon;
+    private TalonSRX shootTalon;
     private AnalogPotentiometer fourtwenty;
     private TorDerivative derivative;
     
@@ -36,7 +37,7 @@ public class ballArm {
 
 
     public ballArm(VictorSPX armTalon1, VictorSPX armTalon2, 
-        VictorSPX shootTalon, AnalogPotentiometer fourtwenty) {
+        TalonSRX shootTalon, AnalogPotentiometer fourtwenty) {
             this.armTalon1 = armTalon1;
             this.armTalon2 = armTalon2;
             this.shootTalon = shootTalon;
@@ -45,8 +46,7 @@ public class ballArm {
             derivative.reset();
     }
 
-    public void update(double targetAngle, int mode) {
-        setMode(mode);
+    public void update(double targetAngle) {
         shootTalon.set(ControlMode.PercentOutput, intakeCurrentRunningPower);
 
         currentAngle = (fourtwenty.get() - flatAngle) * polarity;

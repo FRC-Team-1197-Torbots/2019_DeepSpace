@@ -27,7 +27,6 @@ public class Climb {
     private TalonSRX climberTalon;
 
     // solenoids
-    private Solenoid upPiston;
     private Solenoid climbPiston1;
     private Solenoid climbPiston2;
 
@@ -97,6 +96,10 @@ public class Climb {
     private final long pistonRetractTime = 1000;
     private final long driveOnPlatformTime = 5;
 
+    //ball arm
+    private final double upAngle = 90;
+    private ballArm ballArm;
+
     /*
      * -----------------------------------------------------------------------------
      * -----------------------------------------------------------------------------
@@ -120,7 +123,7 @@ public class Climb {
     private theClimb climb = theClimb.setUp;
 
     public Climb(CANSparkMax talon1, CANSparkMax talon2, TalonSRX climberTalon, Encoder encoder, AnalogGyro climbGyro,
-            DigitalInput climbBreakBeam1, Solenoid upPiston, Solenoid climbPiston1, Solenoid climbPiston2, TorDrive drive) {
+            DigitalInput climbBreakBeam1, Solenoid climbPiston1, Solenoid climbPiston2, TorDrive drive, ballArm ballArm) {
         // talons
         this.talon1 = talon1;
         this.talon2 = talon2;
@@ -132,7 +135,6 @@ public class Climb {
         this.climbBreakBeam1 = climbBreakBeam1;
 
         // Solenoids
-        this.upPiston = upPiston;
         this.climbPiston1 = climbPiston1;
         this.climbPiston2 = climbPiston2;
 
@@ -145,6 +147,7 @@ public class Climb {
         tiltDerivative.reset();
 
         this.drive = drive;
+        this.ballArm = ballArm;
     }
 
     public void update(boolean running) {
@@ -187,6 +190,8 @@ public class Climb {
                 SmartDashboard.putNumber("control Power for climb", controlPower);
                 talon1.set(controlPower);
                 talon2.set(controlPower);
+                ballArm.update(upAngle);
+                ballArm.setMode(0);
             }
         }
 
@@ -200,8 +205,6 @@ public class Climb {
             break;
         case setUp:
             flatGyroValue = climbGyro.getAngle();//this is the value of the gyro you read when you are flat
-
-            upPiston.set(true);
             // go to start climb position
             if(Math.abs(height() - startClimbPosition)  < 0.05) {
                 lastTime = currentTime;

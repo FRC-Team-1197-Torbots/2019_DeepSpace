@@ -50,6 +50,10 @@ public class hatchElevator {
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
     private final double pneumaticIntakeWaitTime = 0.3 * 1000;//you need to have a small pause between the pneumatic and elevator when you intake
+
+    //ball arm
+    private final double upAngleForBallArm = 90;
+    private ballArm ballArm;
     //this is since if you retract really fast before you give the elvator time to lift up, it won't grab the hatch
     /*
     -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -85,7 +89,7 @@ public class hatchElevator {
 
     private theElevator elevator = theElevator.IDLE;
 
-    public hatchElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player2, boolean talon2Inverted, Solenoid piston) {
+    public hatchElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player2, boolean talon2Inverted, Solenoid piston, ballArm ballArm) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
@@ -99,7 +103,8 @@ public class hatchElevator {
         positionPID.reset();
 
         findCurrentVelocity = new TorDerivative(dt);
-		findCurrentVelocity.resetValue(0);
+        findCurrentVelocity.resetValue(0);
+        this.ballArm = ballArm;
     }
 
     public void update(boolean running, boolean limitSwitchBeingHit) {
@@ -159,7 +164,7 @@ public class hatchElevator {
         
                 //this sets the current target
                 if(elevator == theElevator.IDLE) {
-                    currentTarget = -0.1;//this should just be greater than 0 so it doesn't hit anything
+                    currentTarget = -0.4;//this should be low so that the elevator has a low "waiting" cg when you just enter hatch mode
                 } else if(elevator == theElevator.intakeHatchPID) {
                     currentTarget = intakeHatchPosition;
                 } else if(elevator == theElevator.intakeHatchExtendPID) {
@@ -181,13 +186,18 @@ public class hatchElevator {
                     handleSolenoid();
                 }
                 SmartDashboard.putNumber("current running speed:", currentRunningSpeed);
-                if(running && !limitSwitchBeingHit) {
-                    SmartDashboard.putBoolean("got here 2", true);
-                    talon1.set(currentRunningSpeed);
-                    talon2.set(currentRunningSpeed);
+                if(running) {
+                    ballArm.setMode(0);
+                    ballArm.update(upAngleForBallArm);
+                    if(!limitSwitchBeingHit) {
+                        talon1.set(currentRunningSpeed);
+                        talon2.set(currentRunningSpeed);
+                    } else {
+                        talon1.set(0);
+                        talon2.set(0);
+                    }
                 } else {
-                    talon1.set(0);
-                    talon2.set(0);
+                    elevator = theElevator.IDLE;
                 }
             }        
         }

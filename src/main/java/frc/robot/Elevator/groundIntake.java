@@ -1,228 +1,270 @@
 package frc.robot.Elevator;
-import frc.robot.PID_Tools.*;
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Solenoid;
+import com.revrobotics.CANSparkMax;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import frc.robot.Elevator.ballElevator.theElevator;
+import frc.robot.PID_Tools.*;
 
 import edu.wpi.first.wpilibj.Encoder;
 
 public class groundIntake {
-   //it will need both talons to go up. It will need the ground intake talons. It will need the encoder to make sure the elevator
-   //is high enough before the ground intake deploys
-   //it will need a potentiometer for the ground intake
-   //it will need both joysticks
-   //it will need a solenoid to outake
+    //test or not?
+    private final boolean testMode = false;
 
-   private TalonSRX elevatorTalon1;//talons for the up and down
-   private TalonSRX elevatorTalon2;
-   private VictorSPX groundTalon1;
-   private Joystick player1;
-   private Joystick player2;
-   private Encoder encoder;
-   private AnalogPotentiometer fourtwenty;//ITS THE POT
-   private long currentTime = (long)(Timer.getFPGATimestamp() * 1000);
-   private long lastTime = currentTime;
-   private boolean highEnough = false;
-   private TorDerivative findCurrentVelocity;
-   private TorDerivative groundfindCurrentVelocity;
-   private BantorPID positionPID;
-   private BantorPID groundPositionPID;
-   private Solenoid groundShootPiston;
-   private double currentVelocity;
-   private double groundcurrentVelocity;
-   private double controlPower;//this is the amount of power the PID is giving out
-  
-   private double groundCurrentTarget;
+    private double currentRunningSpeed;
 
-   private double groundCurrentAngle;
-   private double groundControlPower;
+    private long currentTime;
+	private long startTime = (long)(Timer.getFPGATimestamp() * 1000);
+	private double timeInterval = 0.005;
+	private double dt = timeInterval;
+	private long lastCountedTime;
+	private boolean starting = true;
+    private BantorPID positionPID;
+    private double controlPower;//this is the amount of power the PID is giving out
+    private TorDerivative findCurrentVelocity;
+    private double currentVelocity;
 
-   /*
-   tuneable stuff--------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-   */
+    private ballArm ballArm;
+    private CANSparkMax elevatorTalon1;
+    private CANSparkMax elevatorTalon2;
+    private Joystick player2;
+    private Encoder encoder;
+    private int initialTicks;
+    private double currentTarget;
 
-   //this top PID is for the elevator
+    //elevator PID Stuff (should be same as the elevator PID in Hatch and Ball)
+    private final double velocityTolerance = 0.0;
+    private final double targetVelocity = 0.0;//probably won't need
+    private final double targetAcceleration = 0.0;//probably won't need
+    private final double positionkP = 2.85;
+    private final double positionkI = 0.0;
+    private final double positionkD = 0.0;
+    private final double positionTolerance = 0.01;//for thePID
+    private final double velocitykP = 0.0;//velocity stuff probably not needed at all and should keep 0
+    private final double velocitykI = 0.0;
+    private final double velocitykD = 0.0;
+    private final double kV = 0.0;
+    private final double kA = 0.0;//this should definitely stay at 0
+    private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
+    private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
+    private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
+
+    /*
+    tunable values for this class (top should be the same)
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    */
+
+    private final double intakeArmAngle = 0;//should stay flat when we intake the hatch
+    private final double defaultArmAngle = 90;//this is the in angle
+    private final double highPositionArmAngle = 60;
+    private final double mediumPositionArmAngle = 80;
+    private final double highPositionReleaseArmAngle = 40;
+    private final double mediumPositionReleaseAngle = 60;
+
+    private final double intakePosition = -0.5;
+    private final double defaultPosition = -0.4;
+    private final double highPosition = -0.2;
+    private final double mediumPosition = -0.4;
+    private final double highReleasePosition = -0.3;
+    private final double mediumReleasePosition = -0.5;
+    /*
+    end of tunable values for this class
+    ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    */
+    private long lastTimeAPressed = 0;
+    private long lastTimeBPressed = 0;
+    private long lastTimeXPressed = 0;
+    private long lastTimeYPressed = 0;
+
+    public static enum theElevator {
+        IDLE, 
+        defaultPosition,
+        intakePID,
+        mediumPID,
+        highPID,
+        mediumReleasePID, highReleasePID;
+        private theElevator() {}
+    }
+
+    public theElevator elevator = theElevator.defaultPosition;
 
 
-   private final double neededHeight = -0.02;//in meters
-   private final double currentTarget = neededHeight + 0.02;//this is the height the elevator will PID to
+    public groundIntake(CANSparkMax elevatorTalon1, CANSparkMax elevatorTalon2, ballArm ballArm, Joystick player2, Encoder encoder) {
+        this.ballArm = ballArm;
+        this.elevatorTalon1 = elevatorTalon1;
+        this.elevatorTalon2 = elevatorTalon2;
+        this.player2 = player2;
+        this.encoder = encoder;
 
-   private final double positionkP = 0.0;
-   private final double positionkI = 0.0;
-   private final double positionkD = 0.0;
-   private final double positionTolerance = 0.01;//for thePID
-   private final double velocitykP = 0.0;//velocity stuff probably not needed at all and should keep 0
-   private final double velocitykI = 0.0;
-   private final double velocitykD = 0.0;
-   private final double kV = 0.0;
-   private final double kA = 0.0;//this should definitely stay at 0
-   private final double velocityTolerance = 0.0;
-   private final double targetVelocity = 0.0;//probably won't need
-   private final double targetAcceleration = 0.0;//probably won't need
-   private final double dt = 0.005;
-   private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
-   private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
-   private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
-  
-   private final long shootOutTime = 500;//time it takes to fire the pistons to shoot the hatch out
+        //this is the PID
+        positionPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP,
+        velocitykI, velocitykD, dt, positionTolerance, velocityTolerance);
+        positionPID.reset();
+     
+        findCurrentVelocity = new TorDerivative(dt);
+        findCurrentVelocity.resetValue(0);
+    }
 
-   private final double groundpositionkP = 0.009;//0.009
-   private final double groundpositionkI = 0.0;
-   private final double groundpositionkD = 0.0002;
-   private final double groundpositionTolerance = 0.0;//for thePID
-   private final double groundvelocitykP = 0.0;//velocity stuff probably not needed at all and should keep 0
-   private final double groundvelocitykI = 0.0;
-   private final double groundvelocitykD = 0.0;
-   private final double groundkV = 0.0;
-   private final double groundkA = 0.0;//this should definitely stay at 0
-   private final double groundvelocityTolerance = 0.0;
-   private final double groundtargetVelocity = 0.0;//probably won't need
-   private final double groundtargetAcceleration = 0.0;//probably won't need
+    public void update(boolean running, boolean limitSwitchBeingHit) {
+        currentTime = (long)(Timer.getFPGATimestamp() * 1000);
+		SmartDashboard.putString("ballElevator state", elevator.toString());
+		//this starting boolean makes it so that it will still do the first value in the trajectory
+		
+		//this handles it so that it will only tick in the time interval so that the derivatives and the integrals are correct
+		if(((currentTime - startTime) - ((currentTime - startTime) % (dt * 1000))) > //has current time minus start time to see the relative time the trajectory has been going
+		((lastCountedTime - startTime) - ((lastCountedTime - startTime) % (dt * 1000))) //subtracts that mod dt times 1000 so that it is floored to the nearest multiple of dt times 1000
+		//then checks if that is greater than the last one to see if it is time to move on to the next tick
+		|| starting) {
+			starting = false;
+			lastCountedTime = currentTime;
+            if(testMode) {
+                SmartDashboard.putNumber("encoder value", encoder.get());
+                SmartDashboard.putNumber("height", height());
+            } else {
+                SmartDashboard.putNumber("encoder value", encoder.get());
+                SmartDashboard.putNumber("height", height());
 
-   private final int potSwitched = -1;
-   private final double groundIntakeDownAngle = 80;
-   private final double groundIntakeInAngle = 25;
-   private final double groundDiagonalAngle = 40;
-   private final double groundstartAngle = 50.077898828536675;
-   /*
-   ----------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-   */
-   private int initialTicks;
+                if(getButtonA() && (currentTime - lastTimeAPressed > 250)) {
+                    lastTimeAPressed = currentTime;
+                    if(elevator == theElevator.intakePID) {
+                        elevator = theElevator.defaultPosition;
+                    } else {
+                        elevator = theElevator.intakePID;
+                    }
+                } else if(getButtonB() && (currentTime - lastTimeBPressed > 250)) {
+                    lastTimeBPressed = currentTime;
+                    elevator = theElevator.mediumPID;
+                } else if(getButtonY() && (currentTime - lastTimeYPressed > 250)) {
+                    lastTimeYPressed = currentTime;
+                    elevator = theElevator.highPID;
+                } else if(getButtonX() && (currentTime - lastTimeXPressed > 250)) {
+                    lastTimeXPressed = currentTime;
+                    if(elevator == theElevator.mediumPID) {
+                        elevator = theElevator.mediumReleasePID;
+                    } else if(elevator == theElevator.highPID) {
+                        elevator = theElevator.highReleasePID;
+                    } else if(elevator == theElevator.highReleasePID || elevator == theElevator.mediumReleasePID) {
+                        elevator = theElevator.defaultPosition;
+                    }
+                    //those are all the states you should be in when you press X
+                    //otherwise it won't work since it is only to outake the ground hatch
+                }
 
-   //the state machine
-   public static enum ground {
-       IDLE, GOINGUP, DOWN, PULLEDBACK, SHOOTPOS, SHOOTING;
-       private ground () {}
-   }
-   private ground groundIntake = ground.IDLE;
+                //handles the current target of the elevator PID
+                if(elevator == theElevator.IDLE) {
+                    currentTarget = -0.1;//this should just be greater than 0 so it doesn't hit anything
+                } else if(elevator == theElevator.mediumPID) {
+                    currentTarget = mediumPosition;
+                } else if(elevator == theElevator.intakePID) {
+                    currentTarget = intakePosition;
+                } else if(elevator == theElevator.highPID) {
+                    currentTarget = highPosition;
+                } else if(elevator == theElevator.mediumReleasePID) {
+                    currentTarget = mediumReleasePosition;
+                } else if(elevator == theElevator.highReleasePID) {
+                    currentTarget = highReleasePosition;
+                } else if(elevator == theElevator.defaultPosition) {
+                    currentTarget = defaultPosition;
+                }
+                PIDRun();//this only updates what value the elevator should be going at
+                if(running) {
+                    handleIntake();
+                    handleArm();
+                    if(!limitSwitchBeingHit) {
+                        elevatorTalon1.set(currentRunningSpeed);
+                        elevatorTalon2.set(currentRunningSpeed);
+                    }
+                } else {
+                    elevator = theElevator.defaultPosition;
+                }
+            }
+        }
+    }
 
-   public groundIntake(VictorSPX groundTalon1,
-       Joystick player1, Joystick player2, AnalogPotentiometer fourtwenty, Solenoid groundShootPiston,
-       Encoder ElevatorEncoder) {
-       this.groundTalon1 = groundTalon1;
-       this.player1 = player1;
-       this.player2 = player2;
-       this.fourtwenty = fourtwenty;
-       this.groundShootPiston = groundShootPiston;
-       this.encoder = ElevatorEncoder;
+    public void PIDRun() {//finds out the current velocity
+        currentVelocity = findCurrentVelocity.estimate(height());
+        positionPID.updateTargets(currentTarget, targetVelocity, targetAcceleration);
+        positionPID.updateCurrentValues(height(), currentVelocity);
+        controlPower = positionPID.update();
+        if(controlPower > absoluteMaxUpwardVelocity) {
+            controlPower = absoluteMaxUpwardVelocity;
+        } else if(controlPower < -absoluteMaxDownwardVelocity) {
+            controlPower = -absoluteMaxDownwardVelocity;
+        }
+    }
+    
+    public void handleArm() {
+        if(elevator == theElevator.IDLE || elevator == theElevator.defaultPosition) {
+            ballArm.update(defaultArmAngle);
+        } else if(elevator == theElevator.highPID) {
+            ballArm.update(highPositionArmAngle);
+        } else if(elevator == theElevator.highReleasePID) {
+            ballArm.update(highPositionReleaseArmAngle);
+        } else if(elevator == theElevator.mediumPID) {
+            ballArm.update(mediumPositionArmAngle);
+        } else if(elevator == theElevator.mediumReleasePID) {
+            ballArm.update(mediumPositionReleaseAngle);
+        } else if(elevator == theElevator.intakePID) {
+            ballArm.update(intakeArmAngle);
+        }
+    }
 
-       //this is the PID
-       positionPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP,
-           velocitykI, velocitykD, dt, positionTolerance, velocityTolerance);
-       groundPositionPID = new BantorPID(groundkV, groundkA, groundpositionkP, groundpositionkI, groundpositionkD, groundvelocitykP,
-           groundvelocitykI, groundvelocitykD, dt, groundpositionTolerance, groundvelocityTolerance);
-       groundPositionPID.reset();
-       groundfindCurrentVelocity = new TorDerivative(dt);
-       groundfindCurrentVelocity.resetValue(0);
-       positionPID.reset();
-       findCurrentVelocity = new TorDerivative(dt);
-       findCurrentVelocity.resetValue(0);
-   }
+    public void handleIntake() {
+        //we should not run the ball intake spin motors when we do ground hatch
+        ballArm.setMode(0);
+    }
 
-   public void update(boolean elevatorManualOverriding, boolean running) {
-       currentTime = (long)(Timer.getFPGATimestamp() * 1000);
-       highEnough = (height() >= neededHeight);
 
-       if((Math.abs(player1.getRawAxis(3)) > 0.3)
-       && (groundIntake == ground.IDLE)) {//right trigger is pressed
-           if(groundIntake == ground.IDLE) {
-               if(elevatorManualOverriding || highEnough) {
-                   groundIntake = ground.DOWN;
-               } else {
-                   groundIntake = ground.GOINGUP;
-               }
-           }
-       }
+    public void init(int initialValue) {
+        initialTicks = encoder.get() - initialValue;
+    }
+    public double height() {
+        return ((encoder.get() - initialTicks)/encoderTicksPerMeter);
+    }
 
-       stateMachineRun();
-       groundPIDRun();
+    /*
+	 *  The following are a bunch of accessor methods to obtain input from the controller.
+	 */
+	public double getLeftX(){
+		return player2.getRawAxis(0);
+	}
 
-       if(running) {
-           elevatorTalon1.set(ControlMode.PercentOutput, controlPower);
-           elevatorTalon2.set(ControlMode.PercentOutput, controlPower);
+	public double getLeftY(){
+		return player2.getRawAxis(1);
+	}
 
-           groundTalon1.set(ControlMode.PercentOutput, groundControlPower);
-       }
-   }
+	public double getRightX(){
+		return player2.getRawAxis(4);
+	}
 
-   public void stateMachineRun() {
-       switch(groundIntake) {
-           case IDLE:
-               groundCurrentTarget = groundIntakeInAngle;
-               break;
-           case DOWN:
-               groundCurrentTarget = groundIntakeDownAngle;
-               if(!(Math.abs(player1.getRawAxis(3)) > 0.3)) {
-                   groundIntake = ground.SHOOTPOS;
-               }
-               break;
-           case GOINGUP:
-               groundCurrentTarget = groundIntakeInAngle;
-               if(highEnough) {
-                   groundIntake = ground.DOWN;
-               }
-               break;
-           case PULLEDBACK:
-               groundCurrentTarget = groundIntakeInAngle;
-               if(!(Math.abs(player2.getRawAxis(2)) > 0.3)) {
-                   groundIntake = ground.SHOOTPOS;
-               }
-               break;
-           case SHOOTPOS:
-               groundCurrentTarget = groundDiagonalAngle;
-               if(player2.getRawButton(3)) {//button X
-                   lastTime = currentTime;
-                   groundShootPiston.set(true);
-                   groundIntake = ground.SHOOTING;
-               } else if((Math.abs(player2.getRawAxis(2)) > 0.3)) {//player 2 presses left trigger
-                   groundIntake = ground.PULLEDBACK;
-               }
-               break;
-           case SHOOTING:
-               groundCurrentTarget = groundDiagonalAngle;
-               if(currentTime - lastTime > shootOutTime) {
-                   groundShootPiston.set(false);
-                   groundIntake = ground.IDLE;
-               }
-               break;
-       }
-   }
+	public double getRightTrigger(){
+		return player2.getRawAxis(3);
+	}
 
-   public void groundPIDRun() {
-       groundCurrentAngle = (fourtwenty.get() - groundstartAngle) * potSwitched;
-       groundcurrentVelocity = groundfindCurrentVelocity.estimate(groundCurrentAngle);
-       groundPositionPID.updateTargets(groundCurrentTarget, groundtargetVelocity, groundtargetAcceleration);
-       groundPositionPID.updateCurrentValues(groundCurrentAngle, groundcurrentVelocity);
-       SmartDashboard.putNumber("groundCurrentAngle:", groundCurrentAngle);
-       SmartDashboard.putNumber("groundCurrentTarget", groundCurrentTarget);
-       groundControlPower = groundPositionPID.update();
-       SmartDashboard.putNumber("groundcontrolpower from the PID directly:", groundControlPower);
-   }
+	public boolean getShiftButton(){
+		return player2.getRawButton(5);
+	}
 
-   public void PIDRun() {//finds out the current velocity
-       currentVelocity = findCurrentVelocity.estimate(height());
-       positionPID.updateTargets(currentTarget, targetVelocity, targetAcceleration);
-       positionPID.updateCurrentValues(height(), currentVelocity);
-       controlPower = positionPID.update();
-       if(controlPower > absoluteMaxUpwardVelocity) {
-           controlPower = absoluteMaxUpwardVelocity;
-       } else if(controlPower < -absoluteMaxDownwardVelocity) {
-           controlPower = -absoluteMaxDownwardVelocity;
-       }
-   }
+	public boolean getRightBumper(){
+		return player2.getRawButton(6);
+	}
 
-   public double height() {
-       return ((encoder.get() - initialTicks)/encoderTicksPerMeter);
-   }
+	public boolean getButtonA(){
+		return player2.getRawButton(1);
+	}
 
-   public void init(int initialValue) {
-       initialTicks = encoder.get() - initialValue;
-   }
+	public boolean getButtonB(){
+		return player2.getRawButton(2);
+	}
+
+	public boolean getButtonX(){
+		return player2.getRawButton(3);
+	}
+
+	public boolean getButtonY(){
+		return player2.getRawButton(4);
+	}
 }
 

@@ -32,11 +32,9 @@ public class manualOverride {
 
     // ------------- Ball Elevator ------------------------------------
     // Ball Intake/Shooter motors
-    private TalonSRX intakeMotor1; // I would make it a button to go in, a button to go out
-    private TalonSRX intakeMotor2;
+    private TalonSRX intakeMotor1;
 
     // piston to angle ball intake for 2nd rocket level
-    private Solenoid upPiston;
     private boolean upPistonActive = false;
 
     private final double intakeSpeed = 1.0; // << ADJUST, speed to intake the ball
@@ -52,12 +50,6 @@ public class manualOverride {
      * ---------------------------------------------------------
      * 
      */
-
-    // ------------- Ball Roller ------------------------------------
-    // Motors for Ball Roller Arm, Ball Roller
-    private VictorSPX overIntake1; // Ball Roller Arm Motor 1
-    private VictorSPX overIntake2; // Ball Roller Arm Motor 2
-    private TalonSRX ballRoller; // Motor for spinning Ball Roller Axel
 
     private double rollerArmAxis; // joystick axis 5 for moving the arm
 
@@ -77,22 +69,14 @@ public class manualOverride {
     // ---------------------------------------------------------
 
     public manualOverride(CANSparkMax talon1, CANSparkMax talon2, Joystick player2, boolean talon2Inverted,
-            TalonSRX intakeMotor1, TalonSRX intakeMotor2, boolean intakeMotor2Inverted, Solenoid upPiston,
-            Solenoid hatchPiston, VictorSPX overIntake1, VictorSPX overIntake2, TalonSRX ballRoller,
-            Solenoid elevatorShifter, Solenoid climberPiston1, Solenoid climberPiston2, TalonSRX climberTalon) {
+            TalonSRX intakeMotor1, boolean intakeMotor2Inverted,
+            Solenoid hatchPiston, Solenoid elevatorShifter, Solenoid climberPiston1, Solenoid climberPiston2, TalonSRX climberTalon) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.player2 = player2;
         this.talon2.follow(this.talon1);
         this.talon2.setInverted(talon2Inverted);
         this.intakeMotor1 = intakeMotor1;
-        this.intakeMotor2 = intakeMotor2;
-        this.intakeMotor2.follow(this.intakeMotor1);
-        this.intakeMotor2.setInverted(intakeMotor2Inverted);
-        this.upPiston = upPiston;
-        this.overIntake1 = overIntake1;
-        this.overIntake2 = overIntake2;
-        this.ballRoller = ballRoller;
         this.elevatorShifter = elevatorShifter;
 
         this.climberPiston1 = climberPiston1;
@@ -144,27 +128,6 @@ public class manualOverride {
                 climberTalon.set(ControlMode.PercentOutput, 0);
             }
 
-
-
-
-
-
-            // Ball Mechanims
-            if (getButtonA()) {// if a is pressed spin the ball roller in and the ball intake in
-                setBallIntakeSpeed(intakeSpeed);
-                ballRoller.set(ControlMode.PercentOutput, ballRollerSpeed);
-            } else {
-                setBallIntakeSpeed(0);
-                ballRoller.set(ControlMode.PercentOutput, 0);
-            }
-
-            // Ball Roller Arm
-            if (Math.abs(rollerArmAxis) > 0.15) { // if you move the right axis up or down to move the roller arm speed
-                setRollerArmSpeed(rollerArmAxis + rollerArmHoldSpeed);
-            } else {
-                setRollerArmSpeed(rollerArmHoldSpeed);
-            }
-
         }
 
     }
@@ -174,14 +137,8 @@ public class manualOverride {
         talon2.set(elevatorSpeed);
     }
 
-    public void setRollerArmSpeed(double rollerArmSpeed) { // method for setting ballroller arm speed
-        overIntake1.set(ControlMode.PercentOutput, rollerArmSpeed);
-        overIntake2.set(ControlMode.PercentOutput, rollerArmSpeed);
-    }
-
     public void setBallIntakeSpeed(double speed) { // method for setting ballroller arm speed
         intakeMotor1.set(ControlMode.PercentOutput, speed);
-        intakeMotor2.set(ControlMode.PercentOutput, -speed); // flip one of motors
     }
 
     public double getLeftX() {

@@ -1,7 +1,4 @@
 package frc.robot.Elevator;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANSparkMax;
 
 import frc.robot.PID_Tools.*;
@@ -9,7 +6,6 @@ import frc.robot.PID_Tools.*;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
 
@@ -26,13 +22,9 @@ public class ballElevator {
 	private long lastCountedTime;
 	private boolean starting = true;
     private BantorPID positionPID;
-    private BantorPID overPositionPID;
     private double controlPower;//this is the amount of power the PID is giving out
     private TorDerivative findCurrentVelocity;
-    private TorDerivative overfindCurrentVelocity;
     private double currentVelocity;
-    private double overcurrentVelocity;
-    private double lastTime = startTime;
 
     /*
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,37 +44,21 @@ public class ballElevator {
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need
 
-    private final double overpositionkP = 0.02;
-    private final double overpositionkI = 0.0;
-    private final double overpositionkD = 0.0;
-    private final double overpositionTolerance = 0.01;//for the overPID
-    private final double overvelocitykP = 0.0;//velocity stuff probably not needed at all and should keep 0
-    private final double overvelocitykI = 0.0;
-    private final double overvelocitykD = 0.0;
-    private final double overkV = 0.0;
-    private final double overkA = 0.0;//this should definitely stay at 0
-    private final double overvelocityTolerance = 0.0;
-    private final double overtargetVelocity = 0.0;//probably won't need
-    private final double overtargetAcceleration = 0.0;//probably won't need
-
-    private final double overLowLevelAngle = 0; //157
-    private final double overOutAngle = 45;
-    private final double overHighLevelAngle = 22;
-
     private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
     private final double lowBallPosition = -0.4;//these three are the heights of what we want to go to
+    private final double mediumBallPosition = -0.2;
     private final double intakeBallPosition = -0.5;
     private final double highBallPosition = -0.01;
+    private final double defaultPosition = -0.4;//should be low so limelight can see and center of gravity isn't too high
     private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
-    private final double intakePower = -0.6;
-    private final double outakePower = 0.4;
-    private final double overIntakePower = -1.0;
-    private final double overOutakePower = 1.0;
-    private final double highOutakePower = -0.7;
-
-    private final double encoderTicksPerDegreeForBallRoller = 0.8111;
+    //for the ballArm positions
+    private final double intakeBallAngle = -40;//we want to intake at a downwards angle to minimize grabbing more than one ball
+    private final double highBallAngle = 60;
+    private final double mediumBallAngle = 0;
+    private final double lowBallAngle = -20;
+    private final double pulledInAngle = 90;//inside the frame for protection
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
     //if it is false then it will only use PID for power
@@ -90,61 +66,42 @@ public class ballElevator {
     /*
     -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
-
-    private double intakeMotorSpeed = 0.0;
     private int initialTicks;
     private double currentTarget;
 
     private long lastTimeAPressed = 0;
     private long lastTimeBPressed = 0;
+    private long lastTimeXPressed = 0;
     private long lastTimeYPressed = 0;
     //our hardware
     private CANSparkMax talon1;
     private CANSparkMax talon2;
-    private TalonSRX intakeMotor1;
-    private TalonSRX intakeMotor2;
-    private VictorSPX overIntake1;//since the 971 intake only matters for this ball elevator
-    //we can instantiate it in here
-    private VictorSPX overIntake2;
-    private TalonSRX overPull;
-    private Encoder ballRollerArmEncoder;
+    private ballArm ballArm;
     private DigitalInput ballBreakBeam;
-
-    private double overstartAngle;
-    private double overcurrentAngle;
-    private double overPower;
     
     private Encoder encoder;
     private Joystick player2;
-    private Solenoid upPiston;
-
-    private double overCurrentTarget;
 
     public static enum theElevator {
         IDLE, lowBallPID,
         intakeBallPID,
         highBallPID,
-        goTolowBallPID, goTointakeBallPID, goToHighBallPID;
+        mediumBallPID,
+        defaultPosition,
+        goTolowBallPID, goTointakeBallPID, goToHighBallPID, goTomediumBallPID;
         private theElevator() {}
     }
 
-    public theElevator elevator = theElevator.IDLE;
+    public theElevator elevator = theElevator.defaultPosition;
 
     public ballElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player2, 
-        boolean talon2Inverted, TalonSRX intakeMotor1, TalonSRX intakeMotor2, boolean intakeMotor2Inverted, Solenoid upPiston,
-        VictorSPX overIntake1, VictorSPX overIntake2, TalonSRX overPull, Encoder ballRollerArmEncoder, DigitalInput ballBreakBeam) {
+        boolean talon2Inverted, DigitalInput ballBreakBeam, ballArm ballArm) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
         this.talon2.follow(this.talon1);
         this.talon2.setInverted(talon2Inverted);
         this.player2 = player2;
-        this.intakeMotor1 = intakeMotor1;
-        this.intakeMotor2 = intakeMotor2;
-        this.intakeMotor2.follow(this.intakeMotor1);
-        this.intakeMotor2.setInverted(intakeMotor2Inverted);
-        this.upPiston = upPiston;
-        this.ballRollerArmEncoder = ballRollerArmEncoder;
         this.ballBreakBeam = ballBreakBeam;
 
         //this is the PID
@@ -153,23 +110,14 @@ public class ballElevator {
         positionPID.reset();
         
         findCurrentVelocity = new TorDerivative(dt);
-        overfindCurrentVelocity = new TorDerivative(dt);
         findCurrentVelocity.resetValue(0);
-        overfindCurrentVelocity.resetValue(0);
-
-        //for the over the ball intake
-        this.overIntake1 = overIntake1;
-        this.overIntake2 = overIntake2;
-        this.overPull = overPull;
-        overPositionPID = new BantorPID(overkV, overkA, overpositionkP, overpositionkI, overpositionkD, overvelocitykP,
-        overvelocitykI, overvelocitykD, dt, overpositionTolerance, overvelocityTolerance);
-        overPositionPID.reset();
+        this.ballArm = ballArm;
     }
 
     public void update(boolean running, boolean limitSwitchBeingHit) {
         talon2.follow(talon1);
 		currentTime = (long)(Timer.getFPGATimestamp() * 1000);
-		SmartDashboard.putString("ballElevatr state", elevator.toString());
+		SmartDashboard.putString("ballElevator state", elevator.toString());
 		//this starting boolean makes it so that it will still do the first value in the trajectory
 		
 		//this handles it so that it will only tick in the time interval so that the derivatives and the integrals are correct
@@ -183,25 +131,41 @@ public class ballElevator {
             if(testMode) {
                 SmartDashboard.putNumber("encoder value", encoder.get());
                 SmartDashboard.putNumber("height", height());
-                SmartDashboard.putNumber("encoder for ball roller", ballRollerArmEncoder.get());
             } else {
                 SmartDashboard.putNumber("encoder value", encoder.get());
                 SmartDashboard.putNumber("height", height());
-                if(getButtonA() && ((currentTime - lastTimeAPressed) > 250) && !(elevator == theElevator.goToHighBallPID || 
-                    elevator == theElevator.goTolowBallPID || elevator == theElevator.goTointakeBallPID || elevator == theElevator.intakeBallPID)) {
+                if(getButtonA() && ((currentTime - lastTimeAPressed) > 250)) {
                     
                     lastTimeAPressed = currentTime;
-                    elevator = theElevator.goTointakeBallPID;
-                } else if(getButtonB() && ((currentTime - lastTimeBPressed) > 250) && !(elevator == theElevator.goToHighBallPID || 
-                    elevator == theElevator.goTolowBallPID || elevator == theElevator.goTointakeBallPID || elevator == theElevator.lowBallPID)) {
+                    if(elevator == theElevator.goTointakeBallPID || elevator == theElevator.intakeBallPID) {
+                        elevator = theElevator.defaultPosition;
+                    } else {
+                        elevator = theElevator.goTointakeBallPID;
+                    }
+                } else if(getButtonB() && ((currentTime - lastTimeBPressed) > 250)) {
                     
                     lastTimeBPressed = currentTime;
-                    elevator = theElevator.goTolowBallPID;
-                } else if(getButtonY() && ((currentTime - lastTimeYPressed) > 250) && !(elevator == theElevator.goToHighBallPID || 
-                    elevator == theElevator.goTolowBallPID || elevator == theElevator.goTointakeBallPID || elevator == theElevator.highBallPID)) {
+                    if(elevator == theElevator.goTolowBallPID || elevator == theElevator.lowBallPID) {
+                        elevator = theElevator.defaultPosition;
+                    } else {
+                        elevator = theElevator.goTolowBallPID;
+                    }
+                } else if(getButtonX() && ((currentTime - lastTimeXPressed) > 250)) {
+                    
+                    lastTimeXPressed = currentTime;
+                    if(elevator == theElevator.goTomediumBallPID || elevator == theElevator.mediumBallPID) {
+                        elevator = theElevator.defaultPosition;
+                    } else {
+                        elevator = theElevator.mediumBallPID;
+                    }
+                } else if(getButtonY() && ((currentTime - lastTimeYPressed) > 250)) {
                     
                     lastTimeYPressed = currentTime;
-                    elevator = theElevator.goToHighBallPID;
+                    if(elevator == theElevator.goToHighBallPID || elevator == theElevator.highBallPID) {
+                        elevator = theElevator.defaultPosition;
+                    } else {
+                        elevator = theElevator.goToHighBallPID;
+                    }
                 }
     
         
@@ -214,110 +178,62 @@ public class ballElevator {
                     currentTarget = intakeBallPosition;
                 } else if(elevator == theElevator.highBallPID) {
                     currentTarget = highBallPosition;
+                } else if(elevator == theElevator.mediumBallPID) {
+                    currentTarget = mediumBallPosition;
                 } else if(elevator == theElevator.goTointakeBallPID) {
                     currentTarget = intakeBallPosition;
                 } else if(elevator == theElevator.goToHighBallPID) {
                     currentTarget = highBallPosition;
                 } else if(elevator == theElevator.goTolowBallPID) {
                     currentTarget = lowBallPosition;
+                } else if(elevator == theElevator.goTomediumBallPID) {
+                    currentTarget = mediumBallPosition;
+                } else if(elevator == theElevator.defaultPosition) {
+                    currentTarget = defaultPosition;
                 }
-                PIDRun();//this only updates what value the elevator should be going
+                PIDRun();//this only updates what value the elevator should be going at
                 stateRun();
-                handleIntake();
-                if(running && !limitSwitchBeingHit) {
-                    talon1.set(currentRunningSpeed);
-                    talon2.set(currentRunningSpeed);
-                } else {
-                    talon1.set(0);
-                    talon2.set(0);
-                }
-
                 if(running) {
-                    if(elevator == theElevator.intakeBallPID || elevator == theElevator.goTointakeBallPID) {
-                        intakeMotor1.set(ControlMode.PercentOutput, intakeMotorSpeed);//auto intake for you
-                    } else {
-                        //you have to press a trigger to make it fire
-                        if(player2.getRawButton(5)) {
-                            intakeMotor1.set(ControlMode.PercentOutput, intakeMotorSpeed);
-                        }
+                    handleIntake();
+                    handleArm();
+                    if(!limitSwitchBeingHit) {
+                        talon1.set(currentRunningSpeed);
+                        talon2.set(currentRunningSpeed);
+
                     }
+                } else {
+                    elevator = theElevator.defaultPosition;
                 }
-
-                if(running) {
-                    handlePneumatics();
-                    handleOver();
-                }
-
             }        
         }
     }
 
-    public void handleOver() {
-        overcurrentAngle = (ballRollerArmEncoder.get() - overstartAngle) / encoderTicksPerDegreeForBallRoller;
-        SmartDashboard.putNumber("overcurrentAngle",overcurrentAngle);
-        overcurrentVelocity = overfindCurrentVelocity.estimate(overcurrentAngle);
-
-        if(elevator == theElevator.intakeBallPID || elevator == theElevator.goTointakeBallPID) {
-            overCurrentTarget = overOutAngle;
-            overPull.set(ControlMode.PercentOutput, overIntakePower);
-        } else if(elevator == theElevator.lowBallPID || elevator == theElevator.goTolowBallPID) {
-            overCurrentTarget = overLowLevelAngle;
-            if(currentTime - lastTime < 250) {//this basically makes it so that when we intake a ball we spin out
-                //for 0.25 seconds after one is intaked just in case another one is about to come in and get stuck
-                overPull.set(ControlMode.PercentOutput, overOutakePower);
-            } else {
-                overPull.set(ControlMode.PercentOutput, 0);
-            }
-        } else if(elevator == theElevator.highBallPID || elevator == theElevator.goToHighBallPID) {
-            overCurrentTarget = overHighLevelAngle;
-            overPull.set(ControlMode.PercentOutput, 0);
-        } else {
-            overCurrentTarget = overOutAngle;
-            overPull.set(ControlMode.PercentOutput, overIntakePower);
-        }
-
-        overPositionPID.updateTargets(overCurrentTarget, overtargetVelocity, overtargetAcceleration);
-        overPositionPID.updateCurrentValues(overcurrentAngle, overcurrentVelocity);
-        overPower = overPositionPID.update();
-
-        overIntake1.set(ControlMode.PercentOutput, overPower);
-        overIntake2.set(ControlMode.PercentOutput, -overPower);
-    }
-
-    public void handlePneumatics() {
-        //this is as very simple class that just makes the piston for the elvator
-        //turn up when player 2 presses X
-        if(getButtonX()) {
-            upPiston.set(true);
-        } else {
-            upPiston.set(false);
+    public void handleArm() {
+        if(elevator == theElevator.IDLE || elevator == theElevator.defaultPosition) {
+            ballArm.update(pulledInAngle);
+        } else if(elevator == theElevator.goToHighBallPID || elevator == theElevator.highBallPID) {
+            ballArm.update(highBallAngle);
+        } else if(elevator == theElevator.goTomediumBallPID || elevator == theElevator.mediumBallPID) {
+            ballArm.update(mediumBallAngle);
+        } else if(elevator == theElevator.goTolowBallPID || elevator == theElevator.lowBallPID) {
+            ballArm.update(lowBallAngle);
+        } else if(elevator == theElevator.intakeBallPID || elevator == theElevator.goTointakeBallPID) {
+            ballArm.update(intakeBallAngle);
         }
     }
 
     public void handleIntake() {
         //this handles the intake motors intake motor speed to be set
-        if(elevator == theElevator.IDLE) {
-            intakeMotorSpeed = outakePower;
-        } else if(elevator == theElevator.lowBallPID) {
-            intakeMotorSpeed = outakePower;
-        } else if(elevator == theElevator.intakeBallPID) {
-            intakeMotorSpeed = -intakePower;
-        } else if(elevator == theElevator.highBallPID) {
-            if(getButtonX()) {
-                intakeMotorSpeed = highOutakePower;
+        if(elevator == theElevator.IDLE || elevator == theElevator.defaultPosition) {
+            ballArm.setMode(0);
+        } else if(elevator == theElevator.intakeBallPID || elevator == theElevator.goTointakeBallPID) {
+            ballArm.setMode(-1);
+        } else {
+            if(player2.getRawButton(5)) {
+                ballArm.setMode(1);
             } else {
-                intakeMotorSpeed = outakePower;
+                ballArm.setMode(0);
             }
-        } else if(elevator == theElevator.goTointakeBallPID) {
-            intakeMotorSpeed = -intakePower;
-        } else if(elevator == theElevator.goToHighBallPID) {
-            if(getButtonX()) {
-                intakeMotorSpeed = highOutakePower;
-            } else {
-                intakeMotorSpeed = outakePower;
-            }
-        } else if(elevator == theElevator.goTolowBallPID) {
-            intakeMotorSpeed = outakePower;
         }
     }
 
@@ -337,20 +253,45 @@ public class ballElevator {
         switch(elevator) {
             case IDLE:
                 break;
+            case defaultPosition:
+                setPercentSpeed(controlPower);
+                break;
             case lowBallPID:
+                setPercentSpeed(controlPower);
+                break;
+            case mediumBallPID:
                 setPercentSpeed(controlPower);
                 break;
             case intakeBallPID:
                 setPercentSpeed(controlPower);
                 if(ballBreakBeam.get()) {
-                    lastTime = currentTime;
-                    elevator = theElevator.goTolowBallPID;
+                    elevator = theElevator.defaultPosition;
                 }
                 break;
             case highBallPID:
                 setPercentSpeed(controlPower);
                 break;
             case goTolowBallPID:
+                if(Math.abs(height() - currentTarget) > pidGoTolerance) {
+                    if((height() - currentTarget) > 0) {
+                        if(powerDrive) {
+                            setPercentSpeed(-absoluteMaxDownwardVelocity);
+                        } else {
+                            setPercentSpeed(controlPower);
+                        }
+                    } else {
+                        if(powerDrive) {
+                            setPercentSpeed(absoluteMaxUpwardVelocity);
+                        } else {
+                            setPercentSpeed(controlPower);
+                        }
+                    }
+                } else {
+                    setPercentSpeed(controlPower);
+                    elevator = theElevator.lowBallPID;
+                }
+                break;
+            case goTomediumBallPID:
                 if(Math.abs(height() - currentTarget) > pidGoTolerance) {
                     if((height() - currentTarget) > 0) {
                         if(powerDrive) {
@@ -415,7 +356,6 @@ public class ballElevator {
     
     public void init(int initialValue) {
         initialTicks = encoder.get() - initialValue;
-        overstartAngle = ballRollerArmEncoder.get();
     }
 
     public void setPercentSpeed(double speed) {

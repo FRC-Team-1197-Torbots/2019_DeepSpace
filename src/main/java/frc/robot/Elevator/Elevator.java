@@ -37,6 +37,7 @@ public class Elevator {
     private ballElevator ballElevator;
     private groundIntake groundIntake;
     private manualOverride manualOverride;
+    private ballArm ballArm;
     private Climb climb;
 
 // ---------------    Hardware   ------------------------------------------
@@ -44,19 +45,12 @@ public class Elevator {
     private CANSparkMax talon1;// this talon is the "drive talon for the elevator"
     private CANSparkMax talon2;// this is the second one
     private TalonSRX ballIntake1; //ball intake shooter
-    private TalonSRX ballIntake2; //ball intake shooter motor 2, needs to be flipped
-    private VictorSPX groundTalon1; //ground hatch motor
-    // private VictorSPX groundTalon2; 
-    private TalonSRX overPull; //ball roller to spin wheels
+    private VictorSPX ballArm1;
+    private VictorSPX ballArm2;
     private TalonSRX climberTalon; // wheels on climber to move forware
-
-    private VictorSPX overIntake1; //ball roller arm motor
-    private VictorSPX overIntake2; //ball roller arm motor
 // Solenoids
     private Solenoid elevatorShifter; // elevator shifter
-    private Solenoid groundShootPiston;  // ground hatch fire pistons
     private Solenoid hatchPiston; // hatch piston for hatch mech
-    private Solenoid ballUpPiston; // piston to angle ball intake 
     private Solenoid climberPiston1;
     private Solenoid climberPiston2;
 
@@ -64,13 +58,12 @@ public class Elevator {
     private DigitalInput hallEffectSensor1;
 
     private Encoder encoder; //elevator encoder
-    private Encoder ballRollerArmEncoder;
   
     private DigitalInput limitSwitch; // limit switch to stop the elevator
     
     private DigitalInput ballBreakBeam;
 
-    private AnalogPotentiometer fourtwenty; // pot on the 
+    private AnalogPotentiometer fourtwenty; // pot on the arm
 
     private DigitalInput climbSwitch1;
 
@@ -91,19 +84,14 @@ public class Elevator {
         talon1 = new CANSparkMax(5, MotorType.kBrushless);
         talon2 = new CANSparkMax(6, MotorType.kBrushless);
         talon2.follow(talon1);
-        ballIntake1 = new TalonSRX(7);
-        ballIntake2 = new TalonSRX(8);
-        overIntake1 = new VictorSPX(9);
-        overIntake2 = new VictorSPX(10);
-        groundTalon1 = new VictorSPX(11);
-        overPull = new TalonSRX(12);
+        ballIntake1 = new TalonSRX(9);
+        ballArm1 = new VictorSPX(7);
+        ballArm2 = new VictorSPX(8);
         climberTalon = new TalonSRX(13);
 
     // Solenoid
         elevatorShifter = new Solenoid(1);
         hatchPiston = new Solenoid(5);
-        ballUpPiston = new Solenoid(6);
-        groundShootPiston = new Solenoid(4);
         climberPiston1 = new Solenoid(2);
         climberPiston2 = new Solenoid(3);
         
@@ -111,7 +99,6 @@ public class Elevator {
         fourtwenty = new AnalogPotentiometer(1, 360, 0);
         climbGyro = new AnalogGyro(0);
         encoder = new Encoder(4, 5);
-        ballRollerArmEncoder = new Encoder(6, 7);
         limitSwitch = new DigitalInput(8);
         ballBreakBeam = new DigitalInput(9);//for the break  beam
         climbSwitch1 = new DigitalInput(23);
@@ -122,15 +109,13 @@ public class Elevator {
         autoBox = new Joystick(2);
 
     // Classes
-        hatchElevator = new hatchElevator(talon1, talon2, encoder, player2, talon2Inverted, hatchPiston);
-        ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballIntake1, ballIntake2,
-                intakeMotor2Inverted, ballUpPiston, overIntake1, overIntake2, overPull, ballRollerArmEncoder, ballBreakBeam);
-        groundIntake = new groundIntake(groundTalon1, player1, player2, fourtwenty, groundShootPiston, encoder);
+        ballArm = new ballArm(ballArm1, ballArm2, ballIntake1, fourtwenty);
+        hatchElevator = new hatchElevator(talon1, talon2, encoder, player2, talon2Inverted, hatchPiston, ballArm);
+        ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballBreakBeam, ballArm);
+        groundIntake = new groundIntake(talon1, talon2, ballArm, player2, encoder);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballIntake1, 
-                ballIntake2, intakeMotor2Inverted, ballUpPiston, hatchPiston, overIntake1, overIntake2, overPull, elevatorShifter, climberPiston1, climberPiston2, climberTalon);
-        climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, ballUpPiston, climberPiston1, climberPiston2, drive);
-
-        
+            intakeMotor2Inverted, hatchPiston, elevatorShifter, climberPiston1, climberPiston2, climberTalon);
+        climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, climberPiston1, climberPiston2, drive, ballArm);
     }
 
     public boolean climbing() {
@@ -159,7 +144,6 @@ public class Elevator {
                 if(!hallEffectSensor1.get() || player2.getRawButton(8)) {
                     ballElevator.init(hallEffectSensorOneHeight);
                     hatchElevator.init(hallEffectSensorOneHeight);
-                    groundIntake.init(hallEffectSensorOneHeight);
                     climb.init(hallEffectSensorOneHeight);
                     elevatorStateMachine = elevatorState.RUNNING;
                 }
@@ -169,7 +153,6 @@ public class Elevator {
                 if(autoBox.getRawButton(1)) {//climbing button
                     elevatorStateMachine = elevatorState.CLIMBING;
                 } else {
-                    groundIntake.update(Math.abs(getRightTrigger()) > 0.1, autoBox.getRawButton(3));
                     if (Math.abs(getRightTrigger()) > 0.1) {
                         manualOverride.update(true);
                     } else {
