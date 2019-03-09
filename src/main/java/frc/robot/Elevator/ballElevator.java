@@ -45,11 +45,11 @@ public class ballElevator {
     private final double targetAcceleration = 0.0;//probably won't need
 
     private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
-    private final double lowBallPosition = -0.4;//these three are the heights of what we want to go to
-    private final double mediumBallPosition = -0.2;
-    private final double intakeBallPosition = -0.5;
-    private final double highBallPosition = -0.01;
-    private final double defaultPosition = -0.4;//should be low so limelight can see and center of gravity isn't too high
+    private final double lowBallPosition = 0.6;//these three are the heights of what we want to go to
+    private final double mediumBallPosition = 0.4;
+    private final double intakeBallPosition = 0.1;
+    private final double highBallPosition = 0.5;
+    private final double defaultPosition = 0.2;//should be low so limelight can see and center of gravity isn't too high
     private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 

@@ -8,7 +8,7 @@ import frc.robot.PID_Tools.*;
 public class ballArm {
     private VictorSPX armTalon1;
     private VictorSPX armTalon2;
-    private TalonSRX shootTalon;
+    private VictorSPX shootTalon;
     private AnalogPotentiometer fourtwenty;
     private TorDerivative derivative;
     
@@ -19,11 +19,11 @@ public class ballArm {
     private double intakeCurrentRunningPower = 0;
 
     //PID values to tune
-    private final double flatAngle = 0;//reading on the pot (fourtwenty) when it is flat
-    private final double polarity = 1;//1 if up is positive, -1 if up is negative
-    private final double kP = 0;
+    private final double flatAngle = 137.93663083305236;//reading on the pot (fourtwenty) when it is flat
+    private final double polarity = -1;//1 if up is positive, -1 if up is negative
+    private final double kP = 0.05;
     private final double kI = 0;
-    private final double kD = 0;
+    private final double kD = -0.001;
     private final double tolerance = 2;//in degrees and is when kI stops
     private final double dt = 0.005;//should be the same as everything else
     //thats it on tunable things
@@ -37,7 +37,7 @@ public class ballArm {
 
 
     public ballArm(VictorSPX armTalon1, VictorSPX armTalon2, 
-        TalonSRX shootTalon, AnalogPotentiometer fourtwenty) {
+        VictorSPX shootTalon, AnalogPotentiometer fourtwenty) {
             this.armTalon1 = armTalon1;
             this.armTalon2 = armTalon2;
             this.shootTalon = shootTalon;
@@ -61,7 +61,7 @@ public class ballArm {
         }
         errorDerivative = derivative.estimate(error);
         output = (error * kP) + (errorDerivative * kD) + (errorSum * kI);
-        armTalon1.set(ControlMode.PercentOutput, output);
+        armTalon1.set(ControlMode.PercentOutput, -output);
         armTalon2.set(ControlMode.PercentOutput, output);
     }
 

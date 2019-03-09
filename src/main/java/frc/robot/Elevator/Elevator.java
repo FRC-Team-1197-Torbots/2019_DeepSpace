@@ -26,8 +26,7 @@ public class Elevator {
 
     //zeroing state tuning-----------
 
-    private final double moveUpZeroSpeed = 0.3;
-    private final int hallEffectSensorOneHeight = 0;//in ticks from this
+    private final double moveUpZeroSpeed = -0.5;
 
     //-----------
 
@@ -44,7 +43,7 @@ public class Elevator {
 // Talons
     private CANSparkMax talon1;// this talon is the "drive talon for the elevator"
     private CANSparkMax talon2;// this is the second one
-    private TalonSRX ballIntake1; //ball intake shooter
+    private VictorSPX ballIntake1; //ball intake shooter
     private VictorSPX ballArm1;
     private VictorSPX ballArm2;
     private TalonSRX climberTalon; // wheels on climber to move forware
@@ -55,8 +54,6 @@ public class Elevator {
     private Solenoid climberPiston2;
 
 // Sensors
-    private DigitalInput hallEffectSensor1;
-
     private Encoder encoder; //elevator encoder
   
     private DigitalInput limitSwitch; // limit switch to stop the elevator
@@ -68,6 +65,10 @@ public class Elevator {
     private DigitalInput climbSwitch1;
 
     private AnalogGyro climbGyro;
+
+    private DigitalInput light1;
+    private DigitalInput light2;
+    private DigitalInput light3;
 
 //end of hardware -------------------------------------------
 
@@ -85,16 +86,16 @@ public class Elevator {
         talon1 = new CANSparkMax(1, MotorType.kBrushless);
         talon2 = new CANSparkMax(2, MotorType.kBrushless);
         talon2.follow(talon1);
-        ballIntake1 = new TalonSRX(9);
+        ballIntake1 = new VictorSPX(9);
         ballArm1 = new VictorSPX(7);
         ballArm2 = new VictorSPX(8);
         climberTalon = new TalonSRX(13);
 
     // Solenoid
         elevatorShifter = new Solenoid(1);
-        hatchPiston = new Solenoid(5);
-        climberPiston1 = new Solenoid(2);
-        climberPiston2 = new Solenoid(3);
+        hatchPiston = new Solenoid(2);
+        climberPiston1 = new Solenoid(3);
+        climberPiston2 = new Solenoid(4);
         
     // Sensors 
         fourtwenty = new AnalogPotentiometer(1, 360, 0);
@@ -103,7 +104,11 @@ public class Elevator {
         limitSwitch = new DigitalInput(8);
         ballBreakBeam = new DigitalInput(9);//for the break  beam
         climbSwitch1 = new DigitalInput(23);
-        hallEffectSensor1 = new DigitalInput(22);
+        
+        // light1 = new DigitalInput();
+        // light2 = new DigitalInput();
+        // light3 = new DigitalInput();
+
 
     // Joysticks 
         this.player1 = player1;
@@ -116,7 +121,7 @@ public class Elevator {
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballBreakBeam, ballArm);
         groundIntake = new groundIntake(talon1, talon2, ballArm, player2, encoder);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballArm1, ballArm2,
-             elevatorShifter, climberPiston1, climberPiston2, climberTalon);
+             elevatorShifter, climberPiston1, climberPiston2, climberTalon, hatchPiston);
         climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, climberPiston1, climberPiston2, drive, ballArm);
     }
 
@@ -126,6 +131,19 @@ public class Elevator {
 
     public void init() {
         elevatorStateMachine = elevatorState.ZEROING;
+    }
+
+    public void testArm() {
+        if(player2.getRawButton(1)) {
+            ballArm.setMode(0);
+            ballArm.update(10);
+        } else if(player2.getRawButton(3)) {
+            ballArm.setMode(0);
+            ballArm.update(60);
+        } else {
+            ballArm.setMode(0);
+            ballArm.update(0);
+        }
     }
 
     public void update() {
@@ -143,10 +161,7 @@ public class Elevator {
                 SmartDashboard.putString("state", "zeroing");
                 talon1.set(moveUpZeroSpeed);
                 talon2.set(moveUpZeroSpeed);
-                if(!hallEffectSensor1.get() || player2.getRawButton(8)) {
-                    ballElevator.init(hallEffectSensorOneHeight);
-                    hatchElevator.init(hallEffectSensorOneHeight);
-                    climb.init(hallEffectSensorOneHeight);
+                if(player2.getRawButton(8)) {
                     elevatorStateMachine = elevatorState.RUNNING;
                 }
                 break;
@@ -177,6 +192,13 @@ public class Elevator {
                 climb.update(true);
                 break;
         }
+    }
+
+    public void initValues() {
+        ballElevator.init(0);
+        hatchElevator.init(0);
+        climb.init(0);
+        groundIntake.init(0);
     }
 
     /*

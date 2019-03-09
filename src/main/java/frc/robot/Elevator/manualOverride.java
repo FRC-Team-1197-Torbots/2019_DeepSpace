@@ -1,6 +1,5 @@
 package frc.robot.Elevator;
 
-import static org.junit.Assert.assertEquals;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -30,7 +29,7 @@ public class manualOverride {
     private Solenoid elevatorShifter;
 
     private double elevatorAxis; // joystick axis 1 for moving elevator
-    private final double elevatorHoldSpeed = 0; // << ADJUST, constant speed that will keep the elevator held in spot
+    private final double elevatorHoldSpeed = -0.075; // << ADJUST, constant speed that will keep the elevator held in spot
     // ---------------------------------------------------------
 
     // ------------- Ball Elevator ------------------------------------
@@ -56,7 +55,7 @@ public class manualOverride {
      * ---------------------------------------------------------
      * 
      */
-
+    private Solenoid hatchPiston;
     private double rollerArmAxis; // joystick axis 5 for moving the arm
 
     private final double rollerArmHoldSpeed = 0.1; // << ADJUST, constant hold Speed for the roller Arm
@@ -76,7 +75,7 @@ public class manualOverride {
 
     public manualOverride(CANSparkMax talon1, CANSparkMax talon2, Joystick player2, boolean talon2Inverted,
             VictorSPX ballIntakeArm1, VictorSPX ballIntakeArm2, 
-            Solenoid elevatorShifter, Solenoid climberPiston1, Solenoid climberPiston2, TalonSRX climberTalon) {
+            Solenoid elevatorShifter, Solenoid climberPiston1, Solenoid climberPiston2, TalonSRX climberTalon, Solenoid hatchPiston) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.player2 = player2;
@@ -91,7 +90,7 @@ public class manualOverride {
         this.climberPiston1 = climberPiston1;
         this.climberPiston2 = climberPiston2;
         this.climberTalon = climberTalon;
-
+        this.hatchPiston = hatchPiston;
     }
 
     public void update(boolean running) {
@@ -137,7 +136,11 @@ public class manualOverride {
             //     setBallIntakeArmSpeed(0);
 
             // }
-
+            if(player2.getRawButton(3)) {
+                hatchPiston.set(true);
+            } else {
+                hatchPiston.set(false);
+            }
 
         }
 

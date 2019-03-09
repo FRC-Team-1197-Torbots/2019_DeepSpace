@@ -27,7 +27,7 @@ public class hatchElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = 2.85;
+    private final double positionkP = -0.4;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -42,10 +42,10 @@ public class hatchElevator {
     private final double targetAcceleration = 0.0;//probably won't need
 
     private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
-    private final double intakeHatchPosition = -0.62;
-    private final double highHatchPosition = -0.01;
-    private final double intakeHatchExtendPosition = -0.52;//should be lower than intakeHatchPosition
-    private final double highHatchExtendPosition = -0.17;//should be lower than highHatchPosition
+    private final double intakeHatchPosition = 0.1;
+    private final double highHatchPosition = 0.6;
+    private final double intakeHatchExtendPosition = 0.05;//should be lower than intakeHatchPosition
+    private final double highHatchExtendPosition = 0.55;//should be lower than highHatchPosition
     private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
@@ -191,7 +191,7 @@ public class hatchElevator {
                 if(running) {
                     ballArm.setMode(0);
                     ballArm.update(upAngleForBallArm);
-                    if(!limitSwitchBeingHit) {
+                    if(limitSwitchBeingHit) {
                         talon1.set(currentRunningSpeed);
                         talon2.set(currentRunningSpeed);
                     } else {

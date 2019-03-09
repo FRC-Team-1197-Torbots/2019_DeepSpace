@@ -24,23 +24,29 @@ public class Robot extends TimedRobot {
 
 
 		UsbCamera hatchSideCam = CameraServer.getInstance().startAutomaticCapture(0);
-		hatchSideCam.setBrightness(50);
-		hatchSideCam.setWhiteBalanceAuto();
-		hatchSideCam.setResolution(420, 240);
-		hatchSideCam.setFPS(30);
+		
 		// hatchSideCam.setExposureManual();
 		CvSink cvsink1 = new CvSink("Hatch Side Cam");
+		hatchSideCam.setBrightness(1);
+
+		hatchSideCam.setExposureManual(2);
+		// hatchSideCam.setWhiteBalanceAuto();
+		hatchSideCam.setResolution(420, 240);
+		hatchSideCam.setFPS(10);
 		cvsink1.setSource(hatchSideCam);
 		cvsink1.setEnabled(true);
 
 		UsbCamera cargoSideCam = CameraServer.getInstance().startAutomaticCapture(1);
-		cargoSideCam.setBrightness(50);
-		cargoSideCam.setWhiteBalanceAuto();
-		cargoSideCam.setResolution(420, 240);
-		cargoSideCam.setFPS(30);
+	
 
 		CvSink cvsink2 = new CvSink("Cargo Side Cam");
 		cvsink2.setSource(cargoSideCam);
+			cargoSideCam.setBrightness(1);
+			cargoSideCam.setExposureManual(1);
+
+		// cargoSideCam.setWhiteBalanceAuto();
+		cargoSideCam.setResolution(420, 240);
+		cargoSideCam.setFPS(10);
 		cvsink2.setEnabled(true);
 	}
 	@Override
@@ -55,14 +61,15 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousPeriodic() {
 		drive.Run(test, true);//IT IS NOW TELEOP IN AUTO
-		elevator.update();
+		// elevator.update();
 	}
 	@Override
 	public void teleopPeriodic() {
 		if(!elevator.climbing()) {
 			drive.Run(test, true);//IT IS TELEOP
 		}
-		elevator.update();
+		// elevator.update();
+		elevator.testArm();
 	}
 	@Override
 	public void testPeriodic() {

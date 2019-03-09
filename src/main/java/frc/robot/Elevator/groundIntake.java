@@ -63,12 +63,12 @@ public class groundIntake {
     private final double highPositionReleaseArmAngle = 40;
     private final double mediumPositionReleaseAngle = 60;
 
-    private final double intakePosition = -0.5;
-    private final double defaultPosition = -0.4;
-    private final double highPosition = -0.2;
-    private final double mediumPosition = -0.4;
-    private final double highReleasePosition = -0.3;
-    private final double mediumReleasePosition = -0.5;
+    private final double intakePosition = 0.1;
+    private final double defaultPosition = 0.2;
+    private final double highPosition = 0.4;
+    private final double mediumPosition = 0.2;
+    private final double highReleasePosition = 0.3;
+    private final double mediumReleasePosition = 0.1;
     /*
     end of tunable values for this class
     ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

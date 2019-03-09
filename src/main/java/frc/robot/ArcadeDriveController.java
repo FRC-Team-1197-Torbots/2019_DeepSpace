@@ -133,7 +133,7 @@ public class ArcadeDriveController extends DriveController {
            // convert the angles into radians
            x *= ((Math.PI) / 180.0);
            distance = areaAt1Meter / area;
-           // NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+           NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
 
            SmartDashboard.putNumber("distance limeligfht", distance);
            if(player1.getRawButton(6)) {
