@@ -227,17 +227,38 @@ public class ballElevator {
         if(elevator == theElevator.IDLE || elevator == theElevator.defaultPosition) {
             ballArm.setMode(0);
         } else if(elevator == theElevator.intakeBallPID || elevator == theElevator.goTointakeBallPID) {
-            ballArm.setMode(-1);
-        } else {
+            ballArm.setMode(-1); //if in intake position, spin wheels in
+        } else if (elevator == theElevator.lowBallPID || elevator == theElevator.goTolowBallPID){
             if(player2.getRawButton(5)) {
-                ballArm.setMode(1);
+                ballArm.setMode(2); //if pressed button spin out ball slowly
             } else if (Math.abs(player2.getRawAxis(2)) > 0.1){
-                ballArm.setMode(2);
+                ballArm.setMode(-1); // if pressed LT, spin in to suck in ball
                 
             } else {
                 ballArm.setMode(0);
             }
+        } else if (elevator == theElevator.mediumBallPID || elevator == theElevator.goTomediumBallPID){
+            if(player2.getRawButton(5)) {
+                ballArm.setMode(2); // if pressed button LB, spin out ball slowly
+            } else if (Math.abs(player2.getRawAxis(2)) > 0.1){
+                ballArm.setMode(-1); // if pressed LT, spin in to suck in ball
+                
+            } else {
+                ballArm.setMode(0);
+            }
+        } else if (elevator == theElevator.highBallPID || elevator == theElevator.goToHighBallPID){
+            if(player2.getRawButton(5)) {
+                ballArm.setMode(1); // if pressed LB, spin out ball fast since 3rd level
+            } else if (Math.abs(player2.getRawAxis(2)) > 0.1){
+                ballArm.setMode(-1); // if pressed LT, pin in to suck in ball
+                
+            } else {
+                ballArm.setMode(0); 
+            }
+        } else {
+            ballArm.setMode(0);
         }
+        
     }
 
     public void PIDRun() {//finds out the current velocity

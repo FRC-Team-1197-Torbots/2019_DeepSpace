@@ -126,16 +126,18 @@ public class manualOverride {
                 climberTalon.set(ControlMode.PercentOutput, 0);
             }
 
-            /* move ball intake arm 
-            *** currently not using */
 
-            // if (Math.abs(rollerArmAxis) > 0.15) { 
-            //     setBallIntakeArmSpeed(rollerArmAxis * rollerArmAxis);
+            // move ball intake arm 
+
+            if (Math.abs(rollerArmAxis) > 0.15) { 
+                setBallIntakeArmSpeed(rollerArmAxis * rollerArmAxis);
             
-            // } else {
-            //     setBallIntakeArmSpeed(0);
+            } else {
+                setBallIntakeArmSpeed(0);
 
-            // }
+            }
+            
+            // activate the hatch piston
             if(player2.getRawButton(3)) {
                 hatchPiston.set(true);
             } else {

@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
+
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.smartdashboard.*;
@@ -67,9 +69,9 @@ public class Elevator {
 
     private AnalogGyro climbGyro;
 
-    private DigitalInput light1;
-    private DigitalInput light2;
-    private DigitalInput light3;
+    private DigitalOutput light1;
+    private DigitalOutput light2;
+    private DigitalOutput light3;
 
 //end of hardware -------------------------------------------
 
@@ -110,9 +112,9 @@ public class Elevator {
         ballBreakBeam = new DigitalInput(9);//for the break  beam
         climbSwitch1 = new DigitalInput(23);
         
-        // light1 = new DigitalInput();
-        // light2 = new DigitalInput();
-        // light3 = new DigitalInput();
+        // light1 = new DigitalOutput(22);
+        // light2 = new DigitalOutput(24);
+        // light3 = new DigitalOutput(25);
 
 
     // Joysticks 
