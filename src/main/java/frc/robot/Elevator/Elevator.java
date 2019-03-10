@@ -3,6 +3,7 @@ package frc.robot.Elevator;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
@@ -72,6 +73,9 @@ public class Elevator {
 
 //end of hardware -------------------------------------------
 
+    private long currentTime = (long)(1000.0 * Timer.getFPGATimestamp());
+    private long lastTime = currentTime;
+
 // Controllers
     private Joystick player1;
     private Joystick player2;
@@ -80,6 +84,7 @@ public class Elevator {
 // Booleans
     private final boolean talon2Inverted = false;
     private final boolean intakeMotor2Inverted = false;
+    private boolean starting = true;
 
     public Elevator(Joystick player1, TorDrive drive) {
     // Talons
@@ -131,12 +136,15 @@ public class Elevator {
 
     public void init() {
         elevatorStateMachine = elevatorState.ZEROING;
+        initValues();
+        currentTime = (long)(1000.0 * Timer.getFPGATimestamp());
+        lastTime = currentTime;
     }
 
     public void testArm() {
         if(player2.getRawButton(1)) {
             ballArm.setMode(0);
-            ballArm.update(10);
+            ballArm.update(-30);
         } else if(player2.getRawButton(3)) {
             ballArm.setMode(0);
             ballArm.update(60);
@@ -147,6 +155,7 @@ public class Elevator {
     }
 
     public void update() {
+        currentTime = (long)(1000 * Timer.getFPGATimestamp());
         if(elevatorStateMachine != elevatorState.CLIMBING) {
             elevatorShifter.set(true);//high gear
         } else {
@@ -154,14 +163,16 @@ public class Elevator {
         }
 
 
-
         //we haven't made an autobox yet
         switch(elevatorStateMachine) {
             case ZEROING:
+                if(starting) {
+                    lastTime = currentTime;
+                    starting = false;
+                }
                 SmartDashboard.putString("state", "zeroing");
-                talon1.set(moveUpZeroSpeed);
-                talon2.set(moveUpZeroSpeed);
-                if(player2.getRawButton(8)) {
+                ballArm.update(65);
+                if(player2.getRawButton(8) || (currentTime - lastTime > 1000)) {
                     elevatorStateMachine = elevatorState.RUNNING;
                 }
                 break;
@@ -175,12 +186,12 @@ public class Elevator {
                     } else {
                         manualOverride.update(false);
                         if (getRightBumper()) {// ball
-                            ballElevator.update(true, !limitSwitch.get());
-                            hatchElevator.update(false, !limitSwitch.get());
+                            ballElevator.update(true, limitSwitch.get());
+                            hatchElevator.update(false, limitSwitch.get());
                             SmartDashboard.putString("elevator state", "ball");
                         } else {// hatch
-                            ballElevator.update(false, !limitSwitch.get());
-                            hatchElevator.update(true, !limitSwitch.get());
+                            ballElevator.update(false, limitSwitch.get());
+                            hatchElevator.update(true, limitSwitch.get());
                             SmartDashboard.putString("elevator state", "hatch");
                         }
                     }

@@ -27,7 +27,7 @@ public class hatchElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = -0.4;
+    private final double positionkP = -7.5;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -41,18 +41,18 @@ public class hatchElevator {
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need
 
-    private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
-    private final double intakeHatchPosition = 0.1;
-    private final double highHatchPosition = 0.6;
-    private final double intakeHatchExtendPosition = 0.05;//should be lower than intakeHatchPosition
-    private final double highHatchExtendPosition = 0.55;//should be lower than highHatchPosition
-    private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
+    private final double encoderTicksPerMeter = 897;//this is how many ticks there are per meter the elevator goes up
+    private final double intakeHatchPosition = 0.2;
+    private final double highHatchPosition = 0.77;
+    private final double intakeHatchExtendPosition = 0.2;//should be lower than intakeHatchPosition
+    private final double highHatchExtendPosition = 0.77;//should be lower than highHatchPosition
+    private final double absoluteMaxUpwardVelocity = 0.45;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
     private final double pneumaticIntakeWaitTime = 0.3 * 1000;//you need to have a small pause between the pneumatic and elevator when you intake
 
     //ball arm
-    private final double upAngleForBallArm = 90;
+    private final double upAngleForBallArm = 65;
     private ballArm ballArm;
     //this is since if you retract really fast before you give the elvator time to lift up, it won't grab the hatch
     /*
@@ -166,7 +166,7 @@ public class hatchElevator {
         
                 //this sets the current target
                 if(elevator == theElevator.IDLE) {
-                    currentTarget = -0.4;//this should be low so that the elevator has a low "waiting" cg when you just enter hatch mode
+                    currentTarget = intakeHatchPosition;//this should be low so that the elevator has a low "waiting" cg when you just enter hatch mode
                 } else if(elevator == theElevator.intakeHatchPID) {
                     currentTarget = intakeHatchPosition;
                 } else if(elevator == theElevator.intakeHatchExtendPID) {
@@ -188,16 +188,17 @@ public class hatchElevator {
                     handleSolenoid();
                 }
                 SmartDashboard.putNumber("current running speed:", currentRunningSpeed);
+                SmartDashboard.putNumber("current Position", height());
                 if(running) {
                     ballArm.setMode(0);
                     ballArm.update(upAngleForBallArm);
-                    if(limitSwitchBeingHit) {
+                    // if(limitSwitchBeingHit) {
                         talon1.set(currentRunningSpeed);
                         talon2.set(currentRunningSpeed);
-                    } else {
-                        talon1.set(0);
-                        talon2.set(0);
-                    }
+                    // } else {
+                    //     talon1.set(0.1);
+                    //     talon2.set(0);
+                    // }
                 } else {
                     elevator = theElevator.IDLE;
                 }
@@ -242,6 +243,7 @@ public class hatchElevator {
     public void stateRun() {
         switch(elevator) {
             case IDLE:
+                setPercentSpeed(controlPower);
                 break;
             case intakeHatchPID:
                 setPercentSpeed(controlPower);

@@ -30,7 +30,7 @@ public class ballElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = 2.85;
+    private final double positionkP = -8.5;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -39,26 +39,26 @@ public class ballElevator {
     private final double velocitykD = 0.0;
     private final double kV = 0.0;
     private final double kA = 0.0;//this should definitely stay at 0
-    private final double pidGoTolerance = 100;//this is in meters and should be kind of large as we are using bang bang till PID turns on
+    private final double pidGoTolerance = 1000;//this is in meters and should be kind of large as we are using bang bang till PID turns on
     private final double velocityTolerance = 0.0;
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need
 
-    private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
+    private final double encoderTicksPerMeter = 897;//this is how many ticks there are per meter the elevator goes up
     private final double lowBallPosition = 0.6;//these three are the heights of what we want to go to
     private final double mediumBallPosition = 0.4;
-    private final double intakeBallPosition = 0.1;
+    private final double intakeBallPosition = 0.25;
     private final double highBallPosition = 0.5;
     private final double defaultPosition = 0.2;//should be low so limelight can see and center of gravity isn't too high
     private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
     //for the ballArm positions
-    private final double intakeBallAngle = -40;//we want to intake at a downwards angle to minimize grabbing more than one ball
+    private final double intakeBallAngle = -15;//we want to intake at a downwards angle to minimize grabbing more than one ball
     private final double highBallAngle = 60;
     private final double mediumBallAngle = 0;
-    private final double lowBallAngle = -20;
-    private final double pulledInAngle = 90;//inside the frame for protection
+    private final double lowBallAngle = 0;
+    private final double pulledInAngle = 70;//inside the frame for protection
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
     //if it is false then it will only use PID for power
@@ -171,7 +171,7 @@ public class ballElevator {
         
                 //this sets the current target
                 if(elevator == theElevator.IDLE) {
-                    currentTarget = -0.1;//this should just be greater than 0 so it doesn't hit anything
+                    currentTarget = intakeBallPosition;//this should just be greater than 0 so it doesn't hit anything
                 } else if(elevator == theElevator.lowBallPID) {
                     currentTarget = lowBallPosition;
                 } else if(elevator == theElevator.intakeBallPID) {
@@ -196,11 +196,11 @@ public class ballElevator {
                 if(running) {
                     handleIntake();
                     handleArm();
-                    if(!limitSwitchBeingHit) {
+                    // if(!limitSwitchBeingHit) {
                         talon1.set(currentRunningSpeed);
                         talon2.set(currentRunningSpeed);
 
-                    }
+                    // }
                 } else {
                     elevator = theElevator.defaultPosition;
                 }
@@ -264,7 +264,7 @@ public class ballElevator {
                 break;
             case intakeBallPID:
                 setPercentSpeed(controlPower);
-                if(ballBreakBeam.get()) {
+                if(!ballBreakBeam.get()) {
                     elevator = theElevator.defaultPosition;
                 }
                 break;
