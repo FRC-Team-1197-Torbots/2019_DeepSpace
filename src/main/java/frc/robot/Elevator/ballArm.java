@@ -15,9 +15,9 @@ public class ballArm {
     private TorDerivative derivative;
     
     //intake speed variables
-    private final double intakePower = -1;
+    private final double intakePower = -0.7;
     private final double outakePower = 1;
-    private final double outakePower2 = 0.5;
+    private final double outakePower2 = 0.675;
     //not tunable
     private double intakeCurrentRunningPower = 0;
 

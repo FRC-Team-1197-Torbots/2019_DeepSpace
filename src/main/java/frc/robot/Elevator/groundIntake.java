@@ -38,7 +38,7 @@ public class groundIntake {
     private final double velocityTolerance = 0.0;
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need
-    private final double positionkP = 2.85;
+    private final double positionkP = -8.5;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -48,7 +48,7 @@ public class groundIntake {
     private final double kV = 0.0;
     private final double kA = 0.0;//this should definitely stay at 0
     private final double encoderTicksPerMeter = 897;//this is how many ticks there are per meter the elevator goes up
-    private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
+    private final double absoluteMaxUpwardVelocity = 0.45;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
     /*
@@ -57,18 +57,18 @@ public class groundIntake {
     */
 
     private final double intakeArmAngle = 0;//should stay flat when we intake the hatch
-    private final double defaultArmAngle = 90;//this is the in angle
+    private final double defaultArmAngle = 70;//this is the in angle
     private final double highPositionArmAngle = 60;
     private final double mediumPositionArmAngle = 75;
-    private final double highPositionReleaseArmAngle = 40;
+    private final double highPositionReleaseArmAngle = 50;
     private final double mediumPositionReleaseAngle = 60;
 
     private final double intakePosition = 0.1;
     private final double defaultPosition = 0.2;
-    private final double highPosition = 0.4;
-    private final double mediumPosition = 0.2;
-    private final double highReleasePosition = 0.3;
-    private final double mediumReleasePosition = 0.1;
+    private final double highPosition = 0.77;
+    private final double mediumPosition = 0.3;
+    private final double highReleasePosition = 0.67;
+    private final double mediumReleasePosition = 0.2;
     /*
     end of tunable values for this class
     ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

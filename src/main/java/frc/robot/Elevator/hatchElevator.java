@@ -27,7 +27,7 @@ public class hatchElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = -7.5;
+    private final double positionkP = -9;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID

@@ -30,7 +30,7 @@ public class ballElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = -8.5;
+    private final double positionkP = -9;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -46,18 +46,18 @@ public class ballElevator {
 
     private final double encoderTicksPerMeter = 897;//this is how many ticks there are per meter the elevator goes up
     private final double lowBallPosition = 0.6;//these three are the heights of what we want to go to
-    private final double mediumBallPosition = 0.4;
-    private final double intakeBallPosition = 0.25;
-    private final double highBallPosition = 0.5;
+    private final double mediumBallPosition = 0.425;
+    private final double intakeBallPosition = 0.3;
+    private final double highBallPosition = 0.8;
     private final double defaultPosition = 0.2;//should be low so limelight can see and center of gravity isn't too high
-    private final double absoluteMaxUpwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
+    private final double absoluteMaxUpwardVelocity = 0.45;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
     //for the ballArm positions
     private final double intakeBallAngle = -15;//we want to intake at a downwards angle to minimize grabbing more than one ball
-    private final double highBallAngle = 60;
-    private final double mediumBallAngle = 0;
-    private final double lowBallAngle = 0;
+    private final double highBallAngle = 70;
+    private final double mediumBallAngle = 55;
+    private final double lowBallAngle = 10;
     private final double pulledInAngle = 70;//inside the frame for protection
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
@@ -231,6 +231,9 @@ public class ballElevator {
         } else {
             if(player2.getRawButton(5)) {
                 ballArm.setMode(1);
+            } else if (Math.abs(player2.getRawAxis(2)) > 0.1){
+                ballArm.setMode(2);
+                
             } else {
                 ballArm.setMode(0);
             }
