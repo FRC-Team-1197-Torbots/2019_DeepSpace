@@ -44,12 +44,12 @@ public class Elevator {
 
 // ---------------    Hardware   ------------------------------------------
 // Talons
-    private CANSparkMax talon1;// this talon is the "drive talon for the elevator"
-    private CANSparkMax talon2;// this is the second one
+    private TalonSRX talon1;// this talon is the "drive talon for the elevator"
+    private TalonSRX talon2;// this is the second one
     private VictorSPX ballIntake1; //ball intake shooter
     private VictorSPX ballArm1;
     private VictorSPX ballArm2;
-    private TalonSRX climberTalon; // wheels on climber to move forware
+    private VictorSPX climberTalon; // wheels on climber to move forware
 // Solenoids
     private Solenoid elevatorShifter; // elevator shifter
     private Solenoid hatchPiston; // hatch piston for hatch mech
@@ -90,13 +90,15 @@ public class Elevator {
 
     public Elevator(Joystick player1, TorDrive drive) {
     // Talons
-        talon1 = new CANSparkMax(1, MotorType.kBrushless);
-        talon2 = new CANSparkMax(2, MotorType.kBrushless);
+        // talon1 = new CANSparkMax(1, MotorType.kBrushless);
+        // talon2 = new CANSparkMax(2, MotorType.kBrushless);
+        talon1 = new TalonSRX(1);
+        talon2 = new TalonSRX(2);
         talon2.follow(talon1);
         ballIntake1 = new VictorSPX(9);
         ballArm1 = new VictorSPX(7);
         ballArm2 = new VictorSPX(8);
-        climberTalon = new TalonSRX(13);
+        climberTalon = new VictorSPX(13);
 
     // Solenoid
         elevatorShifter = new Solenoid(1);
@@ -190,10 +192,17 @@ public class Elevator {
                         if (getRightBumper()) {// ball
                             ballElevator.update(true, limitSwitch.get());
                             hatchElevator.update(false, limitSwitch.get());
+                            groundIntake.update(false, limitSwitch.get());
                             SmartDashboard.putString("elevator state", "ball");
-                        } else {// hatch
+                        } else if (Math.abs(player2.getRawAxis(2)) > 0.1) { //ground hatch
+                            groundIntake.update(true, limitSwitch.get());
+                            ballElevator.update(false, limitSwitch.get());
+                            hatchElevator.update(false, limitSwitch.get());
+                        
+                        }else {// hatch
                             ballElevator.update(false, limitSwitch.get());
                             hatchElevator.update(true, limitSwitch.get());
+                            groundIntake.update(false, limitSwitch.get());
                             SmartDashboard.putString("elevator state", "hatch");
                         }
                     }

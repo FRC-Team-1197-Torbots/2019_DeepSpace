@@ -16,6 +16,7 @@ public class ballArm {
     
     //intake speed variables
     private final double intakePower = -0.7;
+    private final double intakePower2 = -0.5;
     private final double outakePower = 1;
     private final double outakePower2 = 0.675;
     //not tunable
@@ -95,6 +96,9 @@ public class ballArm {
         } else if(mode == -1) {
             lastTime = currentTime;
             intakeCurrentRunningPower = intakePower;
+        } else if (mode == -2){
+            lastTime = currentTime;
+            intakeCurrentRunningPower = intakePower2;
         }
     }
 

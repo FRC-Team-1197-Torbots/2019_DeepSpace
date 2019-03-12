@@ -2,6 +2,9 @@ package frc.robot.Elevator;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
 
 import frc.robot.Elevator.ballElevator.theElevator;
@@ -27,8 +30,8 @@ public class groundIntake {
     private double currentVelocity;
 
     private ballArm ballArm;
-    private CANSparkMax elevatorTalon1;
-    private CANSparkMax elevatorTalon2;
+    private TalonSRX elevatorTalon1;
+    private TalonSRX elevatorTalon2;
     private Joystick player2;
     private Encoder encoder;
     private int initialTicks;
@@ -38,7 +41,7 @@ public class groundIntake {
     private final double velocityTolerance = 0.0;
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need
-    private final double positionkP = -8.5;
+    private final double positionkP = -2.1;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -56,19 +59,19 @@ public class groundIntake {
     ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
 
-    private final double intakeArmAngle = 0;//should stay flat when we intake the hatch
+    private final double intakeArmAngle = -2;//should stay flat when we intake the hatch
     private final double defaultArmAngle = 70;//this is the in angle
     private final double highPositionArmAngle = 60;
-    private final double mediumPositionArmAngle = 75;
+    private final double mediumPositionArmAngle = 70;
     private final double highPositionReleaseArmAngle = 50;
-    private final double mediumPositionReleaseAngle = 60;
+    private final double mediumPositionReleaseAngle = 50;
 
-    private final double intakePosition = 0.1;
-    private final double defaultPosition = 0.2;
-    private final double highPosition = 0.77;
-    private final double mediumPosition = 0.3;
-    private final double highReleasePosition = 0.67;
-    private final double mediumReleasePosition = 0.2;
+    private final double intakePosition = 0.0;
+    private final double defaultPosition = 0.25;
+    private final double highPosition = 0.68;
+    private final double mediumPosition = 0.225;
+    private final double highReleasePosition = 0.48;
+    private final double mediumReleasePosition = 0.05;
     /*
     end of tunable values for this class
     ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -91,7 +94,7 @@ public class groundIntake {
     public theElevator elevator = theElevator.defaultPosition;
 
 
-    public groundIntake(CANSparkMax elevatorTalon1, CANSparkMax elevatorTalon2, ballArm ballArm, Joystick player2, Encoder encoder) {
+    public groundIntake(TalonSRX elevatorTalon1, TalonSRX elevatorTalon2, ballArm ballArm, Joystick player2, Encoder encoder) {
         this.ballArm = ballArm;
         this.elevatorTalon1 = elevatorTalon1;
         this.elevatorTalon2 = elevatorTalon2;
@@ -172,9 +175,11 @@ public class groundIntake {
                 if(running) {
                     handleIntake();
                     handleArm();
-                    if(!limitSwitchBeingHit) {
-                        elevatorTalon1.set(currentRunningSpeed);
-                        elevatorTalon2.set(currentRunningSpeed);
+                    SmartDashboard.putBoolean("Limitswitch being hit", limitSwitchBeingHit);
+                    if(limitSwitchBeingHit) {
+                        elevatorTalon1.set(ControlMode.PercentOutput, currentRunningSpeed);
+                        elevatorTalon2.set(ControlMode.PercentOutput, currentRunningSpeed);
+                    
                     }
                 } else {
                     elevator = theElevator.defaultPosition;
@@ -193,6 +198,7 @@ public class groundIntake {
         } else if(controlPower < -absoluteMaxDownwardVelocity) {
             controlPower = -absoluteMaxDownwardVelocity;
         }
+        currentRunningSpeed = controlPower;
     }
     
     public void handleArm() {
@@ -210,6 +216,8 @@ public class groundIntake {
             ballArm.update(intakeArmAngle);
         }
     }
+
+    
 
     public void handleIntake() {
         //we should not run the ball intake spin motors when we do ground hatch

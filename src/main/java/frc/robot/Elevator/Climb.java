@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -22,9 +23,9 @@ public class Climb {
     private int initialTicks;
 
     // Talons
-    private CANSparkMax talon1;
-    private CANSparkMax talon2;
-    private TalonSRX climberTalon;
+    private TalonSRX talon1;
+    private TalonSRX talon2;
+    private VictorSPX climberTalon;
 
     // solenoids
     private Solenoid climbPiston1;
@@ -71,33 +72,33 @@ public class Climb {
     // ----------------- PID -----------------------------------------
     private double flatGyroValue;
 
-    private final double tiltkP = 1;
+    private final double tiltkP = -0.5;
     private final double tiltkI = 0.0;
     private final double tiltkD = 0.0;
     private final double tiltTolerance = 1;// for thePID
     private final double normalTiltPower = -0.8;
 
-    private final double normalkP = 1;
+    private final double normalkP = -2;
     private final double normalkI = 0.001;
     private final double normalkD = 0.0;
     private final double normalTolerance = 0.01;// for thePID
 
-    private final double encoderTicksPerMeter = 885;// this is how many ticks there are per meter the elevator goes up
+    private final double encoderTicksPerMeter = 897;// this is how many ticks there are per meter the elevator goes up
 
     // ----------------- Elevator -----------------------------------------
 
-    private final double startClimbPosition = -0.3429; // this is where the elevator will go to first.
-    private final double elevatorBottomPosition = -0.825;//these are in meters from the first hall effect sensor
+    private final double startClimbPosition = 0.625;// this is where the elevator will go to first.
+    private final double elevatorBottomPosition = 0.01;//these are in meters from the first hall effect sensor
 
     // ----------------- Drive -----------------------------------------
     private final double climberTalonLiftSpeed = 0.35;
-    private final double climberTalonDriveSpeed = 1;
-    private final double drivetrainSpeed = 0.25;
+    private final double climberTalonDriveSpeed = 0.75;
+    private final double drivetrainSpeed = -0.25;
     private final long pistonRetractTime = 1000;
     private final long driveOnPlatformTime = 5;
 
     //ball arm
-    private final double upAngle = 90;
+    private final double upAngle = 60;
     private ballArm ballArm;
 
     /*
@@ -122,7 +123,7 @@ public class Climb {
 
     private theClimb climb = theClimb.setUp;
 
-    public Climb(CANSparkMax talon1, CANSparkMax talon2, TalonSRX climberTalon, Encoder encoder, AnalogGyro climbGyro,
+    public Climb(TalonSRX talon1, TalonSRX talon2, VictorSPX climberTalon, Encoder encoder, AnalogGyro climbGyro,
             DigitalInput climbBreakBeam1, Solenoid climbPiston1, Solenoid climbPiston2, TorDrive drive, ballArm ballArm) {
         // talons
         this.talon1 = talon1;
@@ -176,7 +177,7 @@ public class Climb {
             // this sets the current target
                     
             stateRun();
-            if (climb == theClimb.setUp || climb == theClimb.IDLE || climb == theClimb.driveRobot) {
+            if (climb == theClimb.setUp || climb == theClimb.IDLE) {
                 currentTarget = startClimbPosition - 0.02;
                 normalPidRun();
             } else {
@@ -184,12 +185,13 @@ public class Climb {
                 gyroPidRun();
 
             }
-            SmartDashboard.putBoolean("got here 1", true);
+
+            SmartDashboard.putString("Climb state", climb.toString());
             if(running) {
                 SmartDashboard.putBoolean("got here 2", true);
                 SmartDashboard.putNumber("control Power for climb", controlPower);
-                talon1.set(controlPower);
-                talon2.set(controlPower);
+                talon1.set(ControlMode.PercentOutput,controlPower);
+                talon2.set(ControlMode.PercentOutput,controlPower);
                 ballArm.update(upAngle);
                 ballArm.setMode(0);
             }
@@ -206,7 +208,7 @@ public class Climb {
         case setUp:
             flatGyroValue = climbGyro.getAngle();//this is the value of the gyro you read when you are flat
             // go to start climb position
-            if(Math.abs(height() - startClimbPosition)  < 0.05) {
+            if(Math.abs(height() - startClimbPosition)  < 0.08) {
                 lastTime = currentTime;
                 climb = theClimb.lift;
             }

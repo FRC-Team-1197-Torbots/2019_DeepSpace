@@ -5,6 +5,9 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Solenoid;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
 
 public class hatchElevator {
@@ -27,7 +30,7 @@ public class hatchElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = -9;
+    private final double positionkP = -2.5;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -42,17 +45,17 @@ public class hatchElevator {
     private final double targetAcceleration = 0.0;//probably won't need
 
     private final double encoderTicksPerMeter = 897;//this is how many ticks there are per meter the elevator goes up
-    private final double intakeHatchPosition = 0.2;
-    private final double highHatchPosition = 0.77;
-    private final double intakeHatchExtendPosition = 0.2;//should be lower than intakeHatchPosition
-    private final double highHatchExtendPosition = 0.77;//should be lower than highHatchPosition
+    private final double intakeHatchPosition = 0.125;
+    private final double highHatchPosition = 0.68;
+    private final double intakeHatchExtendPosition = 0.125;//should be lower than intakeHatchPosition
+    private final double highHatchExtendPosition = 0.68;//should be lower than highHatchPosition
     private final double absoluteMaxUpwardVelocity = 0.45;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
     private final double pneumaticIntakeWaitTime = 0.3 * 1000;//you need to have a small pause between the pneumatic and elevator when you intake
 
     //ball arm
-    private final double upAngleForBallArm = 65;
+    private final double upAngleForBallArm = 70;
     private ballArm ballArm;
     //this is since if you retract really fast before you give the elvator time to lift up, it won't grab the hatch
     /*
@@ -72,8 +75,8 @@ public class hatchElevator {
     private boolean XPressedLast = false;
 
     //our hardware
-    private CANSparkMax talon1;
-    private CANSparkMax talon2;
+    private TalonSRX talon1;
+    private TalonSRX talon2;
     private Encoder encoder;
     private Joystick player1;
     private Joystick player2;
@@ -90,7 +93,7 @@ public class hatchElevator {
 
     private theElevator elevator = theElevator.IDLE;
 
-    public hatchElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player1, Joystick player2, boolean talon2Inverted, Solenoid piston, ballArm ballArm) {
+    public hatchElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player1, Joystick player2, boolean talon2Inverted, Solenoid piston, ballArm ballArm) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
@@ -133,7 +136,7 @@ public class hatchElevator {
                 SmartDashboard.putNumber("current running speed:", currentRunningSpeed);
                 SmartDashboard.putNumber("encoder value", encoder.get());
                 SmartDashboard.putNumber("height", height());
-                if(getButtonX() || player1.getRawButton(6)) {
+                if(getButtonX() || player1.getRawButton(1)) {
                     XPressedLast = true;
                     //button X will be our extend position
                     //if it is intake mode, it will go down and extend
@@ -193,8 +196,8 @@ public class hatchElevator {
                     ballArm.setMode(0);
                     ballArm.update(upAngleForBallArm);
                     // if(limitSwitchBeingHit) {
-                        talon1.set(currentRunningSpeed);
-                        talon2.set(currentRunningSpeed);
+                        talon1.set(ControlMode.PercentOutput, currentRunningSpeed);
+                        talon2.set(ControlMode.PercentOutput, currentRunningSpeed);
                     // } else {
                     //     talon1.set(0.1);
                     //     talon2.set(0);

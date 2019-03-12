@@ -1,10 +1,13 @@
 package frc.robot.Elevator;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
 
 import frc.robot.PID_Tools.*;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -30,7 +33,7 @@ public class ballElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = -9;
+    private final double positionkP = -2.5;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -45,19 +48,19 @@ public class ballElevator {
     private final double targetAcceleration = 0.0;//probably won't need
 
     private final double encoderTicksPerMeter = 897;//this is how many ticks there are per meter the elevator goes up
-    private final double lowBallPosition = 0.6;//these three are the heights of what we want to go to
-    private final double mediumBallPosition = 0.425;
-    private final double intakeBallPosition = 0.3;
-    private final double highBallPosition = 0.8;
-    private final double defaultPosition = 0.2;//should be low so limelight can see and center of gravity isn't too high
-    private final double absoluteMaxUpwardVelocity = 0.45;//don't make it higher than 1.0 POSITIVE
+    private final double lowBallPosition = 0.1;//these three are the heights of what we want to go to
+    private final double mediumBallPosition = 0.525;
+    private final double intakeBallPosition = 0.36;
+    private final double highBallPosition = 0.85;
+    private final double defaultPosition = 0.3;//should be low so limelight can see and center of gravity isn't too high
+    private final double absoluteMaxUpwardVelocity = 0.4;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
     //for the ballArm positions
     private final double intakeBallAngle = -15;//we want to intake at a downwards angle to minimize grabbing more than one ball
     private final double highBallAngle = 70;
     private final double mediumBallAngle = 55;
-    private final double lowBallAngle = 10;
+    private final double lowBallAngle = 27.5;
     private final double pulledInAngle = 70;//inside the frame for protection
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
@@ -74,8 +77,8 @@ public class ballElevator {
     private long lastTimeXPressed = 0;
     private long lastTimeYPressed = 0;
     //our hardware
-    private CANSparkMax talon1;
-    private CANSparkMax talon2;
+    private TalonSRX talon1;
+    private TalonSRX talon2;
     private ballArm ballArm;
     private DigitalInput ballBreakBeam;
     
@@ -94,7 +97,7 @@ public class ballElevator {
 
     public theElevator elevator = theElevator.defaultPosition;
 
-    public ballElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player2, 
+    public ballElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player2, 
         boolean talon2Inverted, DigitalInput ballBreakBeam, ballArm ballArm) {
         this.talon1 = talon1;
         this.talon2 = talon2;
@@ -197,8 +200,8 @@ public class ballElevator {
                     handleIntake();
                     handleArm();
                     // if(!limitSwitchBeingHit) {
-                        talon1.set(currentRunningSpeed);
-                        talon2.set(currentRunningSpeed);
+                        talon1.set(ControlMode.PercentOutput, currentRunningSpeed);
+                        talon2.set(ControlMode.PercentOutput, currentRunningSpeed);
 
                     // }
                 } else {
@@ -232,7 +235,7 @@ public class ballElevator {
             if(player2.getRawButton(5)) {
                 ballArm.setMode(2); //if pressed button spin out ball slowly
             } else if (Math.abs(player2.getRawAxis(2)) > 0.1){
-                ballArm.setMode(-1); // if pressed LT, spin in to suck in ball
+                ballArm.setMode(-2); // if pressed LT, spin in to suck in ball
                 
             } else {
                 ballArm.setMode(0);
@@ -241,7 +244,7 @@ public class ballElevator {
             if(player2.getRawButton(5)) {
                 ballArm.setMode(2); // if pressed button LB, spin out ball slowly
             } else if (Math.abs(player2.getRawAxis(2)) > 0.1){
-                ballArm.setMode(-1); // if pressed LT, spin in to suck in ball
+                ballArm.setMode(-2); // if pressed LT, spin in to suck in ball
                 
             } else {
                 ballArm.setMode(0);
@@ -250,7 +253,7 @@ public class ballElevator {
             if(player2.getRawButton(5)) {
                 ballArm.setMode(1); // if pressed LB, spin out ball fast since 3rd level
             } else if (Math.abs(player2.getRawAxis(2)) > 0.1){
-                ballArm.setMode(-1); // if pressed LT, pin in to suck in ball
+                ballArm.setMode(-2); // if pressed LT, pin in to suck in ball
                 
             } else {
                 ballArm.setMode(0); 
@@ -432,5 +435,8 @@ public class ballElevator {
 
 	public boolean getButtonY(){
 		return player2.getRawButton(4);
-	}
+    }
+    public int getDPad(){
+        return player2.getPOV();
+    }
 }

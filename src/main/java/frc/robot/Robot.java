@@ -23,31 +23,31 @@ public class Robot extends TimedRobot {
 		elevator = new Elevator(player1, drive);
 
 
-		UsbCamera hatchSideCam = CameraServer.getInstance().startAutomaticCapture(0);
+		// UsbCamera hatchSideCam = CameraServer.getInstance().startAutomaticCapture(0);
 		
-		// hatchSideCam.setExposureManual();
-		CvSink cvsink1 = new CvSink("Hatch Side Cam");
-		hatchSideCam.setBrightness(1);
+		// // hatchSideCam.setExposureManual();
+		// CvSink cvsink1 = new CvSink("Hatch Side Cam");
+		// hatchSideCam.setBrightness(1);
 
-		hatchSideCam.setExposureManual(2);
-		// hatchSideCam.setWhiteBalanceAuto();
-		hatchSideCam.setResolution(420, 240);
-		hatchSideCam.setFPS(10);
-		cvsink1.setSource(hatchSideCam);
-		cvsink1.setEnabled(true);
+		// hatchSideCam.setExposureManual(2);
+		// // hatchSideCam.setWhiteBalanceAuto();
+		// hatchSideCam.setResolution(420, 240);
+		// hatchSideCam.setFPS(10);
+		// cvsink1.setSource(hatchSideCam);
+		// cvsink1.setEnabled(true);
 
-		UsbCamera cargoSideCam = CameraServer.getInstance().startAutomaticCapture(1);
+		// UsbCamera cargoSideCam = CameraServer.getInstance().startAutomaticCapture(1);
 	
 
-		CvSink cvsink2 = new CvSink("Cargo Side Cam");
-		cvsink2.setSource(cargoSideCam);
-			cargoSideCam.setBrightness(1);
-			cargoSideCam.setExposureManual(1);
+		// CvSink cvsink2 = new CvSink("Cargo Side Cam");
+		// cvsink2.setSource(cargoSideCam);
+		// 	cargoSideCam.setBrightness(1);
+		// 	cargoSideCam.setExposureManual(1);
 
-		// cargoSideCam.setWhiteBalanceAuto();
-		cargoSideCam.setResolution(420, 240);
-		cargoSideCam.setFPS(10);
-		cvsink2.setEnabled(true);
+		// // cargoSideCam.setWhiteBalanceAuto();
+		// cargoSideCam.setResolution(420, 240);
+		// cargoSideCam.setFPS(10);
+		// cvsink2.setEnabled(true);
 	}
 	@Override
 	public void robotInit() {
