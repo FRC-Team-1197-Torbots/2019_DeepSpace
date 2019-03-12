@@ -100,6 +100,7 @@ public class Climb {
     //ball arm
     private final double upAngle = 60;
     private ballArm ballArm;
+    private statusLights statusLights;
 
     /*
      * -----------------------------------------------------------------------------
@@ -124,8 +125,8 @@ public class Climb {
     private theClimb climb = theClimb.setUp;
 
     public Climb(TalonSRX talon1, TalonSRX talon2, VictorSPX climberTalon, Encoder encoder, AnalogGyro climbGyro,
-            DigitalInput climbBreakBeam1, Solenoid climbPiston1, Solenoid climbPiston2, TorDrive drive, ballArm ballArm) {
-        // talons
+            DigitalInput climbBreakBeam1, Solenoid climbPiston1, Solenoid climbPiston2, TorDrive drive, ballArm ballArm, statusLights statusLights) {
+                // talons
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.climberTalon = climberTalon;
@@ -147,8 +148,11 @@ public class Climb {
         tiltDerivative = new TorDerivative(dt);
         tiltDerivative.reset();
 
+        // classes
         this.drive = drive;
         this.ballArm = ballArm;
+        this.statusLights = statusLights;
+
     }
 
     public void update(boolean running) {
@@ -188,6 +192,7 @@ public class Climb {
 
             SmartDashboard.putString("Climb state", climb.toString());
             if(running) {
+                statusLights.displayRainbowLights();
                 SmartDashboard.putBoolean("got here 2", true);
                 SmartDashboard.putNumber("control Power for climb", controlPower);
                 talon1.set(ControlMode.PercentOutput,controlPower);

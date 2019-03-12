@@ -81,6 +81,7 @@ public class hatchElevator {
     private Joystick player1;
     private Joystick player2;
     private Solenoid piston;
+    private statusLights statusLights;
 
     public static enum theElevator {
         IDLE,
@@ -93,7 +94,7 @@ public class hatchElevator {
 
     private theElevator elevator = theElevator.IDLE;
 
-    public hatchElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player1, Joystick player2, boolean talon2Inverted, Solenoid piston, ballArm ballArm) {
+    public hatchElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player1, Joystick player2, boolean talon2Inverted, Solenoid piston, ballArm ballArm, statusLights statusLights) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
@@ -101,6 +102,7 @@ public class hatchElevator {
         this.player1 = player1;
         this.player2 = player2;
         this.piston = piston;
+        this.statusLights = statusLights;
 
         //this is the PID
         positionPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP,
@@ -210,23 +212,32 @@ public class hatchElevator {
     }
 
     public void handleSolenoid() {
-        //this sets the piston
+        //this sets the piston 
+        // red if actuated, green extended
         if(elevator == theElevator.IDLE) {
             piston.set(false);
+            statusLights.displayGreenLights();
         } else if(elevator == theElevator.intakeHatchPID) {
             piston.set(false);
+            statusLights.displayGreenLights();
         } else if(elevator == theElevator.intakeHatchExtendPID) {
             piston.set(true);
+            statusLights.displayRedLights();
         } else if(elevator == theElevator.intakeHatchUpPID) {
             piston.set(true);
+            statusLights.displayRedLights();
         } else if(elevator == theElevator.highHatchPID) {
             piston.set(false);
+            statusLights.displayGreenLights();
         } else if(elevator == theElevator.highHatchExtendPID) {
             piston.set(true);
+            statusLights.displayRedLights();
         } else if(elevator == theElevator.goTointakeHatchPID) {
             piston.set(false);
+            statusLights.displayGreenLights();
         } else if(elevator == theElevator.goToHighHatchPID) {
             piston.set(false);
+            statusLights.displayGreenLights();
         }
     }
 

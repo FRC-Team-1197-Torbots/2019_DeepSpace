@@ -5,6 +5,8 @@ import com.revrobotics.CANSparkMax;
 
 import frc.robot.PID_Tools.*;
 
+
+
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Talon;
@@ -80,6 +82,7 @@ public class ballElevator {
     private TalonSRX talon1;
     private TalonSRX talon2;
     private ballArm ballArm;
+    private statusLights statusLights;
     private DigitalInput ballBreakBeam;
     
     private Encoder encoder;
@@ -98,7 +101,7 @@ public class ballElevator {
     public theElevator elevator = theElevator.defaultPosition;
 
     public ballElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player2, 
-        boolean talon2Inverted, DigitalInput ballBreakBeam, ballArm ballArm) {
+        boolean talon2Inverted, DigitalInput ballBreakBeam, ballArm ballArm, statusLights statusLights) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
@@ -106,6 +109,7 @@ public class ballElevator {
         this.talon2.setInverted(talon2Inverted);
         this.player2 = player2;
         this.ballBreakBeam = ballBreakBeam;
+        this.statusLights = statusLights;
 
         //this is the PID
         positionPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP,
@@ -229,9 +233,12 @@ public class ballElevator {
         //this handles the intake motors intake motor speed to be set
         if(elevator == theElevator.IDLE || elevator == theElevator.defaultPosition) {
             ballArm.setMode(0);
+            statusLights.displayWhiteLights();
         } else if(elevator == theElevator.intakeBallPID || elevator == theElevator.goTointakeBallPID) {
             ballArm.setMode(-1); //if in intake position, spin wheels in
+            statusLights.displayCyanLights();
         } else if (elevator == theElevator.lowBallPID || elevator == theElevator.goTolowBallPID){
+            statusLights.displayCyanLights();
             if(player2.getRawButton(5)) {
                 ballArm.setMode(2); //if pressed button spin out ball slowly
             } else if (Math.abs(player2.getRawAxis(2)) > 0.1){
@@ -241,6 +248,7 @@ public class ballElevator {
                 ballArm.setMode(0);
             }
         } else if (elevator == theElevator.mediumBallPID || elevator == theElevator.goTomediumBallPID){
+            statusLights.displayCyanLights();
             if(player2.getRawButton(5)) {
                 ballArm.setMode(2); // if pressed button LB, spin out ball slowly
             } else if (Math.abs(player2.getRawAxis(2)) > 0.1){
@@ -250,6 +258,7 @@ public class ballElevator {
                 ballArm.setMode(0);
             }
         } else if (elevator == theElevator.highBallPID || elevator == theElevator.goToHighBallPID){
+            statusLights.displayCyanLights();
             if(player2.getRawButton(5)) {
                 ballArm.setMode(1); // if pressed LB, spin out ball fast since 3rd level
             } else if (Math.abs(player2.getRawAxis(2)) > 0.1){

@@ -41,6 +41,7 @@ public class Elevator {
     private manualOverride manualOverride;
     private ballArm ballArm;
     private Climb climb;
+    private statusLights statusLights;
 
 // ---------------    Hardware   ------------------------------------------
 // Talons
@@ -114,9 +115,9 @@ public class Elevator {
         ballBreakBeam = new DigitalInput(9);//for the break  beam
         climbSwitch1 = new DigitalInput(23);
         
-        // light1 = new DigitalOutput(22);
-        // light2 = new DigitalOutput(24);
-        // light3 = new DigitalOutput(25);
+        light1 = new DigitalOutput(22);
+        light2 = new DigitalOutput(24);
+        light3 = new DigitalOutput(25);
 
 
     // Joysticks 
@@ -126,12 +127,13 @@ public class Elevator {
 
     // Classes
         ballArm = new ballArm(ballArm1, ballArm2, ballIntake1, fourtwenty);
-        hatchElevator = new hatchElevator(talon1, talon2, encoder, player1, player2, talon2Inverted, hatchPiston, ballArm);
-        ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballBreakBeam, ballArm);
-        groundIntake = new groundIntake(talon1, talon2, ballArm, player2, encoder);
+        statusLights = new statusLights(light1, light2, light3);
+        hatchElevator = new hatchElevator(talon1, talon2, encoder, player1, player2, talon2Inverted, hatchPiston, ballArm, statusLights);
+        ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballBreakBeam, ballArm, statusLights);
+        groundIntake = new groundIntake(talon1, talon2, ballArm, player2, encoder, statusLights);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballArm1, ballArm2,
              elevatorShifter, climberPiston1, climberPiston2, climberTalon, hatchPiston);
-        climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, climberPiston1, climberPiston2, drive, ballArm);
+        climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, climberPiston1, climberPiston2, drive, ballArm, statusLights);
     }
 
     public boolean climbing() {

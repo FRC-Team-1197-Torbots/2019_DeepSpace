@@ -30,6 +30,7 @@ public class groundIntake {
     private double currentVelocity;
 
     private ballArm ballArm;
+    private statusLights statusLights;
     private TalonSRX elevatorTalon1;
     private TalonSRX elevatorTalon2;
     private Joystick player2;
@@ -94,12 +95,13 @@ public class groundIntake {
     public theElevator elevator = theElevator.defaultPosition;
 
 
-    public groundIntake(TalonSRX elevatorTalon1, TalonSRX elevatorTalon2, ballArm ballArm, Joystick player2, Encoder encoder) {
+    public groundIntake(TalonSRX elevatorTalon1, TalonSRX elevatorTalon2, ballArm ballArm, Joystick player2, Encoder encoder, statusLights statusLights) {
         this.ballArm = ballArm;
         this.elevatorTalon1 = elevatorTalon1;
         this.elevatorTalon2 = elevatorTalon2;
         this.player2 = player2;
         this.encoder = encoder;
+        this.statusLights = statusLights;
 
         //this is the PID
         positionPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP,
@@ -173,6 +175,7 @@ public class groundIntake {
                 }
                 PIDRun();//this only updates what value the elevator should be going at
                 if(running) {
+                    statusLights.displayYellowLights();
                     handleIntake();
                     handleArm();
                     SmartDashboard.putBoolean("Limitswitch being hit", limitSwitchBeingHit);

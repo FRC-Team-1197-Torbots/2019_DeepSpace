@@ -154,7 +154,7 @@ public class manualOverride {
     }
 
     public void setBallIntakeArmSpeed(double speed) { // method for setting ballroller arm speed
-        ballIntakeArm1.set(ControlMode.PercentOutput, speed);
+        ballIntakeArm1.set(ControlMode.PercentOutput, -speed);
         ballIntakeArm2.set(ControlMode.PercentOutput, speed);
 
     }
