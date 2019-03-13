@@ -23,16 +23,16 @@ public class ballArm {
     private double intakeCurrentRunningPower = 0;
 
     //PID values to tune
-    private final double flatAngle = 157.09216944023322;//reading on the pot (fourtwenty) when it is flat
+    private final double flatAngle = 147.88331812821954;//reading on the pot (fourtwenty) when it is flat
     private final double polarity = -1;//1 if up is positive, -1 if up is negative
-    private final double kP = 0.006;
-    private final double kI = 0.0001;
+    private final double kP = 0.0225; //0.01
+    private final double kI = 0.0001; //0.0001
     private final double kD = -0.001;
-    private final double kF = -0.17;
+    private final double kF = -0.1; //-0.2
     private final double tolerance = 2;//in degrees and is when kI stops
     private final double dt = 0.005;//should be the same as everything else
-    private final double maxSpeedUp = 0.3;
-    private final double maxSpeedDown = -0.6;
+    private final double maxSpeedUp = 0.2;
+    private final double maxSpeedDown = -0.8;
     //thats it on tunable things
 
     private double currentAngle;

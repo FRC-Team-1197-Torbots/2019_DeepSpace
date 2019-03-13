@@ -130,7 +130,7 @@ public class manualOverride {
             // move ball intake arm 
 
             if (Math.abs(rollerArmAxis) > 0.15) { 
-                setBallIntakeArmSpeed(rollerArmAxis * rollerArmAxis);
+                setBallIntakeArmSpeed(rollerArmAxis);
             
             } else {
                 setBallIntakeArmSpeed(0);
