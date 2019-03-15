@@ -53,6 +53,7 @@ public class ballElevator {
     private final double mediumBallPosition = 0.525;
     private final double intakeBallPosition = 0.36;
     private final double highBallPosition = 0.85;
+    private final double cargoBallPosition = 0.4;
     private final double defaultPosition = 0.3;//should be low so limelight can see and center of gravity isn't too high
     private final double absoluteMaxUpwardVelocity = 0.4;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
@@ -62,6 +63,7 @@ public class ballElevator {
     private final double highBallAngle = 70;
     private final double mediumBallAngle = 55;
     private final double lowBallAngle = 27.5;
+    private final double cargoBallAngle = 55;
     private final double pulledInAngle = 70;//inside the frame for protection
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
@@ -77,6 +79,7 @@ public class ballElevator {
     private long lastTimeBPressed = 0;
     private long lastTimeXPressed = 0;
     private long lastTimeYPressed = 0;
+    private long lastTimeDPressed = 0;
     //our hardware
     private TalonSRX talon1;
     private TalonSRX talon2;
@@ -91,9 +94,10 @@ public class ballElevator {
         IDLE, lowBallPID,
         intakeBallPID,
         highBallPID,
+        cargoBallPID,
         mediumBallPID,
         defaultPosition,
-        goTolowBallPID, goTointakeBallPID, goToHighBallPID, goTomediumBallPID;
+        goTolowBallPID, goTointakeBallPID, goToHighBallPID, goTomediumBallPID, goToCargoBallPID;
         private theElevator() {}
     }
 
@@ -172,6 +176,14 @@ public class ballElevator {
                     } else {
                         elevator = theElevator.goToHighBallPID;
                     }
+                } else if(getDpad() && ((currentTime - lastTimeDPressed) > 250)) {
+
+                    lastTimeDPressed = currentTime;
+                    if(elevator == theElevator.goToCargoBallPID || elevator == theElevator.cargoBallPID) {
+                        elevator = theElevator.defaultPosition;
+                    } else {
+                        elevator = theElevator.goToCargoBallPID;
+                    }
                 }
     
         
@@ -196,6 +208,10 @@ public class ballElevator {
                     currentTarget = mediumBallPosition;
                 } else if(elevator == theElevator.defaultPosition) {
                     currentTarget = defaultPosition;
+                } else if(elevator == theElevator.goToCargoBallPID) {
+                    currentTarget = cargoBallPosition;
+                } else if(elevator == theElevator.cargoBallPID) {
+                    currentTarget = cargoBallPosition;
                 }
                 PIDRun();//this only updates what value the elevator should be going at
                 stateRun();
@@ -225,6 +241,8 @@ public class ballElevator {
             ballArm.update(lowBallAngle);
         } else if(elevator == theElevator.intakeBallPID || elevator == theElevator.goTointakeBallPID) {
             ballArm.update(intakeBallAngle);
+        } else if(elevator == theElevator.cargoBallPID || elevator == theElevator.goToCargoBallPID) {
+            ballArm.update(cargoBallAngle);
         }
     }
 
@@ -261,7 +279,17 @@ public class ballElevator {
             if(player2.getRawButton(5)) {
                 ballArm.setMode(1); // if pressed LB, spin out ball fast since 3rd level
             } else if (Math.abs(player2.getRawAxis(2)) > 0.1){
-                ballArm.setMode(-2); // if pressed LT, pin in to suck in ball
+                ballArm.setMode(-2); // if pressed LT, spin in to suck in ball
+                
+            } else {
+                ballArm.setMode(0); 
+            }
+        } else if (elevator == theElevator.cargoBallPID || elevator == theElevator.goToCargoBallPID) {
+            statusLights.displayCyanLights();
+            if(player2.getRawButton(5)) {
+                ballArm.setMode(2); // if pressed LB, spin out ball slowly
+            } else if (Math.abs(player2.getRawAxis(2)) > 0.1){
+                ballArm.setMode(-2); // if pressed LT, spin in to suck in ball
                 
             } else {
                 ballArm.setMode(0); 
@@ -304,6 +332,9 @@ public class ballElevator {
                 }
                 break;
             case highBallPID:
+                setPercentSpeed(controlPower);
+                break;
+            case cargoBallPID:
                 setPercentSpeed(controlPower);
                 break;
             case goTolowBallPID:
@@ -386,6 +417,26 @@ public class ballElevator {
                     elevator = theElevator.highBallPID;
                 }
                 break;
+            case goToCargoBallPID:
+                if(Math.abs(height() - currentTarget) > pidGoTolerance) {
+                    if((height() - currentTarget) > 0) {
+                        if(powerDrive) {
+                            setPercentSpeed(-absoluteMaxDownwardVelocity);
+                        } else {
+                            setPercentSpeed(controlPower);
+                        }
+                    } else {
+                        if(powerDrive) {
+                            setPercentSpeed(absoluteMaxUpwardVelocity);
+                        } else {
+                            setPercentSpeed(controlPower);
+                        }
+                    }
+                } else {
+                    setPercentSpeed(controlPower);
+                    elevator = theElevator.highBallPID;
+                }
+                break;
         }
     }
     
@@ -446,5 +497,9 @@ public class ballElevator {
     }
     public int getDPad(){
         return player2.getPOV();
+    }
+
+    public boolean getDpad() {
+        return (player2.getPOVCount() != 0);
     }
 }
