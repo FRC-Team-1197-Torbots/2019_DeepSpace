@@ -88,6 +88,7 @@ public class Elevator {
     private final boolean talon2Inverted = false;
     private final boolean intakeMotor2Inverted = false;
     private boolean starting = true;
+    private boolean hatchMode = true;
 
     public Elevator(Joystick player1, TorDrive drive) {
     // Talons
@@ -192,16 +193,19 @@ public class Elevator {
                     } else {
                         manualOverride.update(false);
                         if (getRightBumper()) {// ball
+                            hatchMode = false;
                             ballElevator.update(true, limitSwitch.get());
                             hatchElevator.update(false, limitSwitch.get());
                             groundIntake.update(false, limitSwitch.get());
                             SmartDashboard.putString("elevator state", "ball");
                         } else if (Math.abs(player2.getRawAxis(2)) > 0.1) { //ground hatch
+                            hatchMode = false;
                             groundIntake.update(true, limitSwitch.get());
                             ballElevator.update(false, limitSwitch.get());
                             hatchElevator.update(false, limitSwitch.get());
                         
-                        }else {// hatch
+                        } else {// hatch
+                            hatchMode = true;
                             ballElevator.update(false, limitSwitch.get());
                             hatchElevator.update(true, limitSwitch.get());
                             groundIntake.update(false, limitSwitch.get());
@@ -216,6 +220,10 @@ public class Elevator {
                 climb.update(true);
                 break;
         }
+    }
+
+    public boolean hatchMode() {
+        return hatchMode;
     }
 
     public void initValues() {

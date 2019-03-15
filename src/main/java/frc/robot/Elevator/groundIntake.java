@@ -42,7 +42,7 @@ public class groundIntake {
     private final double velocityTolerance = 0.0;
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need
-    private final double positionkP = -2.1;
+    private final double positionkP = -2.5;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -60,7 +60,7 @@ public class groundIntake {
     ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
 
-    private final double intakeArmAngle = -2;//should stay flat when we intake the hatch
+    private final double intakeArmAngle = -1;//should stay flat when we intake the hatch
     private final double defaultArmAngle = 70;//this is the in angle
     private final double highPositionArmAngle = 60;
     private final double mediumPositionArmAngle = 70;
@@ -69,8 +69,8 @@ public class groundIntake {
 
     private final double intakePosition = 0.0;
     private final double defaultPosition = 0.25;
-    private final double highPosition = 0.68;
-    private final double mediumPosition = 0.225;
+    private final double highPosition = 0.70;
+    private final double mediumPosition = 0.185;
     private final double highReleasePosition = 0.48;
     private final double mediumReleasePosition = 0.05;
     /*

@@ -1,7 +1,6 @@
 package frc.robot.Elevator;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.PID_Tools.*;
@@ -23,12 +22,12 @@ public class ballArm {
     private double intakeCurrentRunningPower = 0;
 
     //PID values to tune
-    private final double flatAngle = 147.88331812821954;//reading on the pot (fourtwenty) when it is flat
+    private final double flatAngle = 139.64050813957536;//reading on the pot (fourtwenty) when it is flat
     private final double polarity = -1;//1 if up is positive, -1 if up is negative
-    private final double kP = 0.0225; //0.01
+    private final double kP = 0.01; //0.01
     private final double kI = 0.0001; //0.0001
-    private final double kD = -0.001;
-    private final double kF = -0.1; //-0.2
+    private final double kD = -0.00175; // 0.001
+    private final double kF = -0.2; //-0.2
     private final double tolerance = 2;//in degrees and is when kI stops
     private final double dt = 0.005;//should be the same as everything else
     private final double maxSpeedUp = 0.2;

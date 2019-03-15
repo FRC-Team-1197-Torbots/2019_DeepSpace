@@ -65,10 +65,11 @@ public class Robot extends TimedRobot {
 	}
 	@Override
 	public void teleopPeriodic() {
+		elevator.update();
 		if(!elevator.climbing()) {
+			drive.setHatchMode(elevator.hatchMode());
 			drive.Run(test, true);//IT IS TELEOP
 		}
-		elevator.update();
 	}
 	@Override
 	public void testPeriodic() {
