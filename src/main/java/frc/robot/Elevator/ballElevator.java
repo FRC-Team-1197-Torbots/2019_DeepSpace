@@ -53,7 +53,7 @@ public class ballElevator {
     private final double mediumBallPosition = 0.525;
     private final double intakeBallPosition = 0.36;
     private final double highBallPosition = 0.85;
-    private final double cargoBallPosition = 0.4;
+    private final double cargoBallPosition = 0.175;
     private final double defaultPosition = 0.3;//should be low so limelight can see and center of gravity isn't too high
     private final double absoluteMaxUpwardVelocity = 0.4;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
@@ -63,7 +63,7 @@ public class ballElevator {
     private final double highBallAngle = 70;
     private final double mediumBallAngle = 55;
     private final double lowBallAngle = 27.5;
-    private final double cargoBallAngle = 55;
+    private final double cargoBallAngle = 65;
     private final double pulledInAngle = 70;//inside the frame for protection
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
@@ -125,9 +125,11 @@ public class ballElevator {
     }
 
     public void update(boolean running, boolean limitSwitchBeingHit) {
+        SmartDashboard.putString("ball elevator state:", elevator.toString());
         talon2.follow(talon1);
 		currentTime = (long)(Timer.getFPGATimestamp() * 1000);
-		SmartDashboard.putString("ballElevator state", elevator.toString());
+        SmartDashboard.putString("ballElevator state", elevator.toString());
+        SmartDashboard.putBoolean("d pad: ", getDpad());
 		//this starting boolean makes it so that it will still do the first value in the trajectory
 		
 		//this handles it so that it will only tick in the time interval so that the derivatives and the integrals are correct
@@ -434,7 +436,7 @@ public class ballElevator {
                     }
                 } else {
                     setPercentSpeed(controlPower);
-                    elevator = theElevator.highBallPID;
+                    elevator = theElevator.cargoBallPID;
                 }
                 break;
         }
@@ -500,6 +502,6 @@ public class ballElevator {
     }
 
     public boolean getDpad() {
-        return (player2.getPOVCount() != 0);
+        return (player2.getPOV() >= 0);
     }
 }

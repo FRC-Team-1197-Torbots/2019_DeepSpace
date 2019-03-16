@@ -69,9 +69,9 @@ public class groundIntake {
 
     private final double intakePosition = 0.0;
     private final double defaultPosition = 0.25;
-    private final double highPosition = 0.70;
+    private final double highPosition = 0.84;
     private final double mediumPosition = 0.185;
-    private final double highReleasePosition = 0.48;
+    private final double highReleasePosition = 0.3;
     private final double mediumReleasePosition = 0.05;
     /*
     end of tunable values for this class

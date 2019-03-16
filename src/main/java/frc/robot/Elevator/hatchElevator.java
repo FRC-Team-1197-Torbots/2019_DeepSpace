@@ -30,7 +30,7 @@ public class hatchElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = -2.5;
+    private final double positionkP = -2.75;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -46,9 +46,9 @@ public class hatchElevator {
 
     private final double encoderTicksPerMeter = 897;//this is how many ticks there are per meter the elevator goes up
     private final double intakeHatchPosition = 0.125;
-    private final double highHatchPosition = 0.68;
+    private final double highHatchPosition = 0.85;
     private final double intakeHatchExtendPosition = 0.125;//should be lower than intakeHatchPosition
-    private final double highHatchExtendPosition = 0.68;//should be lower than highHatchPosition
+    private final double highHatchExtendPosition = 0.85;//should be lower than highHatchPosition
     private final double absoluteMaxUpwardVelocity = 0.45;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
@@ -214,28 +214,35 @@ public class hatchElevator {
     public void handleSolenoid() {
         //this sets the piston 
         // red if actuated, green extended
-        if(elevator == theElevator.IDLE) {
-            piston.set(false);
-            statusLights.displayGreenLights();
-        } else if(elevator == theElevator.intakeHatchPID) {
-            piston.set(false);
-            statusLights.displayGreenLights();
-        } else if(elevator == theElevator.intakeHatchExtendPID) {
+        // if(elevator == theElevator.IDLE) {
+        //     piston.set(false);
+        //     statusLights.displayGreenLights();
+        // } else if(elevator == theElevator.intakeHatchPID) {
+        //     piston.set(false);
+        //     statusLights.displayGreenLights();
+        // } else if(elevator == theElevator.intakeHatchExtendPID) {
+        //     piston.set(true);
+        //     statusLights.displayRedLights();
+        // } else if(elevator == theElevator.intakeHatchUpPID) {
+        //     piston.set(true);
+        //     statusLights.displayRedLights();
+        // } else if(elevator == theElevator.highHatchPID) {
+        //     piston.set(false);
+        //     statusLights.displayGreenLights();
+        // } else if(elevator == theElevator.highHatchExtendPID) {
+        //     piston.set(true);
+        //     statusLights.displayRedLights();
+        // } else if(elevator == theElevator.goTointakeHatchPID) {
+        //     piston.set(false);
+        //     statusLights.displayGreenLights();
+        // } else if(elevator == theElevator.goToHighHatchPID) {
+        //     piston.set(false);
+        //     statusLights.displayGreenLights();
+        // }
+        if(getButtonX() || player1.getRawButton(1)) {
             piston.set(true);
             statusLights.displayRedLights();
-        } else if(elevator == theElevator.intakeHatchUpPID) {
-            piston.set(true);
-            statusLights.displayRedLights();
-        } else if(elevator == theElevator.highHatchPID) {
-            piston.set(false);
-            statusLights.displayGreenLights();
-        } else if(elevator == theElevator.highHatchExtendPID) {
-            piston.set(true);
-            statusLights.displayRedLights();
-        } else if(elevator == theElevator.goTointakeHatchPID) {
-            piston.set(false);
-            statusLights.displayGreenLights();
-        } else if(elevator == theElevator.goToHighHatchPID) {
+        } else {
             piston.set(false);
             statusLights.displayGreenLights();
         }
