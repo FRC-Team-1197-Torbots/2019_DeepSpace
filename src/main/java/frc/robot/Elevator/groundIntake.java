@@ -150,9 +150,10 @@ public class groundIntake {
                         elevator = theElevator.mediumReleasePID;
                     } else if(elevator == theElevator.highPID) {
                         elevator = theElevator.highReleasePID;
-                    } else if(elevator == theElevator.highReleasePID || elevator == theElevator.mediumReleasePID) {
-                        elevator = theElevator.defaultPosition;
-                    }
+                    } 
+                    // else if(elevator == theElevator.highReleasePID || elevator == theElevator.mediumReleasePID) {
+                        // elevator = theElevator.defaultPosition;
+                    // }
                     //those are all the states you should be in when you press X
                     //otherwise it won't work since it is only to outake the ground hatch
                 }

@@ -52,9 +52,9 @@ public class ArcadeDriveController extends DriveController {
    // limelight PID
    // Stuff------------------------------>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-   private final double positionkP = -2; //-3.5
-   private final double positionkI = 0;
-   private final double positionkD = -0.02; //-0.07
+   private final double positionkP = -1.45; //-3.5
+   private final double positionkI = 0; //-0.002
+   private final double positionkD = -0.0315; //-0.07
    private final double positionTolerance = 3 * Math.PI / 180.0;// for thePID
    private final double velocitykP = 0.0;// velocity stuff probably not needed at all and should keep 0
    private final double velocitykI = 0.0;

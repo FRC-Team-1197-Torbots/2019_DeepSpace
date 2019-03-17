@@ -15,23 +15,23 @@ public class ballArm {
     
     //intake speed variables
     private final double intakePower = -0.6;
-    private final double intakePower2 = -0.4;
+    private final double intakePower2 = -0.3;
     private final double outakePower = 1;
-    private final double outakePower2 = 0.675;
+    private final double outakePower2 = 0.7;
     //not tunable
     private double intakeCurrentRunningPower = 0;
 
     //PID values to tune
     private final double flatAngle = 135.86667372546034;//reading on the pot (fourtwenty) when it is flat
     private final double polarity = -1;//1 if up is positive, -1 if up is negative
-    private final double kP = 0.045; //0.01
-    private final double kI = 0.005; //0.0001
-    private final double kD = -0.003; // 0.00175
-    private final double kF = -0.35; //-0.2
-    private final double tolerance = 2;//in degrees and is when kI stops
+    private final double kP = 0.017; //0.01
+    private final double kI = 0.0000; //0.00
+    private final double kD = -0.0006; // -0.0005
+    private final double kF = -0.225; //-0.2
+    private final double tolerance = 5;//in degrees and is when kI stops
     private final double dt = 0.005;//should be the same as everything else
-    private final double maxSpeedUp = 0.2;
-    private final double maxSpeedDown = -0.8;
+    private final double maxSpeedUp = 0.21;
+    private final double maxSpeedDown = -1;//max speed up its flipped
     //thats it on tunable things
 
     private double currentAngle;
@@ -69,6 +69,11 @@ public class ballArm {
             onTarget = false;
         }
         errorDerivative = derivative.estimate(error);
+        if(errorSum * kI > 1) {
+            errorSum = 1 / kI;
+        } else if(errorSum * kI < -1) {
+            errorSum = -1 / kI;
+        }
         output = (error * kP) + (errorDerivative * kD) + (errorSum * kI);
         output += kF * Math.cos((currentAngle * Math.PI) / 180.0);
         if(output > maxSpeedUp) {

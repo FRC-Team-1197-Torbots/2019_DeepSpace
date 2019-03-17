@@ -34,7 +34,7 @@ public class ballElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = -2.5;
+    private final double positionkP = -2.75;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -50,12 +50,12 @@ public class ballElevator {
 
     private final double encoderTicksPerMeter = 897;//this is how many ticks there are per meter the elevator goes up
     private final double lowBallPosition = 0.1;//these three are the heights of what we want to go to
-    private final double mediumBallPosition = 0.525;
+    private final double mediumBallPosition = 0.5;
     private final double intakeBallPosition = 0.36;
     private final double highBallPosition = 0.85;
-    private final double cargoBallPosition = 0.175;
+    private final double cargoBallPosition = 0.075;
     private final double defaultPosition = 0.3;//should be low so limelight can see and center of gravity isn't too high
-    private final double absoluteMaxUpwardVelocity = 0.4;//don't make it higher than 1.0 POSITIVE
+    private final double absoluteMaxUpwardVelocity = 0.5;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
     //for the ballArm positions
@@ -63,7 +63,7 @@ public class ballElevator {
     private final double highBallAngle = 70;
     private final double mediumBallAngle = 55;
     private final double lowBallAngle = 27.5;
-    private final double cargoBallAngle = 65;
+    private final double cargoBallAngle = 55;
     private final double pulledInAngle = 70;//inside the frame for protection
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away

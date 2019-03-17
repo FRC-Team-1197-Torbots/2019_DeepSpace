@@ -245,6 +245,7 @@ public class hatchElevator {
         } else {
             piston.set(false);
             statusLights.displayGreenLights();
+            
         }
     }
 

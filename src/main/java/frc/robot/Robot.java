@@ -7,6 +7,32 @@ import frc.robot.Elevator.*;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
+import java.util.List;
+import java.util.ArrayList;
+
+// import com.google.gson.Gson;
+// import com.google.gson.GsonBuilder;
+// import com.google.gson.JsonArray;
+// import com.google.gson.JsonElement;
+// import com.google.gson.JsonObject;
+// import com.google.gson.JsonParser;
+
+import edu.wpi.cscore.MjpegServer;
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.cscore.VideoSource;
+// import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.vision.VisionPipeline;
+import edu.wpi.first.vision.VisionThread;
+
+import org.opencv.core.Mat;
+
+
 
 public class Robot extends TimedRobot {
 	private DriveHardware hardware;
@@ -15,6 +41,21 @@ public class Robot extends TimedRobot {
 	private boolean test;
 	private Elevator elevator;
 	
+	// camera
+	private static String configFile = "/boot/frc.json";
+
+	public static int team;
+	  public static boolean server;
+	// public static class CameraConfig {
+	// 	public String name;
+	// 	public String path;
+	// 	public JsonObject config;
+	// 	public JsonElement streamConfig;
+	//   }
+	// public static List<CameraConfig> cameraConfigs = new ArrayList<>();
+	public static List<VideoSource> cameras = new ArrayList<>();
+
+	
 	public Robot() {
 		test = false;
 		hardware = new DriveHardware();																																																																																																					
@@ -22,7 +63,21 @@ public class Robot extends TimedRobot {
 		drive = new TorDrive(hardware, player1);
 		elevator = new Elevator(player1, drive);
 
-
+//---------------------------- 
+/*
+		NetworkTableInstance raspberryPi = NetworkTableInstance.getDefault();
+		if (!readConfig()) {
+			return;
+		  }
+		  System.out.println("Setting up NetworkTables client for team " + 1198);
+		  raspberryPi.startClientTeam(1198);
+		
+		  for (CameraConfig config : cameraConfigs) {
+			cameras.add(startCamera(config));
+		  }
+*/
+// ------------------------
+	
 		// UsbCamera hatchSideCam = CameraServer.getInstance().startAutomaticCapture(0);
 		
 		// // hatchSideCam.setExposureManual();
@@ -78,6 +133,121 @@ public class Robot extends TimedRobot {
 		}
 		elevator.update();
 	}
+
+
+// Camera config methods
+// ------------------------------------------------------------------------------------------------
+// 	public static boolean readCameraConfig(JsonObject config) {
+// 		CameraConfig cam = new CameraConfig();
+	
+// 		// name
+// 		JsonElement nameElement = config.get("name");
+// 		if (nameElement == null) {
+// 		  parseError("could not read camera name");
+// 		  return false;
+// 		}
+// 		cam.name = nameElement.getAsString();
+	
+// 		// path
+// 		JsonElement pathElement = config.get("path");
+// 		if (pathElement == null) {
+// 		  parseError("camera '" + cam.name + "': could not read path");
+// 		  return false;
+// 		}
+// 		cam.path = pathElement.getAsString();
+	
+// 		// stream properties
+// 		cam.streamConfig = config.get("stream");
+	
+// 		cam.config = config;
+	
+// 		cameraConfigs.add(cam);
+// 		return true;
+// 	  }
+
+
+// 	public static VideoSource startCamera(CameraConfig config) {
+// 		System.out.println("Starting camera '" + config.name + "' on " + config.path);
+// 		CameraServer inst = CameraServer.getInstance();
+// 		UsbCamera camera = new UsbCamera(config.name, config.path);
+// 		MjpegServer server = inst.startAutomaticCapture(camera);
+	
+// 		Gson gson = new GsonBuilder().create();
+	
+// 		camera.setConfigJson(gson.toJson(config.config));
+// 		camera.setConnectionStrategy(VideoSource.ConnectionStrategy.kKeepOpen);
+	
+// 		if (config.streamConfig != null) {
+// 		  server.setConfigJson(gson.toJson(config.streamConfig));
+// 		}
+	
+// 		return camera;
+// 	  }
+
+
+//  public static boolean readConfig() {
+//     // parse file
+//     JsonElement top;
+//     try {
+//       top = new JsonParser().parse(Files.newBufferedReader(Paths.get(configFile)));
+//     } catch (IOException ex) {
+//       System.err.println("could not open '" + configFile + "': " + ex);
+//       return false;
+//     }
+
+//     // top level must be an object
+//     if (!top.isJsonObject()) {
+//       parseError("must be JSON object");
+//       return false;
+//     }
+//     JsonObject obj = top.getAsJsonObject();
+
+//     // team number
+//     JsonElement teamElement = obj.get("team");
+//     if (teamElement == null) {
+//       parseError("could not read team number");
+//       return false;
+//     }
+//     team = teamElement.getAsInt();
+
+//     // ntmode (optional)
+//     if (obj.has("ntmode")) {
+//       String str = obj.get("ntmode").getAsString();
+//       if ("client".equalsIgnoreCase(str)) {
+//         server = false;
+//       } else if ("server".equalsIgnoreCase(str)) {
+//         server = true;
+//       } else {
+//         parseError("could not understand ntmode value '" + str + "'");
+//       }
+//     }
+
+//     // cameras
+//     JsonElement camerasElement = obj.get("cameras");
+//     if (camerasElement == null) {
+//       parseError("could not read cameras");
+//       return false;
+//     }
+//     JsonArray cameras = camerasElement.getAsJsonArray();
+//     for (JsonElement camera : cameras) {
+//       if (!readCameraConfig(camera.getAsJsonObject())) {
+//         return false;
+//       }
+//     }
+
+//     if (obj.has("switched cameras")) {
+//       JsonArray switchedCameras = obj.get("switched cameras").getAsJsonArray();
+//       for (JsonElement camera : switchedCameras) {
+//         if (!readSwitchedCameraConfig(camera.getAsJsonObject())) {
+//           return false;
+//         }
+//       }
+//     }
+
+//     return true;
+//   }
+
+
 	/*
 	 *  The following are a bunch of accessor methods to obtain input from the controller.
 	 */
