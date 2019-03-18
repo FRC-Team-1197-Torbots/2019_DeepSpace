@@ -80,8 +80,8 @@ public class Climb {
     private final double tiltTolerance = 1;// for thePID
     private final double normalTiltPower = -0.8;
 
-    private final double normalkP = -2;
-    private final double normalkI = 0.001;
+    private final double normalkP = -2.75;
+    private final double normalkI = 0.0;
     private final double normalkD = 0.0;
     private final double normalTolerance = 0.01;// for thePID
 
@@ -89,8 +89,8 @@ public class Climb {
 
     // ----------------- Elevator -----------------------------------------
 
-    private final double startClimbPosition = 0.625;// this is where the elevator will go to first.
-    private final double elevatorBottomPosition = 0.01;//these are in meters from the first hall effect sensor
+    private final double startClimbPosition = 0.51;// this is where the elevator will go to first.
+    private final double elevatorBottomPosition = 0.02;//these are in meters from the first hall effect sensor
 
     // ----------------- Drive -----------------------------------------
     private final double climberTalonLiftSpeed = 0.35;
@@ -184,7 +184,7 @@ public class Climb {
                     
             stateRun();
             if (climb == theClimb.setUp || climb == theClimb.IDLE) {
-                currentTarget = startClimbPosition - 0.02;
+                currentTarget = startClimbPosition;
                 normalPidRun();
             } else {
                 currentTarget = elevatorBottomPosition;
