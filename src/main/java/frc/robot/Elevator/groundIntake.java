@@ -6,8 +6,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import frc.robot.Elevator.ballElevator.theElevator;
 import frc.robot.PID_Tools.*;
 
 import edu.wpi.first.wpilibj.Encoder;
@@ -31,8 +31,10 @@ public class groundIntake {
 
     private ballArm ballArm;
     private statusLights statusLights;
-    private TalonSRX elevatorTalon1;
-    private TalonSRX elevatorTalon2;
+    // private TalonSRX elevatorTalon1;
+    // private TalonSRX elevatorTalon2;
+    private CANSparkMax elevatorTalon1;
+    private CANSparkMax elevatorTalon2;
     private Joystick player2;
     private Encoder encoder;
     private int initialTicks;
@@ -95,7 +97,7 @@ public class groundIntake {
     public theElevator elevator = theElevator.defaultPosition;
 
 
-    public groundIntake(TalonSRX elevatorTalon1, TalonSRX elevatorTalon2, ballArm ballArm, Joystick player2, Encoder encoder, statusLights statusLights) {
+    public groundIntake(CANSparkMax elevatorTalon1, CANSparkMax elevatorTalon2, ballArm ballArm, Joystick player2, Encoder encoder, statusLights statusLights) {
         this.ballArm = ballArm;
         this.elevatorTalon1 = elevatorTalon1;
         this.elevatorTalon2 = elevatorTalon2;
@@ -181,8 +183,8 @@ public class groundIntake {
                     handleArm();
                     SmartDashboard.putBoolean("Limitswitch being hit", limitSwitchBeingHit);
                     if(limitSwitchBeingHit) {
-                        elevatorTalon1.set(ControlMode.PercentOutput, currentRunningSpeed);
-                        elevatorTalon2.set(ControlMode.PercentOutput, currentRunningSpeed);
+                        elevatorTalon1.set(currentRunningSpeed);
+                        elevatorTalon2.set(currentRunningSpeed);
                     
                     }
                 } else {

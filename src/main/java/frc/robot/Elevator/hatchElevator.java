@@ -75,8 +75,8 @@ public class hatchElevator {
     private boolean XPressedLast = false;
 
     //our hardware
-    private TalonSRX talon1;
-    private TalonSRX talon2;
+    private CANSparkMax talon1;
+    private CANSparkMax talon2;
     private Encoder encoder;
     private Joystick player1;
     private Joystick player2;
@@ -94,7 +94,7 @@ public class hatchElevator {
 
     private theElevator elevator = theElevator.IDLE;
 
-    public hatchElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player1, Joystick player2, boolean talon2Inverted, Solenoid piston, ballArm ballArm, statusLights statusLights) {
+    public hatchElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player1, Joystick player2, boolean talon2Inverted, Solenoid piston, ballArm ballArm, statusLights statusLights) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
@@ -198,8 +198,8 @@ public class hatchElevator {
                     ballArm.setMode(0);
                     ballArm.update(upAngleForBallArm);
                     // if(limitSwitchBeingHit) {
-                        talon1.set(ControlMode.PercentOutput, currentRunningSpeed);
-                        talon2.set(ControlMode.PercentOutput, currentRunningSpeed);
+                        talon1.set(currentRunningSpeed);
+                        talon2.set(currentRunningSpeed);
                     // } else {
                     //     talon1.set(0.1);
                     //     talon2.set(0);

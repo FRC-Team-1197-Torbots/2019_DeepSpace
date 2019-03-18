@@ -23,8 +23,10 @@ public class manualOverride {
 
     // ------------- Elevator ------------------------------------
     // Elevator Gearbox motors
-    private TalonSRX talon1;
-    private TalonSRX talon2;
+    // private TalonSRX talon1;
+    // private TalonSRX talon2;
+    private CANSparkMax talon1;
+    private CANSparkMax talon2;
 
     private Solenoid elevatorShifter;
 
@@ -73,7 +75,7 @@ public class manualOverride {
     private final double climberSpeed = 0.2;
     // ---------------------------------------------------------
 
-    public manualOverride(TalonSRX talon1, TalonSRX talon2, Joystick player2, boolean talon2Inverted,
+    public manualOverride(CANSparkMax talon1, CANSparkMax talon2, Joystick player2, boolean talon2Inverted,
             VictorSPX ballIntakeArm1, VictorSPX ballIntakeArm2, 
             Solenoid elevatorShifter, Solenoid climberPiston1, Solenoid climberPiston2, VictorSPX climberTalon, Solenoid hatchPiston) {
         this.talon1 = talon1;
@@ -149,8 +151,8 @@ public class manualOverride {
     }
 
     public void setElevatorSpeed(double elevatorSpeed) { // method for setting elevator speed
-        talon1.set(ControlMode.PercentOutput,elevatorSpeed);
-        talon2.set(ControlMode.PercentOutput, elevatorSpeed);
+        talon1.set(elevatorSpeed);
+        talon2.set(elevatorSpeed);
     }
 
     public void setBallIntakeArmSpeed(double speed) { // method for setting ballroller arm speed

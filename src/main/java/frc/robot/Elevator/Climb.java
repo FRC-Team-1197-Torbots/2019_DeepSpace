@@ -23,8 +23,10 @@ public class Climb {
     private int initialTicks;
 
     // Talons
-    private TalonSRX talon1;
-    private TalonSRX talon2;
+    // private TalonSRX talon1;
+    // private TalonSRX talon2;
+    private CANSparkMax talon1;
+    private CANSparkMax talon2;
     private VictorSPX climberTalon;
 
     // solenoids
@@ -124,7 +126,7 @@ public class Climb {
 
     private theClimb climb = theClimb.setUp;
 
-    public Climb(TalonSRX talon1, TalonSRX talon2, VictorSPX climberTalon, Encoder encoder, AnalogGyro climbGyro,
+    public Climb(CANSparkMax talon1, CANSparkMax talon2, VictorSPX climberTalon, Encoder encoder, AnalogGyro climbGyro,
             DigitalInput climbBreakBeam1, Solenoid climbPiston1, Solenoid climbPiston2, TorDrive drive, ballArm ballArm, statusLights statusLights) {
                 // talons
         this.talon1 = talon1;
@@ -195,8 +197,8 @@ public class Climb {
                 statusLights.displayRainbowLights();
                 SmartDashboard.putBoolean("got here 2", true);
                 SmartDashboard.putNumber("control Power for climb", controlPower);
-                talon1.set(ControlMode.PercentOutput,controlPower);
-                talon2.set(ControlMode.PercentOutput,controlPower);
+                talon1.set(controlPower);
+                talon2.set(controlPower);
                 ballArm.update(upAngle);
                 ballArm.setMode(0);
             }

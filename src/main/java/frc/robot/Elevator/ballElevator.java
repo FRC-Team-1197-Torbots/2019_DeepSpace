@@ -81,8 +81,10 @@ public class ballElevator {
     private long lastTimeYPressed = 0;
     private long lastTimeDPressed = 0;
     //our hardware
-    private TalonSRX talon1;
-    private TalonSRX talon2;
+    // private TalonSRX talon1;
+    // private TalonSRX talon2;
+    private CANSparkMax talon1;
+    private CANSparkMax talon2;
     private ballArm ballArm;
     private statusLights statusLights;
     private DigitalInput ballBreakBeam;
@@ -103,7 +105,7 @@ public class ballElevator {
 
     public theElevator elevator = theElevator.defaultPosition;
 
-    public ballElevator(TalonSRX talon1, TalonSRX talon2, Encoder encoder, Joystick player2, 
+    public ballElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player2, 
         boolean talon2Inverted, DigitalInput ballBreakBeam, ballArm ballArm, statusLights statusLights) {
         this.talon1 = talon1;
         this.talon2 = talon2;
@@ -221,8 +223,8 @@ public class ballElevator {
                     handleIntake();
                     handleArm();
                     // if(!limitSwitchBeingHit) {
-                        talon1.set(ControlMode.PercentOutput, currentRunningSpeed);
-                        talon2.set(ControlMode.PercentOutput, currentRunningSpeed);
+                        talon1.set(currentRunningSpeed);
+                        talon2.set(currentRunningSpeed);
 
                     // }
                 } else {

@@ -30,7 +30,6 @@ public class Elevator {
     //zeroing state tuning-----------
 
     private final double moveUpZeroSpeed = -0.5;
-
     //-----------
 
 // ---------------    Classes   ------------------------------------------
@@ -45,8 +44,8 @@ public class Elevator {
 
 // ---------------    Hardware   ------------------------------------------
 // Talons
-    private TalonSRX talon1;// this talon is the "drive talon for the elevator"
-    private TalonSRX talon2;// this is the second one
+    private CANSparkMax talon1;// this talon is the "drive talon for the elevator"
+    private CANSparkMax talon2;// this is the second one
     private VictorSPX ballIntake1; //ball intake shooter
     private VictorSPX ballArm1;
     private VictorSPX ballArm2;
@@ -92,10 +91,10 @@ public class Elevator {
 
     public Elevator(Joystick player1, TorDrive drive) {
     // Talons
-        // talon1 = new CANSparkMax(1, MotorType.kBrushless);
-        // talon2 = new CANSparkMax(2, MotorType.kBrushless);
-        talon1 = new TalonSRX(1);
-        talon2 = new TalonSRX(2);
+        talon1 = new CANSparkMax(1, MotorType.kBrushless);
+        talon2 = new CANSparkMax(2, MotorType.kBrushless);
+        // talon1 = new TalonSRX(1);
+        // talon2 = new TalonSRX(2);
         talon2.follow(talon1);
         ballIntake1 = new VictorSPX(9);
         ballArm1 = new VictorSPX(7);
