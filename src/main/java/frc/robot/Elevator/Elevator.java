@@ -55,6 +55,7 @@ public class Elevator {
     private Solenoid hatchPiston; // hatch piston for hatch mech
     private Solenoid climberPiston1;
     private Solenoid climberPiston2;
+    private Solenoid climberDownPiston;
 
 // Sensors
     private Encoder encoder; //elevator encoder
@@ -106,6 +107,7 @@ public class Elevator {
         hatchPiston = new Solenoid(2);
         climberPiston1 = new Solenoid(3);
         climberPiston2 = new Solenoid(4);
+        climberDownPiston = new Solenoid(5);
         
     // Sensors 
         fourtwenty = new AnalogPotentiometer(1, 360, 0);
@@ -172,6 +174,7 @@ public class Elevator {
         //we haven't made an autobox yet
         switch(elevatorStateMachine) {
             case ZEROING:
+                climberDownPiston.set(false);
                 if(starting) {
                     lastTime = currentTime;
                     starting = false;
@@ -183,6 +186,7 @@ public class Elevator {
                 }
                 break;
             case RUNNING:
+                climberDownPiston.set(false);
                 SmartDashboard.putString("state", "running");
                 if(autoBox.getRawButton(1)) {//climbing button
                     elevatorStateMachine = elevatorState.CLIMBING;
@@ -214,6 +218,7 @@ public class Elevator {
                 }
                 break;
             case CLIMBING:
+                climberDownPiston.set(true);
                 SmartDashboard.putString("state", "climbing");
                 //UPDATE CLIMB 
                 climb.update(true);
