@@ -217,6 +217,9 @@ public class Elevator {
                 SmartDashboard.putString("state", "climbing");
                 //UPDATE CLIMB 
                 climb.update(true);
+                if(climb.isDone() && (Math.abs(player1.getRawAxis(2)) > 0.3)) {
+                    elevatorStateMachine = elevatorState.RUNNING;
+                }
                 break;
         }
     }

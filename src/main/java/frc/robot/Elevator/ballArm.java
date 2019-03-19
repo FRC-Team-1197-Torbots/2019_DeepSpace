@@ -81,6 +81,7 @@ public class ballArm {
         } else if(output < maxSpeedDown) {
             output = maxSpeedDown;
         }
+        SmartDashboard.putNumber("ball arm output:", output);
         armTalon1.set(ControlMode.PercentOutput, -output);
         armTalon2.set(ControlMode.PercentOutput, output);
     }

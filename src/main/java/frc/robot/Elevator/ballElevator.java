@@ -34,7 +34,7 @@ public class ballElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = -2.75;
+    private final double positionkP = -1.5;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -64,7 +64,7 @@ public class ballElevator {
     private final double mediumBallAngle = 55;
     private final double lowBallAngle = 27.5;
     private final double cargoBallAngle = 55;
-    private final double pulledInAngle = 70;//inside the frame for protection
+    private final double pulledInAngle = 68;//inside the frame for protection
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
     //if it is false then it will only use PID for power

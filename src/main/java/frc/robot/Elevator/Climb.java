@@ -74,13 +74,13 @@ public class Climb {
     // ----------------- PID -----------------------------------------
     private double flatGyroValue;
 
-    private final double tiltkP = -0.5;
-    private final double tiltkI = 0.0;
+    private final double tiltkP = 0.25;//1 from the mini cims on real
+    private final double tiltkI = 0.0;//
     private final double tiltkD = 0.0;
     private final double tiltTolerance = 1;// for thePID
-    private final double normalTiltPower = -0.8;
+    private final double normalTiltPower = 0.45;
 
-    private final double normalkP = -2.75;
+    private final double normalkP = -1.5;
     private final double normalkI = 0.0;
     private final double normalkD = 0.0;
     private final double normalTolerance = 0.01;// for thePID
@@ -89,14 +89,14 @@ public class Climb {
 
     // ----------------- Elevator -----------------------------------------
 
-    private final double startClimbPosition = 0.51;// this is where the elevator will go to first.
+    private final double startClimbPosition = 0.505;// this is where the elevator will go to first.
     private final double elevatorBottomPosition = 0.02;//these are in meters from the first hall effect sensor
 
     // ----------------- Drive -----------------------------------------
     private final double climberTalonLiftSpeed = 0.35;
     private final double climberTalonDriveSpeed = 0.75;
     private final double drivetrainSpeed = -0.25;
-    private final long pistonRetractTime = 1000;
+    private final long pistonRetractTime = 1500;
     private final long driveOnPlatformTime = 5;
 
     //ball arm
@@ -183,9 +183,11 @@ public class Climb {
             // this sets the current target
                     
             stateRun();
-            if (climb == theClimb.setUp || climb == theClimb.IDLE) {
+            if (climb == theClimb.setUp) {
                 currentTarget = startClimbPosition;
                 normalPidRun();
+            } else if(climb == theClimb.IDLE) {
+                currentTarget = 0.05;
             } else {
                 currentTarget = elevatorBottomPosition;
                 gyroPidRun();
@@ -215,7 +217,7 @@ public class Climb {
         case setUp:
             flatGyroValue = climbGyro.getAngle();//this is the value of the gyro you read when you are flat
             // go to start climb position
-            if(Math.abs(height() - startClimbPosition)  < 0.08) {
+            if(Math.abs(height() - startClimbPosition)  < 0.04) {
                 lastTime = currentTime;
                 climb = theClimb.lift;
             }
@@ -227,7 +229,7 @@ public class Climb {
 
             climberTalon.set(ControlMode.PercentOutput, climberTalonLiftSpeed);
             // if the position of the elevator is at the bottom, go to drive forward
-            if (height() <= elevatorBottomPosition || ((currentTime - lastTime) > 4000)) {
+            if (height() <= elevatorBottomPosition || ((currentTime - lastTime) > 6000)) {
                 lastTime = currentTime;
                 climb = theClimb.driveForward;
             }
@@ -237,7 +239,8 @@ public class Climb {
             // run the drive motors and the climber motors
             climberTalon.set(ControlMode.PercentOutput, climberTalonDriveSpeed);
             setDriveSpeed(drivetrainSpeed);
-            if (!climbBreakBeam1.get() || ((currentTime - lastTime) > 4000)) { // if the breakbeam is activated and the CG is on the platform,
+            if (!climbBreakBeam1.get() || ((currentTime - lastTime) > 5000)) { // if the breakbeam is activated and the CG is on the platform,
+            // if((currentTime - lastTime) > 8000) {
                 // set motor speeds to 0
                 setDriveSpeed(0);
                 // start retracting the pistons
@@ -309,5 +312,9 @@ public class Climb {
 
     public void init(int initialValue) {
         initialTicks = encoder.get() - initialValue;
+    }
+
+    public boolean isDone() {
+        return (climb == theClimb.IDLE);
     }
 }
