@@ -179,13 +179,12 @@ public class Elevator {
                     starting = false;
                 }
                 SmartDashboard.putString("state", "zeroing");
-                ballArm.update(65);
+                ballArm.update(60);
                 if(player2.getRawButton(8) || (currentTime - lastTime > 1000)) {
                     elevatorStateMachine = elevatorState.RUNNING;
                 }
                 break;
             case RUNNING:
-                climberDownPiston.set(false);
                 SmartDashboard.putString("state", "running");
                 if(autoBox.getRawButton(1)) {//climbing button
                     elevatorStateMachine = elevatorState.CLIMBING;
@@ -211,6 +210,10 @@ public class Elevator {
                             SmartDashboard.putString("elevator state", "hatch");
                         }
                     }
+                }
+                //this makes it so that second driver can deploy the climber piston
+                if(player2.getRawButton(8)) {
+                    climberDownPiston.set(true);
                 }
                 break;
             case CLIMBING:
