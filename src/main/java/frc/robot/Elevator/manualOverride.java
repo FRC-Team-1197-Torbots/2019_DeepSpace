@@ -72,7 +72,7 @@ public class manualOverride {
 
 
     private VictorSPX climberTalon;
-    private final double climberSpeed = 0.2;
+    private final double climberSpeed = 0.3;
     // ---------------------------------------------------------
 
     public manualOverride(CANSparkMax talon1, CANSparkMax talon2, Joystick player2, boolean talon2Inverted,
@@ -112,7 +112,7 @@ public class manualOverride {
             }
 
 
-            // if y is pressed, extend the piston
+            // if left bumper is pressed, extend the piston
             if (getLeftBumper()) {
                 climberPiston1.set(true);
                 climberPiston2.set(true);

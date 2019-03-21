@@ -8,6 +8,7 @@
 package frc.robot.Elevator;
 
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * Add your docs here.
@@ -46,9 +47,22 @@ public class statusLights {
     }
 //  2
     public void displayRainbowLights(){
-        light1.set(rainbow[0]);
-        light2.set(rainbow[1]);
-        light3.set(rainbow[2]);
+        displayGreenLights();
+        // displayCyanLights();
+        // Timer.delay(3);
+        // displayGreenLights();
+        // Timer.delay(3);
+        // displayRedLights();
+        // Timer.delay(3);
+        // displayYellowLights();
+        // Timer.delay(3); 
+        // displayWhiteLights();
+        // Timer.delay(3);
+        // displayAquaLights();
+        // Timer.delay(3);
+        // displayMagentaLights();
+        // Timer.delay(3);
+       
     }
 // 3
     public void displayRedLights(){
@@ -82,6 +96,12 @@ public class statusLights {
         light1.set(white[0]);
         light2.set(white[1]);
         light3.set(white[2]);
+    }
+
+    public void displayAquaLights(){
+        light1.set(rainbow[0]);
+        light2.set(rainbow[1]);
+        light3.set(rainbow[2]);
     }
 
 }
