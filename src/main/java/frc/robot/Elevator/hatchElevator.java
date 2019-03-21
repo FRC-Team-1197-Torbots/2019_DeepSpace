@@ -155,7 +155,7 @@ public class hatchElevator {
                         hatchUpStartTime = currentTime;
                         elevator = theElevator.intakeHatchUpPID;
                     } else if(elevator == theElevator.highHatchExtendPID) {
-                        elevator = theElevator.highHatchPID;
+                        elevator = theElevator.goToHighHatchPID;
                     }
                     XPressedLast = false;
                 } else if(getButtonA() && ((currentTime - lastTimeAPressed) > 250) && !(elevator == theElevator.goToHighHatchPID 
