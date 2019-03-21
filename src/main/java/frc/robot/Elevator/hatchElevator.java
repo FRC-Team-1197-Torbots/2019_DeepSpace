@@ -47,8 +47,8 @@ public class hatchElevator {
     private final double encoderTicksPerMeter = 897;//this is how many ticks there are per meter the elevator goes up
     private final double intakeHatchPosition = 0.125;
     private final double highHatchPosition = 0.85;
-    private final double intakeHatchExtendPosition = 0.125;//should be lower than intakeHatchPosition
-    private final double highHatchExtendPosition = 0.85;//should be lower than highHatchPosition
+    private final double intakeHatchExtendPosition = 0.11;//should be lower than intakeHatchPosition
+    private final double highHatchExtendPosition = 0.835;//should be lower than highHatchPosition
     private final double absoluteMaxUpwardVelocity = 0.45;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
@@ -154,6 +154,8 @@ public class hatchElevator {
                     if(elevator == theElevator.intakeHatchExtendPID) {
                         hatchUpStartTime = currentTime;
                         elevator = theElevator.intakeHatchUpPID;
+                    } else if(elevator == theElevator.highHatchExtendPID) {
+                        elevator = theElevator.highHatchPID;
                     }
                     XPressedLast = false;
                 } else if(getButtonA() && ((currentTime - lastTimeAPressed) > 250) && !(elevator == theElevator.goToHighHatchPID 
@@ -197,13 +199,8 @@ public class hatchElevator {
                 if(running) {
                     ballArm.setMode(0);
                     ballArm.update(upAngleForBallArm);
-                    // if(limitSwitchBeingHit) {
-                        talon1.set(currentRunningSpeed);
-                        talon2.set(currentRunningSpeed);
-                    // } else {
-                    //     talon1.set(0.1);
-                    //     talon2.set(0);
-                    // }
+                    talon1.set(currentRunningSpeed);
+                    talon2.set(currentRunningSpeed);
                 } else {
                     elevator = theElevator.IDLE;
                 }
