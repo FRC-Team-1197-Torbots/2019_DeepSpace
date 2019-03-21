@@ -16,8 +16,8 @@ public class DriveHardware {
 	private final CANSparkMax rightSlave1;
 	private final CANSparkMax leftMaster;
 	private final CANSparkMax leftSlave1;
-	private Encoder leftEncoder;
-	private Encoder rightEncoder;
+	// private Encoder leftEncoder;
+	// private Encoder rightEncoder;
 	
 	private double leftSpeed;
 	private double rightSpeed;
@@ -62,8 +62,8 @@ public class DriveHardware {
 		rightMaster = new CANSparkMax(5, MotorType.kBrushless);
 		rightSlave1 = new CANSparkMax(6, MotorType.kBrushless);
 
-		leftEncoder = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
-		rightEncoder = new Encoder(2, 3, false, Encoder.EncodingType.k4X);
+		// leftEncoder = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
+		// rightEncoder = new Encoder(2, 3, false, Encoder.EncodingType.k4X);
 		
 		leftMaster.setInverted(false); // Left master must be attached to the farthest CIM from the output shaft
 		leftSlave1.setInverted(false); 
@@ -103,24 +103,24 @@ public class DriveHardware {
 	}
 
 	// Getting raw position value from the right encoder
-	public double getRightEncoder() {
-		return rightEncoder.getRaw();
-	}
+	// public double getRightEncoder() {
+	// 	return rightEncoder.getRaw();
+	// }
 
 	// Getting raw position value from the left encoder
-	public double getLeftEncoder() {
-		return leftEncoder.getRaw();
-	}
+	// public double getLeftEncoder() {
+	// 	return leftEncoder.getRaw();
+	// }
 
 	// Getting the average encoder position from both encoders
-	public double getAverageEncoderPosition() {
-		return (rightEncoder.getRaw() + leftEncoder.getRaw()) * 0.5;
-	}
+	// public double getAverageEncoderPosition() {
+	// 	return (rightEncoder.getRaw() + leftEncoder.getRaw()) * 0.5;
+	// }
 
 	// Getting the position from both encoders in meters
-	public double getPosition() {
-		return ((rightEncoder.getRaw() + leftEncoder.getRaw()) * 0.5) / encoderTicksPerMeter; // [meters]
-	}
+	// public double getPosition() {
+	// 	return ((rightEncoder.getRaw() + leftEncoder.getRaw()) * 0.5) / encoderTicksPerMeter; // [meters]
+	// }
 
 	// Getting the angle in radians from the spartan board
 	public double getHeading() {
@@ -140,10 +140,10 @@ public class DriveHardware {
 	}
 
 	// Method to reset the encoder values
-	public void resetEncoder() {
-		leftEncoder.reset();
-		rightEncoder.reset();
-	}
+	// public void resetEncoder() {
+	// 	leftEncoder.reset();
+	// 	rightEncoder.reset();
+	// }
 
 	// Method to reset the spartan board gyro values
 	public void resetGyro() {
@@ -166,7 +166,7 @@ public class DriveHardware {
 			gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 		}
 		gyro.calibrate();
-		resetEncoder();
+		// resetEncoder();
 	}
 	
 	public double getAbsoluteMaxVelocity() {
