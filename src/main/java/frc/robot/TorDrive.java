@@ -27,10 +27,6 @@ public class TorDrive {//this is the upper layer of the drive
 		ADC = new ArcadeDriveController(hardware, player1);
 		TDC = new TestDriveController(hardware, player1);
 	}
-
-	public void setHatchMode(boolean hatchMode) {
-		ADC.setHatchMode(hatchMode);
-	}
 	
 	public void Run(boolean testing, boolean isTeleop) {
 		if(testing) {

@@ -35,8 +35,4 @@ public class TestDriveController extends DriveController {
 	public void setRightOutput(double right) {
 		rightOutput = right;
 	}
-
-	@Override
-	public void setHatchMode(boolean x) {
-	}
 }

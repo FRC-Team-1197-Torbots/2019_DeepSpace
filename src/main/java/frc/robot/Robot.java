@@ -122,7 +122,6 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		elevator.update();
 		if(!elevator.climbing()) {
-			drive.setHatchMode(elevator.hatchMode());
 			drive.Run(test, true);//IT IS TELEOP
 		}
 	}
