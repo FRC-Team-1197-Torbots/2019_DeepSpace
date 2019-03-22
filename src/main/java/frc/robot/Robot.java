@@ -45,6 +45,7 @@ public class Robot extends TimedRobot {
 	private DigitalOutput light1;
 	private DigitalOutput light2;
 	private DigitalOutput light3;
+	private boolean starting = true;
 	
 	// camera
 	private static String configFile = "/boot/frc.json";
@@ -121,19 +122,32 @@ public class Robot extends TimedRobot {
 	}
 	@Override
 	public void robotInit() {
+		starting = true;
 		hardware.init();
 	}
 	@Override
 	public void autonomousInit() {
-		elevator.init();
+		starting = true;
+		if(starting) {
+			elevator.init();
+			starting = false;
+		}
 	}
 	@Override
 	public void autonomousPeriodic() {
+		if(starting) {
+			elevator.init();
+			starting = false;
+		}
 		drive.Run(test, true);//IT IS NOW TELEOP IN AUTO
 		elevator.update();
 	}
 	@Override
 	public void teleopPeriodic() {
+		if(starting) {
+			elevator.init();
+			starting = false;
+		}
 		elevator.update();
 		if(!elevator.climbing()) {
 			drive.Run(test, true);//IT IS TELEOP
