@@ -99,11 +99,11 @@ public class Elevator {
         climberTalon = new VictorSPX(13);
 
     // Solenoid
-        elevatorShifter = new Solenoid(2);
-        hatchPiston = new Solenoid(3);
-        climberPiston1 = new Solenoid(4);
-        climberPiston2 = new Solenoid(5);
-        climberDownPiston = new Solenoid(6);
+        elevatorShifter = new Solenoid(1);
+        hatchPiston = new Solenoid(2);
+        climberPiston1 = new Solenoid(3);
+        climberPiston2 = new Solenoid(4);
+        climberDownPiston = new Solenoid(5);
         
     // Sensors 
         fourtwenty = new AnalogPotentiometer(1, 360, 0);

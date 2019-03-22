@@ -53,7 +53,7 @@ public class groundIntake {
     private final double velocitykD = 0.0;
     private final double kV = 0.0;
     private final double kA = 0.0;//this should definitely stay at 0
-    private final double encoderTicksPerMeter = 897;//this is how many ticks there are per meter the elevator goes up
+    private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
     private final double absoluteMaxUpwardVelocity = 0.45;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 

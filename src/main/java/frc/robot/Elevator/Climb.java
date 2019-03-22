@@ -80,12 +80,12 @@ public class Climb {
     private final double tiltTolerance = 1;// for thePID
     private final double normalTiltPower = 0.45;
 
-    private final double normalkP = -1.5;
+    private final double normalkP = 1.5;
     private final double normalkI = 0.0;
     private final double normalkD = 0.0;
     private final double normalTolerance = 0.01;// for thePID
 
-    private final double encoderTicksPerMeter = 897;// this is how many ticks there are per meter the elevator goes up
+    private final double encoderTicksPerMeter = 885;// this is how many ticks there are per meter the elevator goes up
 
     // ----------------- Elevator -----------------------------------------
 

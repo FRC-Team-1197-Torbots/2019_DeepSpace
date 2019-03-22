@@ -48,7 +48,7 @@ public class ballElevator {
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need
 
-    private final double encoderTicksPerMeter = 897;//this is how many ticks there are per meter the elevator goes up
+    private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
     private final double lowBallPosition = 0.1;//these three are the heights of what we want to go to
     private final double mediumBallPosition = 0.5;
     private final double intakeBallPosition = 0.36;

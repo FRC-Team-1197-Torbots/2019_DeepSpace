@@ -30,7 +30,7 @@ public class hatchElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = -1.5;
+    private final double positionkP = 1.5;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -44,7 +44,7 @@ public class hatchElevator {
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need
 
-    private final double encoderTicksPerMeter = 897;//this is how many ticks there are per meter the elevator goes up
+    private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
     private final double intakeHatchPosition = 0.156;
     private final double highHatchPosition = 0.85;
     private final double intakeHatchExtendPosition = 0.08;//should be lower than intakeHatchPosition

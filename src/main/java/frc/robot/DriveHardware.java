@@ -55,7 +55,7 @@ public class DriveHardware {
 	public DriveHardware() {
 		// gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 		
-		solenoid = new Solenoid(1);
+		solenoid = new Solenoid(0);
 
 		leftMaster = new CANSparkMax(3, MotorType.kBrushless);
 		leftSlave1 = new CANSparkMax(4, MotorType.kBrushless);  
