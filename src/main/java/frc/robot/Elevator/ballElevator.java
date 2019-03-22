@@ -126,7 +126,7 @@ public class ballElevator {
         this.ballArm = ballArm;
     }
 
-    public void update(boolean running, boolean limitSwitchBeingHit) {
+    public void update(boolean running) {
         SmartDashboard.putString("ball elevator state:", elevator.toString());
         talon2.follow(talon1);
 		currentTime = (long)(Timer.getFPGATimestamp() * 1000);

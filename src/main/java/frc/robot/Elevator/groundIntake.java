@@ -114,7 +114,7 @@ public class groundIntake {
         findCurrentVelocity.resetValue(0);
     }
 
-    public void update(boolean running, boolean limitSwitchBeingHit) {
+    public void update(boolean running) {
         currentTime = (long)(Timer.getFPGATimestamp() * 1000);
 		SmartDashboard.putString("ballElevator state", elevator.toString());
 		//this starting boolean makes it so that it will still do the first value in the trajectory
@@ -180,12 +180,12 @@ public class groundIntake {
                 if(running) {
                     handleIntake();
                     handleArm();
-                    SmartDashboard.putBoolean("Limitswitch being hit", limitSwitchBeingHit);
-                    if(limitSwitchBeingHit) {
+                    // SmartDashboard.putBoolean("Limitswitch being hit", limitSwitchBeingHit);
+                    // if(limitSwitchBeingHit) {
                         elevatorTalon1.set(currentRunningSpeed);
                         elevatorTalon2.set(currentRunningSpeed);
                     
-                    }
+                    // }
                 } else {
                     elevator = theElevator.defaultPosition;
                 }

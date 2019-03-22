@@ -39,7 +39,7 @@ public class manualOverride {
     private TalonSRX intakeMotor1;
 
     private VictorSPX ballIntakeArm1;
-    private VictorSPX ballIntakeArm2;
+    // private VictorSPX ballIntakeArm2;
 
     // piston to angle ball intake for 2nd rocket level
     private boolean upPistonActive = false;
@@ -76,7 +76,7 @@ public class manualOverride {
     // ---------------------------------------------------------
 
     public manualOverride(CANSparkMax talon1, CANSparkMax talon2, Joystick player2, boolean talon2Inverted,
-            VictorSPX ballIntakeArm1, VictorSPX ballIntakeArm2, 
+            VictorSPX ballIntakeArm1, 
             Solenoid elevatorShifter, Solenoid climberPiston1, Solenoid climberPiston2, VictorSPX climberTalon, Solenoid hatchPiston) {
         this.talon1 = talon1;
         this.talon2 = talon2;
@@ -85,7 +85,7 @@ public class manualOverride {
         this.talon2.setInverted(talon2Inverted);
 
         this.ballIntakeArm1 = ballIntakeArm1;
-        this.ballIntakeArm2 = ballIntakeArm2;
+        // this.ballIntakeArm2 = ballIntakeArm2;
 
         this.elevatorShifter = elevatorShifter;
 
@@ -157,7 +157,7 @@ public class manualOverride {
 
     public void setBallIntakeArmSpeed(double speed) { // method for setting ballroller arm speed
         ballIntakeArm1.set(ControlMode.PercentOutput, -speed);
-        ballIntakeArm2.set(ControlMode.PercentOutput, speed);
+        // ballIntakeArm2.set(ControlMode.PercentOutput, speed);
 
     }
 

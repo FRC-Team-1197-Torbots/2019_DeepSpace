@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.*;
 
 public class ballArm {
     private VictorSPX armTalon1;
-    private VictorSPX armTalon2;
+    // private VictorSPX armTalon2;
     private VictorSPX shootTalon;
     private AnalogPotentiometer fourtwenty;
     private TorDerivative derivative;
@@ -44,10 +44,9 @@ public class ballArm {
     private long lastTime = currentTime;
 
 
-    public ballArm(VictorSPX armTalon1, VictorSPX armTalon2, 
+    public ballArm(VictorSPX armTalon1, 
         VictorSPX shootTalon, AnalogPotentiometer fourtwenty) {
             this.armTalon1 = armTalon1;
-            this.armTalon2 = armTalon2;
             this.shootTalon = shootTalon;
             this.fourtwenty = fourtwenty;
             derivative = new TorDerivative(dt);
@@ -83,7 +82,7 @@ public class ballArm {
         }
         SmartDashboard.putNumber("ball arm output:", output);
         armTalon1.set(ControlMode.PercentOutput, -output);
-        armTalon2.set(ControlMode.PercentOutput, output);
+        // armTalon2.set(ControlMode.PercentOutput, output);
         // armTalon1.set(ControlMode.PercentOutput, 0);
         // armTalon2.set(ControlMode.PercentOutput, 0);
     }

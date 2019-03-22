@@ -48,7 +48,7 @@ public class Elevator {
     private CANSparkMax talon2;// this is the second one
     private VictorSPX ballIntake1; //ball intake shooter
     private VictorSPX ballArm1;
-    private VictorSPX ballArm2;
+    // private VictorSPX ballArm2;
     private VictorSPX climberTalon; // wheels on climber to move forware
 // Solenoids
     private Solenoid elevatorShifter; // elevator shifter
@@ -60,7 +60,7 @@ public class Elevator {
 // Sensors
     private Encoder encoder; //elevator encoder
   
-    private DigitalInput limitSwitch; // limit switch to stop the elevator
+    // private DigitalInput limitSwitch; // limit switch to stop the elevator
     
     private DigitalInput ballBreakBeam;
 
@@ -95,7 +95,7 @@ public class Elevator {
         talon2.follow(talon1);
         ballIntake1 = new VictorSPX(9);
         ballArm1 = new VictorSPX(7);
-        ballArm2 = new VictorSPX(8);
+        // ballArm2 = new VictorSPX(8);
         climberTalon = new VictorSPX(13);
 
     // Solenoid
@@ -109,7 +109,7 @@ public class Elevator {
         fourtwenty = new AnalogPotentiometer(1, 360, 0);
         climbGyro = new AnalogGyro(0);
         encoder = new Encoder(4, 5);
-        limitSwitch = new DigitalInput(8);
+        // limitSwitch = new DigitalInput(8);
         ballBreakBeam = new DigitalInput(9);//for the break  beam
         climbSwitch1 = new DigitalInput(6);
         
@@ -122,12 +122,12 @@ public class Elevator {
         autoBox = new Joystick(2);
 
     // Classes
-        ballArm = new ballArm(ballArm1, ballArm2, ballIntake1, fourtwenty);
+        ballArm = new ballArm(ballArm1, ballIntake1, fourtwenty);
         this.statusLights = statusLights;
         hatchElevator = new hatchElevator(talon1, talon2, encoder, player1, player2, talon2Inverted, hatchPiston, ballArm, statusLights);
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballBreakBeam, ballArm, statusLights);
         groundIntake = new groundIntake(talon1, talon2, ballArm, player2, encoder, statusLights);
-        manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballArm1, ballArm2,
+        manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballArm1, 
              elevatorShifter, climberPiston1, climberPiston2, climberTalon, hatchPiston);
         climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, climberPiston1, climberPiston2, drive, ballArm, statusLights);
     }
@@ -175,7 +175,7 @@ public class Elevator {
                 }
                 SmartDashboard.putString("state", "zeroing");
                 ballArm.update(60);
-                if(player2.getRawButton(8) || (currentTime - lastTime > 1000)) {
+                if(player2.getRawButton(8) || (currentTime - lastTime > 750)) {
                     elevatorStateMachine = elevatorState.RUNNING;
                 }
                 break;
@@ -190,20 +190,20 @@ public class Elevator {
                     } else {
                         manualOverride.update(false);
                         if (getRightBumper()) {// ball
-                            ballElevator.update(true, limitSwitch.get());
-                            hatchElevator.update(false, limitSwitch.get());
-                            groundIntake.update(false, limitSwitch.get());
+                            ballElevator.update(true);
+                            hatchElevator.update(false);
+                            groundIntake.update(false);
                             SmartDashboard.putString("elevator state", "ball");
                         } else if (Math.abs(player2.getRawAxis(2)) > 0.1) { //ground hatch
-                            groundIntake.update(true, limitSwitch.get());
-                            ballElevator.update(false, limitSwitch.get());
-                            hatchElevator.update(false, limitSwitch.get());
+                            groundIntake.update(true);
+                            ballElevator.update(false);
+                            hatchElevator.update(false);
                             statusLights.displayYellowLights();
                         
                         } else {// hatch
-                            ballElevator.update(false, limitSwitch.get());
-                            hatchElevator.update(true, limitSwitch.get());
-                            groundIntake.update(false, limitSwitch.get());
+                            ballElevator.update(false);
+                            hatchElevator.update(true);
+                            groundIntake.update(false);
                             SmartDashboard.putString("elevator state", "hatch");
                         }
                     }

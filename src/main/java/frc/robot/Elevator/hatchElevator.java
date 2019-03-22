@@ -114,8 +114,8 @@ public class hatchElevator {
         this.ballArm = ballArm;
     }
 
-    public void update(boolean running, boolean limitSwitchBeingHit) {
-        SmartDashboard.putBoolean("limit switch being hit", limitSwitchBeingHit);
+    public void update(boolean running) {
+        // SmartDashboard.putBoolean("limit switch being hit", limitSwitchBeingHit);
         talon2.follow(talon1);
 		currentTime = (long)(Timer.getFPGATimestamp() * 1000);
 		

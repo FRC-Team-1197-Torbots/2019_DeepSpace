@@ -126,7 +126,6 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		elevator.init();
-		hardware.init();
 	}
 	@Override
 	public void autonomousPeriodic() {
