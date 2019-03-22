@@ -26,11 +26,22 @@ public class statusLights {
     private boolean[] magenta = {true, false, true};
     private boolean[] yellow = {true, true, false};
     private boolean[] white = {true, true, true};
+    private long lastTime = 0;
 
 
 
+public static enum theRainbow{
+    iteration1, iteration2,
+    iteration3,
+    iteration4,
+    iteration5,
+    iteration6,
+    iteration7;
+    private theRainbow(){}
+    
 
-
+}
+public theRainbow rainbowLights = theRainbow.iteration1;
 
     public statusLights(DigitalOutput light1, DigitalOutput light2, DigitalOutput light3){
         this.light1 = light1;
@@ -47,7 +58,66 @@ public class statusLights {
     }
 //  2
     public void displayRainbowLights(){
-        displayGreenLights();
+        long currentTime = (long) (Timer.getFPGATimestamp());
+        
+  
+
+        switch (rainbowLights){
+            case iteration1:
+                displayGreenLights();
+                if (currentTime - lastTime > 1.5){
+                    rainbowLights = theRainbow.iteration2;
+                    lastTime = currentTime;
+                }
+            break;
+            case iteration2:
+                displayCyanLights();
+                if (currentTime - lastTime > 1.5){
+                    rainbowLights = theRainbow.iteration3;
+                    lastTime = currentTime;
+                }
+            break;
+            case iteration3:
+                displayRedLights();
+                if (currentTime - lastTime > 1.5){
+                    rainbowLights = theRainbow.iteration4;
+                    lastTime = currentTime;
+                }
+            break;
+            case iteration4:
+                displayYellowLights();
+                if (currentTime - lastTime > 1.5){
+                    rainbowLights = theRainbow.iteration5;
+                    lastTime = currentTime;
+                }
+            break;
+            case iteration5:
+                displayWhiteLights();
+                if (currentTime - lastTime > 1.5){
+                    rainbowLights = theRainbow.iteration6;
+                    lastTime = currentTime;
+                }
+                break;
+            case iteration6:
+                displayMagentaLights();
+                if (currentTime - lastTime > 1.5){
+                    rainbowLights = theRainbow.iteration7;
+                    lastTime = currentTime;
+                }
+                break;
+            case iteration7:
+                displayGreenLights();
+                if (currentTime - lastTime > 1.5){
+                    rainbowLights = theRainbow.iteration1;
+                    lastTime = currentTime;
+                }
+                break;
+           
+
+
+
+        }
+
         // displayCyanLights();
         // Timer.delay(3);
         // displayGreenLights();

@@ -178,7 +178,6 @@ public class groundIntake {
                 }
                 PIDRun();//this only updates what value the elevator should be going at
                 if(running) {
-                    statusLights.displayYellowLights();
                     handleIntake();
                     handleArm();
                     SmartDashboard.putBoolean("Limitswitch being hit", limitSwitchBeingHit);

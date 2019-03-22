@@ -7,6 +7,7 @@ import frc.robot.Elevator.*;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -40,6 +41,10 @@ public class Robot extends TimedRobot {
 	private Joystick player1;
 	private boolean test;
 	private Elevator elevator;
+	private statusLights statusLights;
+	private DigitalOutput light1;
+	private DigitalOutput light2;
+	private DigitalOutput light3;
 	
 	// camera
 	private static String configFile = "/boot/frc.json";
@@ -61,7 +66,17 @@ public class Robot extends TimedRobot {
 		hardware = new DriveHardware();																																																																																																					
 		player1 = new Joystick(0);
 		drive = new TorDrive(hardware, player1);
-		elevator = new Elevator(player1, drive);
+
+		light1 = new DigitalOutput(23);
+        light2 = new DigitalOutput(24);
+		light3 = new DigitalOutput(25);
+		
+		statusLights = new statusLights(light1, light2, light3);
+		statusLights.displayRedLights();
+		elevator = new Elevator(player1, drive, statusLights);
+
+		
+		
 
 //---------------------------- 
 /*

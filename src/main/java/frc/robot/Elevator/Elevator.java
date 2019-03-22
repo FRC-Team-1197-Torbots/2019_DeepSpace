@@ -70,9 +70,6 @@ public class Elevator {
 
     private AnalogGyro climbGyro;
 
-    private DigitalOutput light1;
-    private DigitalOutput light2;
-    private DigitalOutput light3;
 
 //end of hardware -------------------------------------------
 
@@ -89,7 +86,7 @@ public class Elevator {
     private final boolean intakeMotor2Inverted = false;
     private boolean starting = true;
 
-    public Elevator(Joystick player1, TorDrive drive) {
+    public Elevator(Joystick player1, TorDrive drive, statusLights statusLights) {
     // Talons
         talon1 = new CANSparkMax(1, MotorType.kBrushless);
         talon2 = new CANSparkMax(2, MotorType.kBrushless);
@@ -114,11 +111,9 @@ public class Elevator {
         encoder = new Encoder(4, 5);
         limitSwitch = new DigitalInput(8);
         ballBreakBeam = new DigitalInput(9);//for the break  beam
-        climbSwitch1 = new DigitalInput(23);
+        climbSwitch1 = new DigitalInput(6);
         
-        light1 = new DigitalOutput(22);
-        light2 = new DigitalOutput(24);
-        light3 = new DigitalOutput(25);
+       
 
 
     // Joysticks 
@@ -128,7 +123,7 @@ public class Elevator {
 
     // Classes
         ballArm = new ballArm(ballArm1, ballArm2, ballIntake1, fourtwenty);
-        statusLights = new statusLights(light1, light2, light3);
+        this.statusLights = statusLights;
         hatchElevator = new hatchElevator(talon1, talon2, encoder, player1, player2, talon2Inverted, hatchPiston, ballArm, statusLights);
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballBreakBeam, ballArm, statusLights);
         groundIntake = new groundIntake(talon1, talon2, ballArm, player2, encoder, statusLights);
@@ -202,6 +197,7 @@ public class Elevator {
                             groundIntake.update(true, limitSwitch.get());
                             ballElevator.update(false, limitSwitch.get());
                             hatchElevator.update(false, limitSwitch.get());
+                            statusLights.displayYellowLights();
                         
                         } else {// hatch
                             ballElevator.update(false, limitSwitch.get());
