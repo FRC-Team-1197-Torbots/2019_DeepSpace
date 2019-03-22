@@ -82,10 +82,10 @@ public class ballArm {
             output = maxSpeedDown;
         }
         SmartDashboard.putNumber("ball arm output:", output);
-        // armTalon1.set(ControlMode.PercentOutput, -output);
-        // armTalon2.set(ControlMode.PercentOutput, output);
-        armTalon1.set(ControlMode.PercentOutput, 0);
-        armTalon2.set(ControlMode.PercentOutput, 0);
+        armTalon1.set(ControlMode.PercentOutput, -output);
+        armTalon2.set(ControlMode.PercentOutput, output);
+        // armTalon1.set(ControlMode.PercentOutput, 0);
+        // armTalon2.set(ControlMode.PercentOutput, 0);
     }
 
     public void setMode(int mode) {

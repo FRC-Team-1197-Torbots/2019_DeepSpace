@@ -182,6 +182,7 @@ public class Elevator {
             case RUNNING:
                 SmartDashboard.putString("state", "running");
                 if(autoBox.getRawButton(1)) {//climbing button
+                    climb.resetGyro();
                     elevatorStateMachine = elevatorState.CLIMBING;
                 } else {
                     if (Math.abs(getRightTrigger()) > 0.1) {
