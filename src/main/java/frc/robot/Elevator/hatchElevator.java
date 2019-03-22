@@ -45,9 +45,9 @@ public class hatchElevator {
     private final double targetAcceleration = 0.0;//probably won't need
 
     private final double encoderTicksPerMeter = 897;//this is how many ticks there are per meter the elevator goes up
-    private final double intakeHatchPosition = 0.125;
+    private final double intakeHatchPosition = 0.156;
     private final double highHatchPosition = 0.85;
-    private final double intakeHatchExtendPosition = 0.11;//should be lower than intakeHatchPosition
+    private final double intakeHatchExtendPosition = 0.08;//should be lower than intakeHatchPosition
     private final double highHatchExtendPosition = 0.835;//should be lower than highHatchPosition
     private final double absoluteMaxUpwardVelocity = 0.45;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
