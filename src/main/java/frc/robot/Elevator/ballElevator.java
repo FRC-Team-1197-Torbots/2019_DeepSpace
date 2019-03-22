@@ -34,7 +34,7 @@ public class ballElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = -1.5;
+    private final double positionkP = 1.5;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -48,18 +48,18 @@ public class ballElevator {
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need
 
-    private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
+    private final double encoderTicksPerMeter = 892;//this is how many ticks there are per meter the elevator goes up
     private final double lowBallPosition = 0.1;//these three are the heights of what we want to go to
     private final double mediumBallPosition = 0.5;
     private final double intakeBallPosition = 0.36;
     private final double highBallPosition = 0.85;
-    private final double cargoBallPosition = 0.075;
+    private final double cargoBallPosition = 0.05;
     private final double defaultPosition = 0.3;//should be low so limelight can see and center of gravity isn't too high
     private final double absoluteMaxUpwardVelocity = 0.5;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
     //for the ballArm positions
-    private final double intakeBallAngle = -15;//we want to intake at a downwards angle to minimize grabbing more than one ball
+    private final double intakeBallAngle = -25;//we want to intake at a downwards angle to minimize grabbing more than one ball
     private final double highBallAngle = 70;
     private final double mediumBallAngle = 55;
     private final double lowBallAngle = 27.5;

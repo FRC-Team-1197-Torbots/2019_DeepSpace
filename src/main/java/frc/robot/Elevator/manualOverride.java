@@ -72,7 +72,7 @@ public class manualOverride {
 
 
     private VictorSPX climberTalon;
-    private final double climberSpeed = 0.3;
+    private final double climberSpeed = -0.3;
     // ---------------------------------------------------------
 
     public manualOverride(CANSparkMax talon1, CANSparkMax talon2, Joystick player2, boolean talon2Inverted,

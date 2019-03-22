@@ -78,23 +78,23 @@ public class Climb {
     private final double tiltkI = 0.0;//
     private final double tiltkD = 0.0;
     private final double tiltTolerance = 1;// for thePID
-    private final double normalTiltPower = -0.45;
+    private final double normalTiltPower = -0.5;
 
     private final double normalkP = 1.5;
     private final double normalkI = 0.0;
     private final double normalkD = 0.0;
     private final double normalTolerance = 0.01;// for thePID
 
-    private final double encoderTicksPerMeter = 885;// this is how many ticks there are per meter the elevator goes up
+    private final double encoderTicksPerMeter = 892;// this is how many ticks there are per meter the elevator goes up
 
     // ----------------- Elevator -----------------------------------------
 
     private final double startClimbPosition = 0.505;// this is where the elevator will go to first.
-    private final double elevatorBottomPosition = 0.02;//these are in meters from the first hall effect sensor
+    private final double elevatorBottomPosition = 0.0;//these are in meters from the first hall effect sensor
 
     // ----------------- Drive -----------------------------------------
-    private final double climberTalonLiftSpeed = 0.35;
-    private final double climberTalonDriveSpeed = 0.75;
+    private final double climberTalonLiftSpeed = -0.35;
+    private final double climberTalonDriveSpeed = -0.75;
     private final double drivetrainSpeed = -0.25;
     private final long pistonRetractTime = 1500;
     private final long driveOnPlatformTime = 5;
@@ -233,7 +233,7 @@ public class Climb {
 
             climberTalon.set(ControlMode.PercentOutput, climberTalonLiftSpeed);
             // if the position of the elevator is at the bottom, go to drive forward
-            if (height() <= elevatorBottomPosition || ((currentTime - lastTime) > 6000)) {
+            if (height() <= elevatorBottomPosition || ((currentTime - lastTime) > 8000)) {
                 lastTime = currentTime;
                 climb = theClimb.driveForward;
             }

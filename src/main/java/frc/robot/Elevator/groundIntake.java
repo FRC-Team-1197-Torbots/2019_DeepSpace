@@ -44,7 +44,7 @@ public class groundIntake {
     private final double velocityTolerance = 0.0;
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need
-    private final double positionkP = -1.5;
+    private final double positionkP = 1.5;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -53,7 +53,7 @@ public class groundIntake {
     private final double velocitykD = 0.0;
     private final double kV = 0.0;
     private final double kA = 0.0;//this should definitely stay at 0
-    private final double encoderTicksPerMeter = 885;//this is how many ticks there are per meter the elevator goes up
+    private final double encoderTicksPerMeter = 892;//this is how many ticks there are per meter the elevator goes up
     private final double absoluteMaxUpwardVelocity = 0.45;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
