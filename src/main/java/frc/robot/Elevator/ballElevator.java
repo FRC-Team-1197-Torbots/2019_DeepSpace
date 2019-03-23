@@ -59,7 +59,7 @@ public class ballElevator {
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
     //for the ballArm positions
-    private final double intakeBallAngle = -25;//we want to intake at a downwards angle to minimize grabbing more than one ball
+    private final double intakeBallAngle = -20;//we want to intake at a downwards angle to minimize grabbing more than one ball
     private final double highBallAngle = 70;
     private final double mediumBallAngle = 55;
     private final double lowBallAngle = 27.5;

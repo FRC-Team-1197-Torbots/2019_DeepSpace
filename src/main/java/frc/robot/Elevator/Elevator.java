@@ -130,7 +130,8 @@ public class Elevator {
         groundIntake = new groundIntake(talon1, talon2, ballArm, player2, encoder, statusLights);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballArm1, 
              elevatorShifter, climberPiston1, climberPiston2, climberTalon, hatchPiston);
-        climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, climberPiston1, climberPiston2, drive, ballArm, statusLights);
+        climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, climberPiston1, climberPiston2, 
+        drive, ballArm, statusLights, player2);
     }
 
     public boolean climbing() {

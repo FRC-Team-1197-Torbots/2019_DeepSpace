@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.*;
+import edu.wpi.first.wpilibj.Joystick;
 
 import frc.robot.PID_Tools.*;
 import frc.robot.TorDrive;
@@ -63,6 +64,7 @@ public class Climb {
     
     private TorDerivative tiltDerivative;
     private TorDerivative normalDerivative;
+    private Joystick player2;
 
     /*
      * tuneable
@@ -78,7 +80,7 @@ public class Climb {
     private final double tiltkI = 0.0;//
     private final double tiltkD = 0.0;
     private final double tiltTolerance = 1;// for thePID
-    private final double normalTiltPower = -0.5;
+    private final double normalTiltPower = -0.55;
 
     private final double normalkP = 1.5;
     private final double normalkI = 0.0;
@@ -94,8 +96,8 @@ public class Climb {
 
     // ----------------- Drive -----------------------------------------
     private final double climberTalonLiftSpeed = -0.35;
-    private final double climberTalonDriveSpeed = -0.75;
-    private final double drivetrainSpeed = -0.25;
+    private final double climberTalonDriveSpeed = -1.0;
+    private final double drivetrainSpeed = -0.3;
     private final long pistonRetractTime = 1500;
     private final long driveOnPlatformTime = 5;
 
@@ -127,11 +129,13 @@ public class Climb {
     private theClimb climb = theClimb.setUp;
 
     public Climb(CANSparkMax talon1, CANSparkMax talon2, VictorSPX climberTalon, Encoder encoder, AnalogGyro climbGyro,
-            DigitalInput climbBreakBeam1, Solenoid climbPiston1, Solenoid climbPiston2, TorDrive drive, ballArm ballArm, statusLights statusLights) {
+            DigitalInput climbBreakBeam1, Solenoid climbPiston1, Solenoid climbPiston2, TorDrive drive, ballArm ballArm, statusLights statusLights,
+            Joystick player2) {
                 // talons
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.climberTalon = climberTalon;
+        this.player2 = player2;
 
         // sensors
         this.encoder = encoder;
@@ -243,7 +247,7 @@ public class Climb {
             // run the drive motors and the climber motors
             climberTalon.set(ControlMode.PercentOutput, climberTalonDriveSpeed);
             setDriveSpeed(drivetrainSpeed);
-            if (!climbBreakBeam1.get() || ((currentTime - lastTime) > 5000)) { // if the breakbeam is activated and the CG is on the platform,
+            if (!climbBreakBeam1.get() || (player2.getRawButton(1))) { // if the breakbeam is activated and the CG is on the platform,
             // if((currentTime - lastTime) > 8000) {
                 // set motor speeds to 0
                 setDriveSpeed(0);
