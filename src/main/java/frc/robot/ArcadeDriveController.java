@@ -19,10 +19,10 @@ public class ArcadeDriveController extends DriveController {
    private Joystick player1;
 
    // for the limelight
-   private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+   private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-ball");//bottom
    private NetworkTableEntry tx = table.getEntry("tx");
    private NetworkTableEntry ta = table.getEntry("ta");
-   private NetworkTable table2 = NetworkTableInstance.getDefault().getTable("limelight-top");
+   private NetworkTable table2 = NetworkTableInstance.getDefault().getTable("limelight");//top
    private NetworkTableEntry tx2 = table2.getEntry("tx");
    private NetworkTableEntry ta2 = table2.getEntry("ta");
    private double x;
@@ -148,9 +148,9 @@ public class ArcadeDriveController extends DriveController {
            if(player1.getRawButton(6)) {
              SmartDashboard.putBoolean("active limelight", true);
              if(limeLightTop) {
-                NetworkTableInstance.getDefault().getTable("limelight-top").getEntry("ledMode").setNumber(3);
+                NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);//top
              } else {
-                NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+                NetworkTableInstance.getDefault().getTable("limelight-ball").getEntry("ledMode").setNumber(3);//bottom
              }
                if(distance > desiredDistanceFromTarget) {//we just pretty much turn towards it and go forwards
                     currentVelocity = findCurrentVelocity.estimate(x);
