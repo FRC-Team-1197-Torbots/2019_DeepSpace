@@ -22,9 +22,13 @@ public class ArcadeDriveController extends DriveController {
    private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
    private NetworkTableEntry tx = table.getEntry("tx");
    private NetworkTableEntry ta = table.getEntry("ta");
+   private NetworkTable table2 = NetworkTableInstance.getDefault().getTable("limelight-top");
+   private NetworkTableEntry tx2 = table2.getEntry("tx");
+   private NetworkTableEntry ta2 = table2.getEntry("ta");
    private double x;
    private double speedChange;
    private double area;
+   private boolean limeLightTop = false;
 
    private double distance;
    private BantorPID limeLightPID;
@@ -125,19 +129,29 @@ public class ArcadeDriveController extends DriveController {
            arcadeSteerAxis = Math.pow(arcadeSteerAxis, 3);
            throttleAxis = Math.pow(throttleAxis, 3);
            // get all the values from the limelight
-           x = tx.getDouble(0.0);
-           area = ta.getDouble(0.0);
+           if(limeLightTop) {
+               x = tx.getDouble(0.0);
+               area = ta.getDouble(0.0);
+           } else {
+               x = tx2.getDouble(0.0);
+               area = ta2.getDouble(0.0);
+           }
 
            // convert the angles into radians
            x *= ((Math.PI) / 180.0);
            distance = areaAt1Meter / area;
            NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+           NetworkTableInstance.getDefault().getTable("limelight-top").getEntry("ledMode").setNumber(1);
 
            SmartDashboard.putNumber("distance limelight", distance);
            SmartDashboard.putBoolean("active limelight", false);
            if(player1.getRawButton(6)) {
              SmartDashboard.putBoolean("active limelight", true);
-             NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+             if(limeLightTop) {
+                NetworkTableInstance.getDefault().getTable("limelight-top").getEntry("ledMode").setNumber(3);
+             } else {
+                NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);
+             }
                if(distance > desiredDistanceFromTarget) {//we just pretty much turn towards it and go forwards
                     currentVelocity = findCurrentVelocity.estimate(x);
 
@@ -209,6 +223,11 @@ public class ArcadeDriveController extends DriveController {
    @Override
    public void setRightOutput(double right) {
        rightOutput = right;
+   }
+
+   @Override
+   public void limeLightTop(boolean top) {
+       limeLightTop = top;
    }
 
    public void setTargets(double velocity, double omega) {

@@ -241,6 +241,12 @@ public class hatchElevator {
         }
     }
 
+    public boolean topLimeLight() {
+        return (elevator == theElevator.goTointakeHatchPID || elevator == theElevator.intakeHatchExtendPID
+            || elevator == theElevator.intakeHatchPID || elevator == theElevator.intakeHatchUpPID
+            || elevator == theElevator.lowHatchDownPID);
+    }
+
     public void handleSolenoid() {
         //this sets the piston 
         // red if actuated, green extended

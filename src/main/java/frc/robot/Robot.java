@@ -139,8 +139,8 @@ public class Robot extends TimedRobot {
 			elevator.init();
 			starting = false;
 		}
-		drive.Run(test, true);//IT IS NOW TELEOP IN AUTO
 		elevator.update();
+		drive.Run(test, true, elevator.limeLightTop());//IT IS NOW TELEOP IN AUTO
 	}
 	@Override
 	public void teleopPeriodic() {
@@ -150,13 +150,13 @@ public class Robot extends TimedRobot {
 		}
 		elevator.update();
 		if(!elevator.climbing()) {
-			drive.Run(test, true);//IT IS TELEOP
+			drive.Run(test, true, elevator.limeLightTop());//IT IS TELEOP
 		}
 	}
 	@Override
 	public void testPeriodic() {
 		if(!elevator.climbing()) {
-			drive.Run(true, false);//whether or not it is teleop in test mode does not matter
+			drive.Run(true, false, elevator.limeLightTop());//whether or not it is teleop in test mode does not matter
 		}
 		elevator.update();
 	}

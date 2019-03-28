@@ -28,7 +28,9 @@ public class TorDrive {//this is the upper layer of the drive
 		TDC = new TestDriveController(hardware, player1);
 	}
 	
-	public void Run(boolean testing, boolean isTeleop) {
+	public void Run(boolean testing, boolean isTeleop, boolean topLimeLight) {
+		ADC.limeLightTop(topLimeLight);
+		TDC.limeLightTop(topLimeLight);
 		if(testing) {
 			drive = driveStateRunner.TestDrive;
 		} else {

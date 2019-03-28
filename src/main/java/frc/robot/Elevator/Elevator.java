@@ -85,6 +85,7 @@ public class Elevator {
     private final boolean talon2Inverted = false;
     private final boolean intakeMotor2Inverted = false;
     private boolean starting = true;
+    private boolean limeLightTop = false;
 
     public Elevator(Joystick player1, TorDrive drive, statusLights statusLights) {
     // Talons
@@ -195,6 +196,7 @@ public class Elevator {
                             ballElevator.update(true);
                             hatchElevator.update(false);
                             groundIntake.update(false);
+                            limeLightTop = ballElevator.topLimelight();
                             SmartDashboard.putString("elevator state", "ball");
                         } else if (Math.abs(player2.getRawAxis(2)) > 0.1) { //ground hatch
                             groundIntake.update(true);
@@ -206,6 +208,7 @@ public class Elevator {
                             ballElevator.update(false);
                             hatchElevator.update(true);
                             groundIntake.update(false);
+                            limeLightTop = hatchElevator.topLimeLight();
                             SmartDashboard.putString("elevator state", "hatch");
                         }
                     }
@@ -232,6 +235,10 @@ public class Elevator {
         hatchElevator.init(0);
         climb.init(0);
         groundIntake.init(0);
+    }
+
+    public boolean limeLightTop() {
+        return limeLightTop;
     }
 
     /*

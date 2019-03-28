@@ -32,6 +32,10 @@ public class TestDriveController extends DriveController {
 	}
 
 	@Override
+	public void limeLightTop(boolean top) {
+	}
+
+	@Override
 	public void setRightOutput(double right) {
 		rightOutput = right;
 	}

@@ -2,6 +2,7 @@ package frc.robot.Elevator;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
+// import com.sun.jndi.url.rmi.rmiURLContext;
 
 import frc.robot.PID_Tools.*;
 
@@ -454,6 +455,12 @@ public class ballElevator {
 
     public double height() {
         return ((encoder.get() - initialTicks)/encoderTicksPerMeter);
+    }
+
+    public boolean topLimelight() {
+        return (elevator == theElevator.intakeBallPID || elevator == theElevator.goTolowBallPID
+            || elevator == theElevator.lowBallPID || elevator == theElevator.goToCargoBallPID 
+            || elevator == theElevator.goTointakeBallPID || elevator == theElevator.cargoBallPID);
     }
 
 
