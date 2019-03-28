@@ -57,6 +57,7 @@ public class hatchElevator {
 
     //ball arm
     private final double upAngleForBallArm = 68;
+    private final double downAngleForExtendArm = 45;
     private ballArm ballArm;
     //this is since if you retract really fast before you give the elvator time to lift up, it won't grab the hatch
     /*
@@ -231,7 +232,12 @@ public class hatchElevator {
                 SmartDashboard.putNumber("current Position", height());
                 if(running) {
                     ballArm.setMode(0);
-                    ballArm.update(upAngleForBallArm);
+                    if(elevator == theElevator.highHatchDownPID || elevator == theElevator.highHatchExtendPID
+                    || elevator == theElevator.intakeHatchExtendPID || elevator == theElevator.lowHatchDownPID) {
+                        ballArm.update(downAngleForExtendArm);
+                    } else {
+                        ballArm.update(upAngleForBallArm);
+                    }
                     talon1.set(currentRunningSpeed);
                     talon2.set(currentRunningSpeed);
                 } else {
