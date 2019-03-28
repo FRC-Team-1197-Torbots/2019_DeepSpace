@@ -24,9 +24,9 @@ public class ballArm {
     //PID values to tune
     private final double flatAngle = 186.73;//reading on the pot (fourtwenty) when it is flat
     private final double polarity = -1;//1 if up is positive, -1 if up is negative
-    private final double kP = -0.017; //0.01
-    private final double kI = -0.0000; //0.00
-    private final double kD = 0.0006; // -0.0005
+    private final double kP = -0.021; //0.01
+    private final double kI = -0.00003; //0.00
+    private final double kD = 0.0011; // -0.0005
     private final double kF = 0.225; //-0.2
     private final double tolerance = 5;//in degrees and is when kI stops
     private final double dt = 0.005;//should be the same as everything else
