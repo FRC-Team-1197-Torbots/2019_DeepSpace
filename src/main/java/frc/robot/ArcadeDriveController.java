@@ -158,7 +158,7 @@ public class ArcadeDriveController extends DriveController {
                if(distance > desiredDistanceFromTarget) {//we just pretty much turn towards it and go forwards
                     currentVelocity = findCurrentVelocity.estimate(x);
 
-                    limeLightPID.updateTargets(0, targetVelocity, targetAcceleration);
+                    limeLightPID.updateTargets(-2.5 * (Math.PI / 180.0), targetVelocity, targetAcceleration);
                     limeLightPID.updateCurrentValues(x, currentVelocity);
                     speedChange = limeLightPID.update();
                     SmartDashboard.putNumber("speedChanged right now:", speedChange);

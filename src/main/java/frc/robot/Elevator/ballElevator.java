@@ -332,9 +332,9 @@ public class ballElevator {
                 break;
             case intakeBallPID:
                 setPercentSpeed(controlPower);
-                // if(!ballBreakBeam.get()) {
-                //     elevator = theElevator.defaultPosition;
-                // }
+                if(!ballBreakBeam.get()) {
+                    elevator = theElevator.defaultPosition;
+                }
                 break;
             case highBallPID:
                 setPercentSpeed(controlPower);
@@ -439,7 +439,7 @@ public class ballElevator {
                 //     }
                 // } else {
                 setPercentSpeed(controlPower);
-                if(height() >= (currentTarget - 0.125)) {
+                if(height() >= (currentTarget - 0.2)) {
                     elevator = theElevator.cargoBallPID;
                 }
                 // }

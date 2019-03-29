@@ -45,8 +45,8 @@ public class hatchElevator {
     private final double targetAcceleration = 0.0;//probably won't need
 
     private final double encoderTicksPerMeter = 892;//this is how many ticks there are per meter the elevator goes up
-    private final double intakeHatchPosition = 0.23;
-    private final double highHatchPosition = 0.835;
+    private final double intakeHatchPosition = 0.15;
+    private final double highHatchPosition = 0.815;
     private final double intakeHatchExtendPosition = 0.07;//should be lower than intakeHatchPosition
     private final double highHatchExtendPosition = 0.735;//should be lower than highHatchPosition
     private final double absoluteMaxUpwardVelocity = 0.45;//don't make it higher than 1.0 POSITIVE
@@ -57,7 +57,7 @@ public class hatchElevator {
 
     //ball arm
     private final double upAngleForBallArm = 62;
-    private final double downAngleForExtendArm = 59;
+    private final double downAngleForExtendArm = 56;
     private ballArm ballArm;
     //this is since if you retract really fast before you give the elvator time to lift up, it won't grab the hatch
     /*
