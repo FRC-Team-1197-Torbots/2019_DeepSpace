@@ -98,6 +98,12 @@ public class ArcadeDriveController extends DriveController {
        limeLightPID.reset();
        findCurrentVelocity = new TorDerivative(dt);
        findCurrentVelocity.resetValue(0);
+       table = NetworkTableInstance.getDefault().getTable("limelight-ball");//bottom
+       tx = table.getEntry("tx");
+       ta = table.getEntry("ta");
+       table2 = NetworkTableInstance.getDefault().getTable("limelight");//top
+       tx2 = table2.getEntry("tx");
+       ta2 = table2.getEntry("ta");
    }
 
    @Override
@@ -168,7 +174,7 @@ public class ArcadeDriveController extends DriveController {
                if(distance > desiredDistanceFromTarget) {//we just pretty much turn towards it and go forwards
                     currentVelocity = findCurrentVelocity.estimate(x);
 
-                    limeLightPID.updateTargets(-2.5 * (Math.PI / 180.0), targetVelocity, targetAcceleration);
+                    limeLightPID.updateTargets(0 * (Math.PI / 180.0), targetVelocity, targetAcceleration);
                     limeLightPID.updateCurrentValues(x, currentVelocity);
                     speedChange = limeLightPID.update();
                     SmartDashboard.putNumber("speedChanged right now:", speedChange);

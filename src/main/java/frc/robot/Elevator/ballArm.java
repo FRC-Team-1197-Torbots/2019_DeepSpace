@@ -90,8 +90,8 @@ public class ballArm {
     public void setMode(int mode) {
         currentTime = (long)(1000 * Timer.getFPGATimestamp());
         if(mode == 0) {
-            if(currentTime - lastTime < 1500) {
-                intakeCurrentRunningPower = -0.25;
+            if(currentTime - lastTime < 800) {
+                intakeCurrentRunningPower = -0.6;
             } else {
                 intakeCurrentRunningPower = 0;
             }
