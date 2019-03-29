@@ -45,10 +45,11 @@ public class hatchElevator {
     private final double targetAcceleration = 0.0;//probably won't need
 
     private final double encoderTicksPerMeter = 892;//this is how many ticks there are per meter the elevator goes up
-    private final double intakeHatchPosition = 0.135;
+    private final double intakeHatchPosition = 0.165;
     private final double highHatchPosition = 0.835;
-    private final double intakeHatchExtendPosition = 0.055;//should be lower than intakeHatchPosition
-    private final double highHatchExtendPosition = 0.755;//should be lower than highHatchPosition
+    private final double intakeHatchExtendPosition = 0.085;//should be lower than intakeHatchPosition
+    private final double intakeHatchOutakeExtendPosition = 0.06;
+    private final double highHatchExtendPosition = 0.72;//should be lower than highHatchPosition
     private final double absoluteMaxUpwardVelocity = 0.45;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
@@ -231,7 +232,7 @@ public class hatchElevator {
                     if(getButtonB()) {
                         currentTarget = intakeHatchPosition;
                     } else {
-                        currentTarget = intakeHatchExtendPosition;
+                        currentTarget = intakeHatchOutakeExtendPosition;
                     }
                 }
                 PIDRun();//this only updates what value the elevator should be going
