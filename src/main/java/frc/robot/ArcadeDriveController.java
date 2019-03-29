@@ -65,7 +65,7 @@ public class ArcadeDriveController extends DriveController {
    private final double velocityTolerance = 0.0;
    private final double targetVelocity = 0.0;// probably won't need
    private final double targetAcceleration = 0.0;// probably won't need
-   private final double desiredDistanceFromTarget = 0.01;
+   private final double desiredDistanceFromTarget = -500;
 
    // ------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -129,7 +129,9 @@ public class ArcadeDriveController extends DriveController {
            arcadeSteerAxis = Math.pow(arcadeSteerAxis, 3);
            throttleAxis = Math.pow(throttleAxis, 3);
            // get all the values from the limelight
-           if(limeLightTop) {
+           SmartDashboard.putNumber("tx:", tx.getDouble(0.0));
+           SmartDashboard.putNumber("tx2:", tx2.getDouble(0.0));
+           if(!limeLightTop) {
                x = tx.getDouble(0.0);
                area = ta.getDouble(0.0);
            } else {
@@ -139,9 +141,10 @@ public class ArcadeDriveController extends DriveController {
 
            // convert the angles into radians
            x *= ((Math.PI) / 180.0);
+           SmartDashboard.putNumber("x:", x);
            distance = areaAt1Meter / area;
            NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
-           NetworkTableInstance.getDefault().getTable("limelight-top").getEntry("ledMode").setNumber(1);
+           NetworkTableInstance.getDefault().getTable("limelight-ball").getEntry("ledMode").setNumber(1);
 
            SmartDashboard.putNumber("distance limelight", distance);
            SmartDashboard.putBoolean("active limelight", false);
@@ -158,7 +161,7 @@ public class ArcadeDriveController extends DriveController {
                     limeLightPID.updateTargets(0, targetVelocity, targetAcceleration);
                     limeLightPID.updateCurrentValues(x, currentVelocity);
                     speedChange = limeLightPID.update();
-                    SmartDashboard.putNumber("speedChanged", speedChange);
+                    SmartDashboard.putNumber("speedChanged right now:", speedChange);
                     arcadeSteerAxis += speedChange;
                    
                }

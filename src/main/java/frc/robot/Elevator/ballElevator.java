@@ -35,7 +35,7 @@ public class ballElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = 1.5;
+    private final double positionkP = 3;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -50,21 +50,21 @@ public class ballElevator {
     private final double targetAcceleration = 0.0;//probably won't need
 
     private final double encoderTicksPerMeter = 892;//this is how many ticks there are per meter the elevator goes up
-    private final double lowBallPosition = 0.1;//these three are the heights of what we want to go to
-    private final double mediumBallPosition = 0.5;
-    private final double intakeBallPosition = 0.36;
+    private final double lowBallPosition = 0.17;//these three are the heights of what we want to go to
+    private final double mediumBallPosition = 0.85;
+    private final double intakeBallPosition = 0.275;
     private final double highBallPosition = 0.85;
-    private final double cargoBallPosition = 0.05;
+    private final double cargoBallPosition = 0.85;
     private final double defaultPosition = 0.3;//should be low so limelight can see and center of gravity isn't too high
     private final double absoluteMaxUpwardVelocity = 0.5;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
     //for the ballArm positions
-    private final double intakeBallAngle = -20;//we want to intake at a downwards angle to minimize grabbing more than one ball
+    private final double intakeBallAngle = -35;//we want to intake at a downwards angle to minimize grabbing more than one ball
     private final double highBallAngle = 70;
-    private final double mediumBallAngle = 55;
+    private final double mediumBallAngle = 31;
     private final double lowBallAngle = 27.5;
-    private final double cargoBallAngle = 55;
+    private final double cargoBallAngle = -2;
     private final double pulledInAngle = 68;//inside the frame for protection
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
@@ -236,7 +236,7 @@ public class ballElevator {
     }
 
     public void handleArm() {
-        if(elevator == theElevator.IDLE || elevator == theElevator.defaultPosition) {
+        if(elevator == theElevator.IDLE || elevator == theElevator.defaultPosition || elevator == theElevator.goToCargoBallPID) {
             ballArm.update(pulledInAngle);
         } else if(elevator == theElevator.goToHighBallPID || elevator == theElevator.highBallPID) {
             ballArm.update(highBallAngle);
@@ -246,7 +246,7 @@ public class ballElevator {
             ballArm.update(lowBallAngle);
         } else if(elevator == theElevator.intakeBallPID || elevator == theElevator.goTointakeBallPID) {
             ballArm.update(intakeBallAngle);
-        } else if(elevator == theElevator.cargoBallPID || elevator == theElevator.goToCargoBallPID) {
+        } else if(elevator == theElevator.cargoBallPID) {
             ballArm.update(cargoBallAngle);
         }
     }
@@ -332,9 +332,9 @@ public class ballElevator {
                 break;
             case intakeBallPID:
                 setPercentSpeed(controlPower);
-                if(!ballBreakBeam.get()) {
-                    elevator = theElevator.defaultPosition;
-                }
+                // if(!ballBreakBeam.get()) {
+                //     elevator = theElevator.defaultPosition;
+                // }
                 break;
             case highBallPID:
                 setPercentSpeed(controlPower);
@@ -423,24 +423,26 @@ public class ballElevator {
                 }
                 break;
             case goToCargoBallPID:
-                if(Math.abs(height() - currentTarget) > pidGoTolerance) {
-                    if((height() - currentTarget) > 0) {
-                        if(powerDrive) {
-                            setPercentSpeed(-absoluteMaxDownwardVelocity);
-                        } else {
-                            setPercentSpeed(controlPower);
-                        }
-                    } else {
-                        if(powerDrive) {
-                            setPercentSpeed(absoluteMaxUpwardVelocity);
-                        } else {
-                            setPercentSpeed(controlPower);
-                        }
-                    }
-                } else {
-                    setPercentSpeed(controlPower);
+                // if(Math.abs(height() - currentTarget) > pidGoTolerance) {
+                //     if((height() - currentTarget) > 0) {
+                //         if(powerDrive) {
+                //             setPercentSpeed(-absoluteMaxDownwardVelocity);
+                //         } else {
+                //             setPercentSpeed(controlPower);
+                //         }
+                //     } else {
+                //         if(powerDrive) {
+                //             setPercentSpeed(absoluteMaxUpwardVelocity);
+                //         } else {
+                //             setPercentSpeed(controlPower);
+                //         }
+                //     }
+                // } else {
+                setPercentSpeed(controlPower);
+                if(height() >= (currentTarget - 0.125)) {
                     elevator = theElevator.cargoBallPID;
                 }
+                // }
                 break;
         }
     }
@@ -459,8 +461,8 @@ public class ballElevator {
 
     public boolean topLimelight() {
         return (elevator == theElevator.intakeBallPID || elevator == theElevator.goTolowBallPID
-            || elevator == theElevator.lowBallPID || elevator == theElevator.goToCargoBallPID 
-            || elevator == theElevator.goTointakeBallPID || elevator == theElevator.cargoBallPID);
+            || elevator == theElevator.lowBallPID
+            || elevator == theElevator.goTointakeBallPID);
     }
 
 

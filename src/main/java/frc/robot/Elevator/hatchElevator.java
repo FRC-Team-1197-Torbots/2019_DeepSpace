@@ -30,7 +30,7 @@ public class hatchElevator {
     tuneable variables------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
     //our variables
-    private final double positionkP = 1.5;
+    private final double positionkP = 3;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
@@ -45,19 +45,19 @@ public class hatchElevator {
     private final double targetAcceleration = 0.0;//probably won't need
 
     private final double encoderTicksPerMeter = 892;//this is how many ticks there are per meter the elevator goes up
-    private final double intakeHatchPosition = 0.278;
-    private final double highHatchPosition = 0.85;
-    private final double intakeHatchExtendPosition = 0.178;//should be lower than intakeHatchPosition
-    private final double highHatchExtendPosition = 0.835;//should be lower than highHatchPosition
+    private final double intakeHatchPosition = 0.23;
+    private final double highHatchPosition = 0.835;
+    private final double intakeHatchExtendPosition = 0.07;//should be lower than intakeHatchPosition
+    private final double highHatchExtendPosition = 0.735;//should be lower than highHatchPosition
     private final double absoluteMaxUpwardVelocity = 0.45;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
-    private final double pneumaticIntakeWaitTime = 0.3 * 1000;//you need to have a small pause between the pneumatic and elevator when you intake
-    private final double pneumaticOutakeWaitTime = 1.0 * 1000;
+    private final double pneumaticIntakeWaitTime = 1 * 1000;//you need to have a small pause between the pneumatic and elevator when you intake
+    private final double pneumaticOutakeWaitTime = 2.0 * 1000;
 
     //ball arm
-    private final double upAngleForBallArm = 68;
-    private final double downAngleForExtendArm = 45;
+    private final double upAngleForBallArm = 62;
+    private final double downAngleForExtendArm = 59;
     private ballArm ballArm;
     //this is since if you retract really fast before you give the elvator time to lift up, it won't grab the hatch
     /*
@@ -99,7 +99,7 @@ public class hatchElevator {
         private theElevator() {}
     }
 
-    private theElevator elevator = theElevator.IDLE;
+    private theElevator elevator = theElevator.intakeHatchPID;
 
     public hatchElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player1, Joystick player2, boolean talon2Inverted, Solenoid piston, ballArm ballArm, statusLights statusLights) {
         this.talon1 = talon1;
@@ -174,20 +174,13 @@ public class hatchElevator {
                     //if it is in a mode where it will put the hatch in, it will up and extend to let it in
                     //when you let go of X in intake mode, it will go up and retract to take the hatch
                     //when you let go of X in outake mode, it will go down and retract to let the mechanism come out
+                    lowHatchDownStartTime = currentTime;
+                    highHatchDownStartTime = currentTime;
                     if(elevator == theElevator.intakeHatchPID || elevator == theElevator.goTointakeHatchPID) {
-                        lowHatchDownStartTime = currentTime;
                         elevator = theElevator.lowHatchDownPID;
                     } else if(elevator == theElevator.highHatchPID || elevator == theElevator.goToHighHatchPID) {
-                        highHatchDownStartTime = currentTime;
                         elevator = theElevator.highHatchDownPID;
                     }
-                } else if(BPressedLast) {
-                    if(elevator == theElevator.lowHatchDownPID && (currentTime - lowHatchDownStartTime > pneumaticOutakeWaitTime)) {
-                        elevator = theElevator.intakeHatchPID;
-                    } else if(elevator == theElevator.highHatchDownPID && ((currentTime - highHatchDownStartTime) > pneumaticOutakeWaitTime)) {
-                        elevator = theElevator.highHatchPID;
-                    }
-                    BPressedLast = false;
                 } else if(getButtonA() && ((currentTime - lastTimeAPressed) > 250) && !(elevator == theElevator.goToHighHatchPID 
                     || elevator == theElevator.goTointakeHatchPID || elevator == theElevator.intakeHatchUpPID)) {
                     
@@ -198,8 +191,17 @@ public class hatchElevator {
                     
                     lastTimeYPressed = currentTime;
                     elevator = theElevator.goToHighHatchPID;
+                } else if(!getButtonB()) {
+                    if(elevator == theElevator.lowHatchDownPID && (currentTime - lowHatchDownStartTime > pneumaticOutakeWaitTime)) {
+                        // lowHatchDownStartTime = currentTime;
+                        elevator = theElevator.intakeHatchPID;
+                    } else if(elevator == theElevator.highHatchDownPID && 
+                        ((currentTime - highHatchDownStartTime) > pneumaticOutakeWaitTime)) {
+                        // highHatchDownStartTime = currentTime;
+                        elevator = theElevator.highHatchPID;
+                    }
+                    BPressedLast = false;
                 }
-    
         
                 //this sets the current target
                 if(elevator == theElevator.IDLE) {
@@ -219,9 +221,17 @@ public class hatchElevator {
                 } else if(elevator == theElevator.goToHighHatchPID) {
                     currentTarget = highHatchPosition;
                 } else if(elevator == theElevator.highHatchDownPID) {
-                    currentTarget = highHatchExtendPosition;
+                    if(getButtonB()) {
+                        currentTarget = highHatchPosition;
+                    } else {
+                        currentTarget = highHatchExtendPosition;
+                    }
                 } else if(elevator == theElevator.lowHatchDownPID) {
-                    currentTarget = intakeHatchExtendPosition;
+                    if(getButtonB()) {
+                        currentTarget = intakeHatchPosition;
+                    } else {
+                        currentTarget = intakeHatchExtendPosition;
+                    }
                 }
                 PIDRun();//this only updates what value the elevator should be going
                 stateRun();
@@ -286,13 +296,17 @@ public class hatchElevator {
             statusLights.displayRedLights();
         } else {
             if(elevator == theElevator.highHatchDownPID || elevator == theElevator.lowHatchDownPID) {
-                if(currentTime - lowHatchDownStartTime < 500 || currentTime - highHatchDownStartTime < 500) {
+                if(currentTime - lowHatchDownStartTime < 1000 || currentTime - highHatchDownStartTime < 1000) {
                     piston.set(true);
                 } else {
                     piston.set(false);
                 }
             } else {
-                piston.set(false);
+                if(elevator == theElevator.intakeHatchUpPID) {
+                    piston.set(true);
+                } else {
+                    piston.set(false);
+                }
             }
             statusLights.displayGreenLights();
             

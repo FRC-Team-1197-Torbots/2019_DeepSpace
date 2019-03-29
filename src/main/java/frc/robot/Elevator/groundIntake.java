@@ -44,7 +44,7 @@ public class groundIntake {
     private final double velocityTolerance = 0.0;
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need
-    private final double positionkP = 1.5;
+    private final double positionkP = 3;
     private final double positionkI = 0.0;
     private final double positionkD = 0.0;
     private final double positionTolerance = 0.01;//for thePID
