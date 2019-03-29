@@ -332,7 +332,7 @@ public class ballElevator {
                 break;
             case intakeBallPID:
                 setPercentSpeed(controlPower);
-                if(!ballBreakBeam.get()) {
+                if(!ballBreakBeam.get() && !player2.getRawButton(9)) {
                     elevator = theElevator.defaultPosition;
                 }
                 break;

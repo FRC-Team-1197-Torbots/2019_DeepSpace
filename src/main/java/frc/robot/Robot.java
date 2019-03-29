@@ -130,6 +130,7 @@ public class Robot extends TimedRobot {
 		starting = true;
 		if(starting) {
 			elevator.init();
+			drive.init();
 			starting = false;
 		}
 	}
@@ -137,6 +138,7 @@ public class Robot extends TimedRobot {
 	public void autonomousPeriodic() {
 		if(starting) {
 			elevator.init();
+			drive.init();
 			starting = false;
 		}
 		elevator.update();
@@ -146,6 +148,7 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		if(starting) {
 			elevator.init();
+			drive.init();
 			starting = false;
 		}
 		elevator.update();

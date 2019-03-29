@@ -14,4 +14,5 @@ public abstract class DriveController {
 	public abstract void setRightOutput(double right);
 	public abstract void run();
 	public abstract void limeLightTop(boolean top);
+	public abstract void init();
 }

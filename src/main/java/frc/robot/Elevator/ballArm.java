@@ -108,6 +108,10 @@ public class ballArm {
         }
     }
 
+    // public double getOutputCurrent() {
+    //     return shootTalon.get
+    // }
+
     public boolean isOnTarget() {
         return onTarget;
     }

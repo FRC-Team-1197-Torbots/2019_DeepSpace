@@ -17,6 +17,11 @@ public class TestDriveController extends DriveController {
 	}
 
 	@Override
+	public void init() {
+		
+	}
+
+	@Override
 	public double getLeftOutput() {
 		return leftOutput;
 	}

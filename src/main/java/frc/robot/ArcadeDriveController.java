@@ -19,12 +19,12 @@ public class ArcadeDriveController extends DriveController {
    private Joystick player1;
 
    // for the limelight
-   private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-ball");//bottom
-   private NetworkTableEntry tx = table.getEntry("tx");
-   private NetworkTableEntry ta = table.getEntry("ta");
-   private NetworkTable table2 = NetworkTableInstance.getDefault().getTable("limelight");//top
-   private NetworkTableEntry tx2 = table2.getEntry("tx");
-   private NetworkTableEntry ta2 = table2.getEntry("ta");
+   private NetworkTable table;//bottom
+   private NetworkTableEntry tx;
+   private NetworkTableEntry ta;
+   private NetworkTable table2;//top
+   private NetworkTableEntry tx2;
+   private NetworkTableEntry ta2;
    private double x;
    private double speedChange;
    private double area;
@@ -98,6 +98,16 @@ public class ArcadeDriveController extends DriveController {
        limeLightPID.reset();
        findCurrentVelocity = new TorDerivative(dt);
        findCurrentVelocity.resetValue(0);
+   }
+
+   @Override
+   public void init() {
+       table = NetworkTableInstance.getDefault().getTable("limelight-ball");//bottom
+       tx = table.getEntry("tx");
+       ta = table.getEntry("ta");
+       table2 = NetworkTableInstance.getDefault().getTable("limelight");//top
+       tx2 = table2.getEntry("tx");
+       ta2 = table2.getEntry("ta");
    }
 
    @Override
