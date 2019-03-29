@@ -256,7 +256,7 @@ public class hatchElevator {
                     talon1.set(currentRunningSpeed);
                     talon2.set(currentRunningSpeed);
                 } else {
-                    elevator = theElevator.IDLE;
+                    elevator = theElevator.goTointakeHatchPID;
                 }
             }        
         }
