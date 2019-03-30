@@ -159,8 +159,6 @@ public class ArcadeDriveController extends DriveController {
            x *= ((Math.PI) / 180.0);
            SmartDashboard.putNumber("x:", x);
            distance = areaAt1Meter / area;
-           NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
-           NetworkTableInstance.getDefault().getTable("limelight-ball").getEntry("ledMode").setNumber(1);
 
            SmartDashboard.putNumber("distance limelight", distance);
            SmartDashboard.putBoolean("active limelight", false);
@@ -168,8 +166,10 @@ public class ArcadeDriveController extends DriveController {
              SmartDashboard.putBoolean("active limelight", true);
              if(limeLightTop) {
                 NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(3);//top
+                NetworkTableInstance.getDefault().getTable("limelight-ball").getEntry("ledMode").setNumber(1);
              } else {
                 NetworkTableInstance.getDefault().getTable("limelight-ball").getEntry("ledMode").setNumber(3);//bottom
+                NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
              }
                if(distance > desiredDistanceFromTarget) {//we just pretty much turn towards it and go forwards
                     currentVelocity = findCurrentVelocity.estimate(x);
@@ -181,6 +181,10 @@ public class ArcadeDriveController extends DriveController {
                     arcadeSteerAxis += speedChange;
                    
                }
+           } else {
+               NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
+               NetworkTableInstance.getDefault().getTable("limelight-ball").getEntry("ledMode").setNumber(1);
+
            }
 
            throttleAxis *= weight;
