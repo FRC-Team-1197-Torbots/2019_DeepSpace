@@ -14,6 +14,7 @@ public class hatchElevator {
     private final boolean testMode = false;
 
     private double currentRunningSpeed;
+    private double currentRunningAngle;
 
     private long currentTime;
 	private long startTime = (long)(Timer.getFPGATimestamp() * 1000);
@@ -39,47 +40,41 @@ public class hatchElevator {
     private final double velocitykD = 0.0;
     private final double kV = 0.0;
     private final double kA = 0.0;//this should definitely stay at 0
-    private final double pidGoTolerance = 1000;//this is in meters and should be kind of large as we are using bang bang till PID turns on
     private final double velocityTolerance = 0.0;
     private final double targetVelocity = 0.0;//probably won't need
     private final double targetAcceleration = 0.0;//probably won't need
 
     private final double encoderTicksPerMeter = 892;//this is how many ticks there are per meter the elevator goes up
-    private final double intakeHatchPosition = 0.165;
-    private final double highHatchPosition = 0.835;
-    private final double intakeHatchExtendPosition = 0.085;//should be lower than intakeHatchPosition
-    private final double intakeHatchOutakeExtendPosition = 0.06;
-    private final double highHatchExtendPosition = 0.72;//should be lower than highHatchPosition
-    private final double absoluteMaxUpwardVelocity = 0.45;//don't make it higher than 1.0 POSITIVE
-    private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
-    private final double pneumaticIntakeWaitTime = 1 * 1000;//you need to have a small pause between the pneumatic and elevator when you intake
-    private final double pneumaticOutakeWaitTime = 2.0 * 1000;
+    private final double intakeHatchPosition = 0.02;
+    private final double lowHatchPosition = 0.13;
+    private final double midHatchPosition = 0.8;
+    private final double highHatchPosition = 0.835;
+
+    private final double absoluteMaxUpwardVelocity = 0.6;//don't make it higher than 1.0 POSITIVE
+    private final double absoluteMaxDownwardVelocity = 0.6;//don't make it higher than 1.0 POSITIVE
 
     //ball arm
-    private final double upAngleForBallArm = 62;
-    private final double downAngleForIntakeArm = 59;
-    private final double downAngleForExtendArm = 56;
+    private final double intakeHatchAngle = 12;
+    private final double lowHatchAngle = 7;
+    private final double midHatchAngle = 10;
+    private final double highHatchAngle = 50;
+    private final double holdingAngle = 64;
+
     private ballArm ballArm;
     //this is since if you retract really fast before you give the elvator time to lift up, it won't grab the hatch
     /*
     -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     */
 
-    private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
-    //if it is false then it will only use PID for power
-
     private int initialTicks;
     private double currentTarget;
 
     private long lastTimeAPressed = 0;
+    private long lastTimeXPressed = 0;
+    private long lastTimeBPressed = 0;
     private long lastTimeYPressed = 0;
     private long hatchUpStartTime = 0;
-    private long lowHatchDownStartTime = 0;
-    private long highHatchDownStartTime = 0;
-
-    private boolean XPressedLast = false;
-    private boolean BPressedLast = false;
 
     //our hardware
     private CANSparkMax talon1;
@@ -92,16 +87,15 @@ public class hatchElevator {
 
     public static enum theElevator {
         IDLE,
-        intakeHatchPID, intakeHatchExtendPID, intakeHatchUpPID, //we need this extra state here since pneumatics are faster than the elevator
-        //if we don't have it, the pneumatic will retract before the elevator goes up and it won't work
-        lowHatchDownPID,
-        highHatchPID, highHatchExtendPID,
-        highHatchDownPID,
-        goTointakeHatchPID, goToHighHatchPID;
+        intakeHatchPID, 
+        lowHatchPID,
+        midHatchPID,
+        highHatchPID,
+        holdingPID;
         private theElevator() {}
     }
 
-    private theElevator elevator = theElevator.intakeHatchPID;
+    private theElevator elevator = theElevator.IDLE;
 
     public hatchElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player1, Joystick player2, boolean talon2Inverted, Solenoid piston, ballArm ballArm, statusLights statusLights) {
         this.talon1 = talon1;
@@ -135,10 +129,49 @@ public class hatchElevator {
 		((lastCountedTime - startTime) - ((lastCountedTime - startTime) % (dt * 1000))) //subtracts that mod dt times 1000 so that it is floored to the nearest multiple of dt times 1000
 		//then checks if that is greater than the last one to see if it is time to move on to the next tick
 		|| starting) {
-            SmartDashboard.putBoolean("got here 1", true);
             SmartDashboard.putString("hatch elevator state:", elevator.toString());
 			starting = false;
 			lastCountedTime = currentTime;
+
+            if(getButtonA()) {
+                if((currentTime - lastTimeAPressed) > 250) {
+                    if(!(elevator == theElevator.intakeHatchPID)) {
+                        elevator = theElevator.intakeHatchPID;
+                    } else {
+                        elevator = theElevator.holdingPID;
+                    }
+                    lastTimeAPressed = currentTime;
+                }
+            } else if(getButtonX()) {
+                if((currentTime - lastTimeXPressed) > 250) {
+                    if(!(elevator == theElevator.lowHatchPID)) {
+                        elevator = theElevator.lowHatchPID;
+                    } else {
+                        elevator = theElevator.holdingPID;
+                    }
+                    lastTimeXPressed = currentTime;
+                }
+            } else if(getButtonB()) {
+                if((currentTime - lastTimeBPressed) > 250) {
+                    if(!(elevator == theElevator.midHatchPID)) {
+                        elevator = theElevator.midHatchPID;
+                    } else {
+                        elevator = theElevator.holdingPID;
+                    }
+                    lastTimeBPressed = currentTime;
+                }
+            } else if(getButtonY()) {
+                if((currentTime - lastTimeYPressed) > 250) {
+                    if(!(elevator == theElevator.highHatchPID)) {
+                        elevator = theElevator.highHatchPID;
+                    } else {
+                        elevator = theElevator.holdingPID;
+                    }
+                    lastTimeYPressed = currentTime;
+                }
+            } else if(!running) {
+                elevator = theElevator.IDLE;
+            }
 
             if(testMode) {
                 SmartDashboard.putNumber("encoder value", encoder.get());
@@ -147,175 +180,69 @@ public class hatchElevator {
                 SmartDashboard.putNumber("current running speed:", currentRunningSpeed);
                 SmartDashboard.putNumber("encoder value", encoder.get());
                 SmartDashboard.putNumber("height", height());
-                if(getButtonX()) {
-                    XPressedLast = true;
-                    //button X will be our extend position
-                    //if it is intake mode, it will go down and extend
-                    //if it is in a mode where it will put the hatch in, it will up and extend to let it in
-                    //when you let go of X in intake mode, it will go up and retract to take the hatch
-                    //when you let go of X in outake mode, it will go down and retract to let the mechanism come out
-                    if(elevator == theElevator.intakeHatchPID || elevator == theElevator.goTointakeHatchPID) {
-                        elevator = theElevator.intakeHatchExtendPID;
-                    }
-                    // } else if(elevator == theElevator.highHatchPID || elevator == theElevator.goToHighHatchPID) {
-                    //     elevator = theElevator.highHatchExtendPID;
-                    // }
-                } else if(XPressedLast) {
-                    if(elevator == theElevator.intakeHatchExtendPID) {
-                        hatchUpStartTime = currentTime;
-                        elevator = theElevator.intakeHatchUpPID;
-                    }
-                    // else if(elevator == theElevator.highHatchExtendPID) {
-                    //     elevator = theElevator.goToHighHatchPID;
-                    // }
-                    XPressedLast = false;
-                } else if(getButtonB()) {
-                    BPressedLast = true;
-                    //button X will be our extend position
-                    //if it is intake mode, it will go down and extend
-                    //if it is in a mode where it will put the hatch in, it will up and extend to let it in
-                    //when you let go of X in intake mode, it will go up and retract to take the hatch
-                    //when you let go of X in outake mode, it will go down and retract to let the mechanism come out
-                    lowHatchDownStartTime = currentTime;
-                    highHatchDownStartTime = currentTime;
-                    if(elevator == theElevator.intakeHatchPID || elevator == theElevator.goTointakeHatchPID) {
-                        elevator = theElevator.lowHatchDownPID;
-                    } else if(elevator == theElevator.highHatchPID || elevator == theElevator.goToHighHatchPID) {
-                        elevator = theElevator.highHatchDownPID;
-                    }
-                } else if(getButtonA() && ((currentTime - lastTimeAPressed) > 250) && !(elevator == theElevator.goToHighHatchPID 
-                    || elevator == theElevator.goTointakeHatchPID || elevator == theElevator.intakeHatchUpPID)) {
-                    
-                    lastTimeAPressed = currentTime;
-                    elevator = theElevator.goTointakeHatchPID;
-                } else if(getButtonY() && ((currentTime - lastTimeYPressed) > 250) && !(elevator == theElevator.goToHighHatchPID 
-                || elevator == theElevator.goTointakeHatchPID || elevator == theElevator.intakeHatchUpPID)) {
-                    
-                    lastTimeYPressed = currentTime;
-                    elevator = theElevator.goToHighHatchPID;
-                } else if(!getButtonB()) {
-                    if(elevator == theElevator.lowHatchDownPID && (currentTime - lowHatchDownStartTime > pneumaticOutakeWaitTime)) {
-                        // lowHatchDownStartTime = currentTime;
-                        elevator = theElevator.intakeHatchPID;
-                    } else if(elevator == theElevator.highHatchDownPID && 
-                        ((currentTime - highHatchDownStartTime) > pneumaticOutakeWaitTime)) {
-                        // highHatchDownStartTime = currentTime;
-                        elevator = theElevator.highHatchPID;
-                    }
-                    BPressedLast = false;
-                }
-        
-                //this sets the current target
-                if(elevator == theElevator.IDLE) {
-                    currentTarget = intakeHatchPosition;//this should be low so that the elevator has a low "waiting" cg when you just enter hatch mode
-                } else if(elevator == theElevator.intakeHatchPID) {
-                    currentTarget = intakeHatchPosition;
-                } else if(elevator == theElevator.intakeHatchExtendPID) {
-                    currentTarget = intakeHatchExtendPosition;
-                } else if(elevator == theElevator.intakeHatchUpPID) {
-                    currentTarget = intakeHatchPosition;
-                } else if(elevator == theElevator.highHatchPID) {
-                    currentTarget = highHatchPosition;
-                } else if(elevator == theElevator.highHatchExtendPID) {
-                    currentTarget = highHatchExtendPosition;
-                } else if(elevator == theElevator.goTointakeHatchPID) {
-                    currentTarget = intakeHatchPosition;
-                } else if(elevator == theElevator.goToHighHatchPID) {
-                    currentTarget = highHatchPosition;
-                } else if(elevator == theElevator.highHatchDownPID) {
-                    if(getButtonB()) {
-                        currentTarget = highHatchPosition;
-                    } else {
-                        currentTarget = highHatchExtendPosition;
-                    }
-                } else if(elevator == theElevator.lowHatchDownPID) {
-                    if(getButtonB()) {
-                        currentTarget = intakeHatchPosition;
-                    } else {
-                        currentTarget = intakeHatchOutakeExtendPosition;
-                    }
-                }
+                
+                handleElevatorPosition();
+                handleBallArmAngle();
                 PIDRun();//this only updates what value the elevator should be going
-                stateRun();
                 if(running) {
                     handleSolenoid();
+                    setPercentSpeed(controlPower);
+                    talon1.set(currentRunningSpeed);
+                    talon2.set(currentRunningSpeed);
+                    ballArm.update(currentRunningAngle);
                 }
                 SmartDashboard.putNumber("current running speed:", currentRunningSpeed);
                 SmartDashboard.putNumber("current Position", height());
-                if(running) {
-                    ballArm.setMode(0);
-                    if(elevator == theElevator.highHatchDownPID || elevator == theElevator.highHatchExtendPID
-                    || elevator == theElevator.intakeHatchExtendPID || elevator == theElevator.lowHatchDownPID) {
-                        if(elevator == theElevator.intakeHatchExtendPID) {
-                            ballArm.update(downAngleForIntakeArm);
-                        } else {
-                            ballArm.update(downAngleForExtendArm);
-                        }
-                    } else {
-                        ballArm.update(upAngleForBallArm);
-                    }
-                    talon1.set(currentRunningSpeed);
-                    talon2.set(currentRunningSpeed);
-                } else {
-                    elevator = theElevator.goTointakeHatchPID;
-                }
             }        
         }
     }
 
+    public void handleElevatorPosition() {
+        //this sets the current target
+        //this should be low so that the elevator has a low "waiting" cg when you just enter hatch mode
+        if(elevator == theElevator.intakeHatchPID || elevator == theElevator.holdingPID || elevator == theElevator.IDLE) {
+            currentTarget = intakeHatchPosition;
+        } else if(elevator == theElevator.lowHatchPID) {
+            currentTarget = lowHatchPosition;
+        } else if(elevator == theElevator.midHatchPID) {
+            currentTarget = midHatchPosition;
+        } else if(elevator == theElevator.highHatchPID) {
+            currentTarget = highHatchPosition;
+        }
+    }
+
+    public void handleBallArmAngle() {
+        ballArm.setMode(0);
+        if(elevator == theElevator.holdingPID || elevator == theElevator.IDLE) {
+            currentRunningAngle = holdingAngle;
+        } else if(elevator == theElevator.intakeHatchPID) {
+            currentRunningAngle = intakeHatchAngle;
+        } else if(elevator == theElevator.lowHatchPID) {
+            currentRunningAngle = lowHatchAngle;
+        } else if(elevator == theElevator.midHatchPID) {
+            currentRunningAngle = midHatchAngle;
+        } else if(elevator == theElevator.highHatchPID) {
+            currentRunningAngle = highHatchAngle;
+        }
+    }
+
     public boolean topLimeLight() {
-        return (elevator == theElevator.goTointakeHatchPID || elevator == theElevator.intakeHatchExtendPID
-            || elevator == theElevator.intakeHatchPID || elevator == theElevator.intakeHatchUpPID
-            || elevator == theElevator.lowHatchDownPID);
+        return (elevator == theElevator.intakeHatchPID || elevator == theElevator.lowHatchPID
+            || elevator == theElevator.midHatchPID || elevator == theElevator.holdingPID);
     }
 
     public void handleSolenoid() {
-        //this sets the piston 
-        // red if actuated, green extended
-        // if(elevator == theElevator.IDLE) {
-        //     piston.set(false);
-        //     statusLights.displayGreenLights();
-        // } else if(elevator == theElevator.intakeHatchPID) {
-        //     piston.set(false);
-        //     statusLights.displayGreenLights();
-        // } else if(elevator == theElevator.intakeHatchExtendPID) {
-        //     piston.set(true);
-        //     statusLights.displayRedLights();
-        // } else if(elevator == theElevator.intakeHatchUpPID) {
-        //     piston.set(true);
-        //     statusLights.displayRedLights();
-        // } else if(elevator == theElevator.highHatchPID) {
-        //     piston.set(false);
-        //     statusLights.displayGreenLights();
-        // } else if(elevator == theElevator.highHatchExtendPID) {
-        //     piston.set(true);
-        //     statusLights.displayRedLights();
-        // } else if(elevator == theElevator.goTointakeHatchPID) {
-        //     piston.set(false);
-        //     statusLights.displayGreenLights();
-        // } else if(elevator == theElevator.goToHighHatchPID) {
-        //     piston.set(false);
-        //     statusLights.displayGreenLights();
-        // }
-        if(getButtonX() || getButtonB()) {
+        if(!(elevator == theElevator.holdingPID)) {
+            if(getLeftBumper()) {
+                piston.set(false);
+                statusLights.displayGreenLights();
+            } else {
+                piston.set(true);
+                statusLights.displayRedLights();
+            }
+        } else {
             piston.set(true);
             statusLights.displayRedLights();
-        } else {
-            if(elevator == theElevator.highHatchDownPID || elevator == theElevator.lowHatchDownPID) {
-                if(currentTime - lowHatchDownStartTime < 1000 || currentTime - highHatchDownStartTime < 1000) {
-                    piston.set(true);
-                } else {
-                    piston.set(false);
-                }
-            } else {
-                if(elevator == theElevator.intakeHatchUpPID) {
-                    piston.set(true);
-                } else {
-                    piston.set(false);
-                }
-            }
-            statusLights.displayGreenLights();
-            
         }
     }
 
@@ -329,78 +256,6 @@ public class hatchElevator {
             controlPower = absoluteMaxUpwardVelocity;
         } else if(controlPower < -absoluteMaxDownwardVelocity) {
             controlPower = -absoluteMaxDownwardVelocity;
-        }
-    }
-
-    public void stateRun() {
-        switch(elevator) {
-            case IDLE:
-                setPercentSpeed(controlPower);
-                break;
-            case lowHatchDownPID:
-                setPercentSpeed(controlPower);
-                break;
-            case highHatchDownPID:
-                setPercentSpeed(controlPower);
-                break;
-            case intakeHatchPID:
-                setPercentSpeed(controlPower);
-                break;
-            case intakeHatchExtendPID:
-                setPercentSpeed(controlPower);
-                break;
-            case intakeHatchUpPID:
-                setPercentSpeed(controlPower);
-                if((currentTime - hatchUpStartTime) >= pneumaticIntakeWaitTime) {
-                    elevator = theElevator.intakeHatchPID;
-                }
-                break;
-            case highHatchPID:
-                setPercentSpeed(controlPower);
-                break;
-            case highHatchExtendPID:
-                setPercentSpeed(controlPower);
-                break;
-            case goTointakeHatchPID:
-                if(Math.abs(height() - currentTarget) > pidGoTolerance) {
-                    if((height() - currentTarget) > 0) {
-                        if(powerDrive) {
-                            setPercentSpeed(-absoluteMaxDownwardVelocity);
-                        } else {
-                            setPercentSpeed(controlPower);
-                        }
-                    } else {
-                        if(powerDrive) {
-                            setPercentSpeed(absoluteMaxUpwardVelocity);
-                        } else {
-                            setPercentSpeed(controlPower);
-                        }
-                    }
-                } else {
-                    setPercentSpeed(controlPower);
-                    elevator = theElevator.intakeHatchPID;
-                }
-                break;
-            case goToHighHatchPID:
-                if(Math.abs(height() - currentTarget) > pidGoTolerance) {
-                    if((height() - currentTarget) > 0) {
-                        if(powerDrive) {
-                            setPercentSpeed(-absoluteMaxDownwardVelocity);
-                        } else {
-                            setPercentSpeed(controlPower);
-                        }
-                    } else {
-                        if(powerDrive) {
-                            setPercentSpeed(absoluteMaxUpwardVelocity);
-                        } else {
-                            setPercentSpeed(controlPower);
-                        }
-                    }
-                } else {
-                    setPercentSpeed(controlPower);
-                    elevator = theElevator.highHatchPID;
-                }
-                break;
         }
     }
     
