@@ -111,7 +111,7 @@ public class ArcadeDriveController extends DriveController {
        table = NetworkTableInstance.getDefault().getTable("limelight-ball");//bottom
        tx = table.getEntry("tx");
        ta = table.getEntry("ta");
-       table2 = NetworkTableInstance.getDefault().getTable("limelight  ");//top
+       table2 = NetworkTableInstance.getDefault().getTable("limelight");//top
        tx2 = table2.getEntry("tx");
        ta2 = table2.getEntry("ta");
    }
