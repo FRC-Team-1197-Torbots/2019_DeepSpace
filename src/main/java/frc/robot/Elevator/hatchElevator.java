@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -81,6 +82,7 @@ public class hatchElevator {
     private Encoder encoder;
     private Joystick player1;
     private Joystick player2;
+    private DigitalInput hatchLimitSwitch;
     private statusLights statusLights;
 
     public static enum theElevator {
@@ -96,7 +98,7 @@ public class hatchElevator {
     private theElevator elevator = theElevator.IDLE;
 
     public hatchElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player1, Joystick player2, 
-        boolean talon2Inverted, ballArm ballArm, statusLights statusLights) {
+        boolean talon2Inverted, ballArm ballArm, statusLights statusLights, DigitalInput hatchLimitSwitch) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
@@ -104,6 +106,7 @@ public class hatchElevator {
         this.player1 = player1;
         this.player2 = player2;
         this.statusLights = statusLights;
+        this.hatchLimitSwitch = hatchLimitSwitch;
 
         //this is the PID
         positionPID = new BantorPID(kV, kA, positionkP, positionkI, positionkD, velocitykP,
@@ -184,6 +187,7 @@ public class hatchElevator {
                 PIDRun();//this only updates what value the elevator should be going
                 if(running) {
                     handleHatchShooter();
+                    handleLimitSwitch();
                     setPercentSpeed(controlPower);
                     talon1.set(currentRunningSpeed);
                     talon2.set(currentRunningSpeed);
@@ -196,7 +200,9 @@ public class hatchElevator {
     }
 
     public void handleLimitSwitch() {
-        
+        if(!hatchLimitSwitch.get() && elevator == theElevator.intakeHatchPID) {
+            elevator = theElevator.holdingPID;
+        }
     }
 
     public void handleElevatorPosition() {
@@ -235,10 +241,10 @@ public class hatchElevator {
 
     public void handleHatchShooter() {
         if(elevator == theElevator.intakeHatchPID) {
-            ballArm.setMode(-1);
+            ballArm.setMode(1);
         } else {
             if(getLeftBumper()) {
-                ballArm.setMode(1);
+                ballArm.setMode(-3);
             } else {
                 ballArm.setMode(0);
             }

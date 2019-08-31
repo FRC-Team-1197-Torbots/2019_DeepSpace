@@ -105,6 +105,9 @@ public class ballArm {
         } else if (mode == -2){
             lastTime = currentTime;
             intakeCurrentRunningPower = intakePower2;
+        } else if (mode == -3) {
+            lastTime = currentTime;
+            intakeCurrentRunningPower = -1;
         }
     }
 

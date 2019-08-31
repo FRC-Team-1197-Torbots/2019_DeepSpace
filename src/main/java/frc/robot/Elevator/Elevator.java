@@ -66,6 +66,7 @@ public class Elevator {
     private AnalogPotentiometer fourtwenty; // pot on the arm
 
     private DigitalInput climbSwitch1;
+    private DigitalInput hatchLimitSwitch;
 
     private AnalogGyro climbGyro;
 
@@ -106,6 +107,7 @@ public class Elevator {
         climberDownPiston = new Solenoid(5);
         
     // Sensors 
+        hatchLimitSwitch = new DigitalInput(0);
         fourtwenty = new AnalogPotentiometer(1, 360, 0);
         climbGyro = 
         new AnalogGyro(0);
@@ -125,7 +127,8 @@ public class Elevator {
     // Classes
         ballArm = new ballArm(ballArm1, ballIntake1, fourtwenty);
         this.statusLights = statusLights;
-        hatchElevator = new hatchElevator(talon1, talon2, encoder, player1, player2, talon2Inverted, ballArm, statusLights);
+        hatchElevator = new hatchElevator(talon1, talon2, encoder, player1, player2, talon2Inverted, ballArm, statusLights, 
+            hatchLimitSwitch);
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballBreakBeam, ballArm, statusLights);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballArm1, 
              elevatorShifter, climberPiston1, climberPiston2, climberTalon);
@@ -191,13 +194,13 @@ public class Elevator {
                     } else {
                         manualOverride.update(false);
                         if (getRightBumper()) {// ball
-                            switchStatePiston.set(true);
+                            switchStatePiston.set(false);
                             ballElevator.update(true);
                             hatchElevator.update(false);
                             limeLightTop = ballElevator.topLimelight();
                             SmartDashboard.putString("elevator state", "ball");
                         } else {// hatch
-                            switchStatePiston.set(false);
+                            switchStatePiston.set(true);
                             ballElevator.update(false);
                             hatchElevator.update(true);
                             limeLightTop = hatchElevator.topLimeLight();
