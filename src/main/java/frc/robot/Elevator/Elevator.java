@@ -36,7 +36,6 @@ public class Elevator {
 // this elevator has the hatch elevator and the ball elevator in it
     private hatchElevator hatchElevator;
     private ballElevator ballElevator;
-    private groundIntake groundIntake;
     private manualOverride manualOverride;
     private ballArm ballArm;
     private Climb climb;
@@ -55,6 +54,7 @@ public class Elevator {
     private Solenoid climberPiston1;
     private Solenoid climberPiston2;
     private Solenoid climberDownPiston;
+    private Solenoid switchStatePiston;
 
 // Sensors
     private Encoder encoder; //elevator encoder
@@ -100,6 +100,7 @@ public class Elevator {
 
     // Solenoid
         elevatorShifter = new Solenoid(1);
+        switchStatePiston = new Solenoid(2);
         climberPiston1 = new Solenoid(3);
         climberPiston2 = new Solenoid(4);
         climberDownPiston = new Solenoid(5);
@@ -126,7 +127,6 @@ public class Elevator {
         this.statusLights = statusLights;
         hatchElevator = new hatchElevator(talon1, talon2, encoder, player1, player2, talon2Inverted, ballArm, statusLights);
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballBreakBeam, ballArm, statusLights);
-        groundIntake = new groundIntake(talon1, talon2, ballArm, player2, encoder, statusLights);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballArm1, 
              elevatorShifter, climberPiston1, climberPiston2, climberTalon);
         climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, climberPiston1, climberPiston2, 
@@ -191,21 +191,15 @@ public class Elevator {
                     } else {
                         manualOverride.update(false);
                         if (getRightBumper()) {// ball
+                            switchStatePiston.set(true);
                             ballElevator.update(true);
                             hatchElevator.update(false);
-                            groundIntake.update(false);
                             limeLightTop = ballElevator.topLimelight();
                             SmartDashboard.putString("elevator state", "ball");
-                        } else if (Math.abs(player2.getRawAxis(2)) > 0.1) { //ground hatch
-                            groundIntake.update(true);
-                            ballElevator.update(false);
-                            hatchElevator.update(false);
-                            statusLights.displayYellowLights();
-                        
                         } else {// hatch
+                            switchStatePiston.set(false);
                             ballElevator.update(false);
                             hatchElevator.update(true);
-                            groundIntake.update(false);
                             limeLightTop = hatchElevator.topLimeLight();
                             SmartDashboard.putString("elevator state", "hatch");
                         }
@@ -232,7 +226,6 @@ public class Elevator {
         ballElevator.init(0);
         hatchElevator.init(0);
         climb.init(0);
-        groundIntake.init(0);
     }
 
     public boolean limeLightTop() {

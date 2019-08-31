@@ -74,7 +74,6 @@ public class hatchElevator {
     private long lastTimeXPressed = 0;
     private long lastTimeBPressed = 0;
     private long lastTimeYPressed = 0;
-    private long hatchUpStartTime = 0;
 
     //our hardware
     private CANSparkMax talon1;
@@ -196,6 +195,10 @@ public class hatchElevator {
         }
     }
 
+    public void handleLimitSwitch() {
+        
+    }
+
     public void handleElevatorPosition() {
         //this sets the current target
         //this should be low so that the elevator has a low "waiting" cg when you just enter hatch mode
@@ -231,17 +234,14 @@ public class hatchElevator {
     }
 
     public void handleHatchShooter() {
-        if(!(elevator == theElevator.holdingPID)) {
-            if(getLeftBumper()) {
-                piston.set(false);
-                statusLights.displayGreenLights();
-            } else {
-                piston.set(true);
-                statusLights.displayRedLights();
-            }
+        if(elevator == theElevator.intakeHatchPID) {
+            ballArm.setMode(-1);
         } else {
-            piston.set(true);
-            statusLights.displayRedLights();
+            if(getLeftBumper()) {
+                ballArm.setMode(1);
+            } else {
+                ballArm.setMode(0);
+            }
         }
     }
 
