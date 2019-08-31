@@ -52,7 +52,6 @@ public class Elevator {
     private VictorSPX climberTalon; // wheels on climber to move forware
 // Solenoids
     private Solenoid elevatorShifter; // elevator shifter
-    private Solenoid hatchPiston; // hatch piston for hatch mech
     private Solenoid climberPiston1;
     private Solenoid climberPiston2;
     private Solenoid climberDownPiston;
@@ -101,7 +100,6 @@ public class Elevator {
 
     // Solenoid
         elevatorShifter = new Solenoid(1);
-        hatchPiston = new Solenoid(2);
         climberPiston1 = new Solenoid(3);
         climberPiston2 = new Solenoid(4);
         climberDownPiston = new Solenoid(5);
@@ -126,11 +124,11 @@ public class Elevator {
     // Classes
         ballArm = new ballArm(ballArm1, ballIntake1, fourtwenty);
         this.statusLights = statusLights;
-        hatchElevator = new hatchElevator(talon1, talon2, encoder, player1, player2, talon2Inverted, hatchPiston, ballArm, statusLights);
+        hatchElevator = new hatchElevator(talon1, talon2, encoder, player1, player2, talon2Inverted, ballArm, statusLights);
         ballElevator = new ballElevator(talon1, talon2, encoder, player2, talon2Inverted, ballBreakBeam, ballArm, statusLights);
         groundIntake = new groundIntake(talon1, talon2, ballArm, player2, encoder, statusLights);
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballArm1, 
-             elevatorShifter, climberPiston1, climberPiston2, climberTalon, hatchPiston);
+             elevatorShifter, climberPiston1, climberPiston2, climberTalon);
         climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, climberPiston1, climberPiston2, 
         drive, ballArm, statusLights, player2);
     }

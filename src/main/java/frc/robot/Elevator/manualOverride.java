@@ -57,7 +57,6 @@ public class manualOverride {
      * ---------------------------------------------------------
      * 
      */
-    private Solenoid hatchPiston;
     private double rollerArmAxis; // joystick axis 5 for moving the arm
 
     private final double rollerArmHoldSpeed = 0.1; // << ADJUST, constant hold Speed for the roller Arm
@@ -77,7 +76,7 @@ public class manualOverride {
 
     public manualOverride(CANSparkMax talon1, CANSparkMax talon2, Joystick player2, boolean talon2Inverted,
             VictorSPX ballIntakeArm1, 
-            Solenoid elevatorShifter, Solenoid climberPiston1, Solenoid climberPiston2, VictorSPX climberTalon, Solenoid hatchPiston) {
+            Solenoid elevatorShifter, Solenoid climberPiston1, Solenoid climberPiston2, VictorSPX climberTalon) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.player2 = player2;
@@ -92,7 +91,6 @@ public class manualOverride {
         this.climberPiston1 = climberPiston1;
         this.climberPiston2 = climberPiston2;
         this.climberTalon = climberTalon;
-        this.hatchPiston = hatchPiston;
     }
 
     public void update(boolean running) {
@@ -137,13 +135,6 @@ public class manualOverride {
             } else {
                 setBallIntakeArmSpeed(0);
 
-            }
-            
-            // activate the hatch piston
-            if(player2.getRawButton(3)) {
-                hatchPiston.set(true);
-            } else {
-                hatchPiston.set(false);
             }
 
         }

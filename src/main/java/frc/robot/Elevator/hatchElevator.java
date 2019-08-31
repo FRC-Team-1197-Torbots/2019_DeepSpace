@@ -55,9 +55,9 @@ public class hatchElevator {
     private final double absoluteMaxDownwardVelocity = 0.6;//don't make it higher than 1.0 POSITIVE
 
     //ball arm
-    private final double intakeHatchAngle = 12;
-    private final double lowHatchAngle = 7;
-    private final double midHatchAngle = 10;
+    private final double intakeHatchAngle = 5;
+    private final double lowHatchAngle = 5;
+    private final double midHatchAngle = 5;
     private final double highHatchAngle = 50;
     private final double holdingAngle = 64;
 
@@ -82,7 +82,6 @@ public class hatchElevator {
     private Encoder encoder;
     private Joystick player1;
     private Joystick player2;
-    private Solenoid piston;
     private statusLights statusLights;
 
     public static enum theElevator {
@@ -97,14 +96,14 @@ public class hatchElevator {
 
     private theElevator elevator = theElevator.IDLE;
 
-    public hatchElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player1, Joystick player2, boolean talon2Inverted, Solenoid piston, ballArm ballArm, statusLights statusLights) {
+    public hatchElevator(CANSparkMax talon1, CANSparkMax talon2, Encoder encoder, Joystick player1, Joystick player2, 
+        boolean talon2Inverted, ballArm ballArm, statusLights statusLights) {
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.encoder = encoder;
         this.talon2.setInverted(talon2Inverted);
         this.player1 = player1;
         this.player2 = player2;
-        this.piston = piston;
         this.statusLights = statusLights;
 
         //this is the PID
@@ -185,7 +184,7 @@ public class hatchElevator {
                 handleBallArmAngle();
                 PIDRun();//this only updates what value the elevator should be going
                 if(running) {
-                    handleSolenoid();
+                    handleHatchShooter();
                     setPercentSpeed(controlPower);
                     talon1.set(currentRunningSpeed);
                     talon2.set(currentRunningSpeed);
@@ -231,7 +230,7 @@ public class hatchElevator {
             || elevator == theElevator.midHatchPID || elevator == theElevator.holdingPID);
     }
 
-    public void handleSolenoid() {
+    public void handleHatchShooter() {
         if(!(elevator == theElevator.holdingPID)) {
             if(getLeftBumper()) {
                 piston.set(false);
