@@ -56,12 +56,16 @@ public class DriveHardware {
 		// gyro = new ADXRS450_Gyro(SPI.Port.kOnboardCS0);
 		
 		solenoid = new Solenoid(0);
+		
 
 		leftMaster = new CANSparkMax(3, MotorType.kBrushless);
 		leftSlave1 = new CANSparkMax(4, MotorType.kBrushless);  
 		rightMaster = new CANSparkMax(5, MotorType.kBrushless);
 		rightSlave1 = new CANSparkMax(6, MotorType.kBrushless);
-
+		leftMaster.getEncoder();
+		leftSlave1.getEncoder();
+		rightMaster.getEncoder();
+		rightSlave1.getEncoder();
 		// leftEncoder = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
 		// rightEncoder = new Encoder(2, 3, false, Encoder.EncodingType.k4X);
 		

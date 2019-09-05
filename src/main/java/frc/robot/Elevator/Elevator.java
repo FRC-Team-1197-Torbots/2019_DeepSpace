@@ -89,8 +89,11 @@ public class Elevator {
 
     public Elevator(Joystick player1, TorDrive drive, statusLights statusLights) {
     // Talons
+       
         talon1 = new CANSparkMax(1, MotorType.kBrushless);
         talon2 = new CANSparkMax(2, MotorType.kBrushless);
+        talon1.getEncoder();
+        talon2.getEncoder();
         // talon1 = new TalonSRX(1);
         // talon2 = new TalonSRX(2);
         talon2.follow(talon1);
@@ -108,7 +111,8 @@ public class Elevator {
         
     // Sensors 
         hatchLimitSwitch = new DigitalInput(0);
-        fourtwenty = new AnalogPotentiometer(1, 360, 0);
+        fourtwenty = new AnalogPotentiometer(1, (360 * 6), 0);
+        //multiplied by 6 since weird issue with pot only going from 0 to 60
         climbGyro = 
         new AnalogGyro(0);
         encoder = new Encoder(4, 5);
