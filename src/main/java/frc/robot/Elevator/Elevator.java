@@ -111,10 +111,8 @@ public class Elevator {
         
     // Sensors 
         hatchLimitSwitch = new DigitalInput(0);
-        fourtwenty = new AnalogPotentiometer(1, (360 * 6), 0);
-        //multiplied by 6 since weird issue with pot only going from 0 to 60
-        climbGyro = 
-        new AnalogGyro(0);
+        fourtwenty = new AnalogPotentiometer(1, 360, 0);
+        climbGyro = new AnalogGyro(0);
         encoder = new Encoder(4, 5);
         // limitSwitch = new DigitalInput(8);
         ballBreakBeam = new DigitalInput(9);//for the break  beam
