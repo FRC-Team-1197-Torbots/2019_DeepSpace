@@ -47,9 +47,9 @@ public class hatchElevator {
 
     private final double encoderTicksPerMeter = 892;//this is how many ticks there are per meter the elevator goes up
 
-    private final double intakeHatchPosition = 0.02;
-    private final double lowHatchPosition = 0.13;
-    private final double midHatchPosition = 0.8;
+    private final double intakeHatchPosition = 0.15;
+    private final double lowHatchPosition = 0.24;
+    private final double midHatchPosition = 0.835;
     private final double highHatchPosition = 0.835;
 
     private final double absoluteMaxUpwardVelocity = 0.6;//don't make it higher than 1.0 POSITIVE
@@ -236,7 +236,7 @@ public class hatchElevator {
 
     public boolean topLimeLight() {
         return (elevator == theElevator.intakeHatchPID || elevator == theElevator.lowHatchPID
-            || elevator == theElevator.midHatchPID || elevator == theElevator.holdingPID);
+            || elevator == theElevator.holdingPID || elevator == theElevator.IDLE);
     }
 
     public void handleHatchShooter() {

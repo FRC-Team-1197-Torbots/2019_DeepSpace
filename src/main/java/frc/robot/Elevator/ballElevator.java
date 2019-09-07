@@ -50,20 +50,20 @@ public class ballElevator {
     private final double targetAcceleration = 0.0;//probably won't need
 
     private final double encoderTicksPerMeter = 892;//this is how many ticks there are per meter the elevator goes up
-    private final double lowBallPosition = 0.17;//these three are the heights of what we want to go to
-    private final double mediumBallPosition = 0.85;
-    private final double intakeBallPosition = 0.275;
-    private final double highBallPosition = 0.85;
-    private final double cargoBallPosition = 0.85;
+    private final double lowBallPosition = 0.35;//these three are the heights of what we want to go to
+    private final double mediumBallPosition = 0.835;
+    private final double intakeBallPosition = 0.225;
+    private final double highBallPosition = 0.835;
+    private final double cargoBallPosition = 0.75;
     private final double defaultPosition = 0.3;//should be low so limelight can see and center of gravity isn't too high
     private final double absoluteMaxUpwardVelocity = 0.5;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
     //for the ballArm positions
     private final double intakeBallAngle = -20;//we want to intake at a downwards angle to minimize grabbing more than one ball
-    private final double highBallAngle = 70;
-    private final double mediumBallAngle = 31;
-    private final double lowBallAngle = 27.5;
+    private final double highBallAngle = 50;
+    private final double mediumBallAngle = 30;
+    private final double lowBallAngle = 5;
     private final double cargoBallAngle = -2;
     private final double pulledInAngle = 68;//inside the frame for protection
 
@@ -332,7 +332,8 @@ public class ballElevator {
                 break;
             case intakeBallPID:
                 setPercentSpeed(controlPower);
-                if(!ballBreakBeam.get() && !player2.getRawButton(9)) {
+                if(//!ballBreakBeam.get() && 
+                player2.getRawButton(9)) {
                     elevator = theElevator.defaultPosition;
                 }
                 break;
