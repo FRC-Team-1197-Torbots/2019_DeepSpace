@@ -64,7 +64,7 @@ public class ballElevator {
     private final double highBallAngle = 50;
     private final double mediumBallAngle = 30;
     private final double lowBallAngle = 5;
-    private final double cargoBallAngle = -2; //can't make it look down
+    private final double cargoBallAngle = -15; //can't make it look down
     private final double pulledInAngle = 68;//inside the frame for protection
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
