@@ -50,9 +50,9 @@ public class ballElevator {
     private final double targetAcceleration = 0.0;//probably won't need
 
     private final double encoderTicksPerMeter = 892;//this is how many ticks there are per meter the elevator goes up
-    private final double lowBallPosition = 0.35;//these three are the heights of what we want to go to
+    private final double lowBallPosition = 0.45;//these three are the heights of what we want to go to
     private final double mediumBallPosition = 0.835;
-    private final double intakeBallPosition = 0.225;
+    private final double intakeBallPosition = 0.15;
     private final double highBallPosition = 0.835;
     private final double cargoBallPosition = 0.75;
     private final double defaultPosition = 0.3;//should be low so limelight can see and center of gravity isn't too high
@@ -64,7 +64,7 @@ public class ballElevator {
     private final double highBallAngle = 50;
     private final double mediumBallAngle = 30;
     private final double lowBallAngle = 5;
-    private final double cargoBallAngle = -2;
+    private final double cargoBallAngle = -2; //can't make it look down
     private final double pulledInAngle = 68;//inside the frame for protection
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away
@@ -332,7 +332,7 @@ public class ballElevator {
                 break;
             case intakeBallPID:
                 setPercentSpeed(controlPower);
-                if(//!ballBreakBeam.get() && 
+                if(!ballBreakBeam.get() || 
                 player2.getRawButton(9)) {
                     elevator = theElevator.defaultPosition;
                 }

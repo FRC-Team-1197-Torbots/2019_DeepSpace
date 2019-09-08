@@ -47,7 +47,7 @@ public class hatchElevator {
 
     private final double encoderTicksPerMeter = 892;//this is how many ticks there are per meter the elevator goes up
 
-    private final double intakeHatchPosition = 0.15;
+    private final double intakeHatchPosition = 0.22;
     private final double lowHatchPosition = 0.24;
     private final double midHatchPosition = 0.835;
     private final double highHatchPosition = 0.835;
@@ -58,7 +58,7 @@ public class hatchElevator {
     //ball arm
     private final double intakeHatchAngle = 5;
     private final double lowHatchAngle = 5;
-    private final double midHatchAngle = 5;
+    private final double midHatchAngle = 30;
     private final double highHatchAngle = 50;
     private final double holdingAngle = 64;
 
