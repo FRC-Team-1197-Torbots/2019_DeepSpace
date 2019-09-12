@@ -54,7 +54,7 @@ public class ballElevator {
     private final double mediumBallPosition = 0.835;
     private final double intakeBallPosition = 0.15;
     private final double highBallPosition = 0.835;
-    private final double cargoBallPosition = 0.75;
+    private final double cargoBallPosition = 0.825;
     private final double defaultPosition = 0.3;//should be low so limelight can see and center of gravity isn't too high
     private final double absoluteMaxUpwardVelocity = 0.5;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
@@ -64,7 +64,7 @@ public class ballElevator {
     private final double highBallAngle = 50;
     private final double mediumBallAngle = 30;
     private final double lowBallAngle = 5;
-    private final double cargoBallAngle = -15; //can't make it look down
+    private final double cargoBallAngle = -2.5; //can't make it look down
     private final double pulledInAngle = 68;//inside the frame for protection
 
     private final boolean powerDrive = false;//this boolean is here so that we will go at a set speed when we are far away

@@ -7,6 +7,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Ultrasonic;
 
 public class ArcadeDriveController extends DriveController {
 
@@ -27,13 +28,14 @@ public class ArcadeDriveController extends DriveController {
    private NetworkTableEntry ta2;
    private double x;
    private double speedChange;
-   private double area;
+   private double distanceInches;
    private boolean limeLightTop = false;
+   private double distanceFromTarget;
 
-   private double distance;
    private BantorPID limeLightPID;
    private double currentVelocity;
    private TorDerivative findCurrentVelocity;
+   private Ultrasonic ultra;
 
    //time stuff to make sure only goes in correct intervals
    private long currentTime;
@@ -48,8 +50,8 @@ public class ArcadeDriveController extends DriveController {
     * things---------------------------------------------------------------->>>>>>>
     * >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     */
-   private final double areaAt1Meter = 1.27;//in percent//maybe later?
-
+    private final double desiredDistance = 8;
+    private final double kP = 0.02;
    // limelight PID
    // Stuff------------------------------>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -65,7 +67,6 @@ public class ArcadeDriveController extends DriveController {
    private final double velocityTolerance = 0.0;
    private final double targetVelocity = 0.0;// probably won't need
    private final double targetAcceleration = 0.0;// probably won't need
-   private final double desiredDistanceFromTarget = -500;
 
    // ------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -104,6 +105,8 @@ public class ArcadeDriveController extends DriveController {
        table2 = NetworkTableInstance.getDefault().getTable("limelight");//top
        tx2 = table2.getEntry("tx");
        ta2 = table2.getEntry("ta");
+       ultra = new Ultrasonic(3, 2);
+       ultra.setAutomaticMode(true);
    }
 
    @Override
@@ -149,18 +152,18 @@ public class ArcadeDriveController extends DriveController {
            SmartDashboard.putNumber("tx2:", tx2.getDouble(0.0));
            if(!limeLightTop) {
                x = tx.getDouble(0.0);
-               area = ta.getDouble(0.0);
            } else {
                x = tx2.getDouble(0.0);
-               area = ta2.getDouble(0.0);
            }
 
            // convert the angles into radians
            x *= ((Math.PI) / 180.0);
            SmartDashboard.putNumber("x:", x);
-           distance = areaAt1Meter / area;
+           distanceInches = ultra.getRangeInches();
+           distanceFromTarget = distanceInches - desiredDistance;
+           SmartDashboard.putNumber("Distance from Target", distanceFromTarget);
 
-           SmartDashboard.putNumber("distance limelight", distance);
+           SmartDashboard.putNumber("distance ultra sonic", distanceInches);
            SmartDashboard.putBoolean("active limelight", false);
            if(player1.getRawButton(6)) {
              SmartDashboard.putBoolean("active limelight", true);
@@ -171,17 +174,16 @@ public class ArcadeDriveController extends DriveController {
                 NetworkTableInstance.getDefault().getTable("limelight-ball").getEntry("ledMode").setNumber(3);//bottom
                 NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
              }
-               if(distance > desiredDistanceFromTarget) {//we just pretty much turn towards it and go forwards
-                    currentVelocity = findCurrentVelocity.estimate(x);
+                currentVelocity = findCurrentVelocity.estimate(x);
 
-                    limeLightPID.updateTargets(0 * (Math.PI / 180.0), targetVelocity, targetAcceleration);
-                    limeLightPID.updateCurrentValues(x, currentVelocity);
-                    speedChange = limeLightPID.update();
-                    SmartDashboard.putNumber("speedChanged right now:", speedChange);
-                    arcadeSteerAxis += speedChange;
-                   
-               }
-           } else {
+                limeLightPID.updateTargets(0 * (Math.PI / 180.0), targetVelocity, targetAcceleration);
+                limeLightPID.updateCurrentValues(x, currentVelocity);
+                speedChange = limeLightPID.update();
+                SmartDashboard.putNumber("speedChanged right now:", speedChange);
+                arcadeSteerAxis += speedChange;
+                arcadeSteerAxis *= kP * distanceFromTarget;
+                throttleAxis *= kP * distanceFromTarget;
+            } else {
                NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
                NetworkTableInstance.getDefault().getTable("limelight-ball").getEntry("ledMode").setNumber(1);
 

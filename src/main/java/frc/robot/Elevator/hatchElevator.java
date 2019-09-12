@@ -59,7 +59,7 @@ public class hatchElevator {
     private final double intakeHatchAngle = 5;
     private final double lowHatchAngle = 5;
     private final double midHatchAngle = 30;
-    private final double highHatchAngle = 50;
+    private final double highHatchAngle = 30;
     private final double holdingAngle = 64;
 
     private ballArm ballArm;
