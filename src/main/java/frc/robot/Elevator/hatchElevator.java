@@ -47,7 +47,7 @@ public class hatchElevator {
 
     private final double encoderTicksPerMeter = 892;//this is how many ticks there are per meter the elevator goes up
 
-    private final double intakeHatchPosition = 0.22;
+    private final double intakeHatchPosition = 0.26;
     private final double lowHatchPosition = 0.24;
     private final double midHatchPosition = 0.835;
     private final double highHatchPosition = 0.835;
@@ -241,12 +241,12 @@ public class hatchElevator {
 
     public void handleHatchShooter() {
         if(elevator == theElevator.intakeHatchPID) {
-            ballArm.setMode(1);
+            ballArm.setMode(1, true);
         } else {
             if(getLeftBumper()) {
-                ballArm.setMode(-3);
+                ballArm.setMode(-3, true);
             } else {
-                ballArm.setMode(0);
+                ballArm.setMode(0, true);
             }
         }
     }

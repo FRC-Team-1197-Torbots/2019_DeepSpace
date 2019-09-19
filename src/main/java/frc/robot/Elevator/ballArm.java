@@ -1,17 +1,20 @@
 package frc.robot.Elevator;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Victor;
 import frc.robot.PID_Tools.*;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 
 public class ballArm {
     private VictorSPX armTalon1;
-    // private VictorSPX armTalon2;
+    private VictorSPX toprollerTalon;
     private VictorSPX shootTalon;
     private AnalogPotentiometer fourtwenty;
     private TorDerivative derivative;
+    private boolean topRollerLimelight = true;
     
     //intake speed variables
     private final double intakePower = -1;
@@ -44,10 +47,10 @@ public class ballArm {
     private long lastTime = currentTime;
 
 
-    public ballArm(VictorSPX armTalon1, 
-        VictorSPX shootTalon, AnalogPotentiometer fourtwenty) {
+    public ballArm(VictorSPX armTalon1, VictorSPX shootTalon, VictorSPX toprollerTalon, AnalogPotentiometer fourtwenty) {
             this.armTalon1 = armTalon1;
             this.shootTalon = shootTalon;
+            this.toprollerTalon = toprollerTalon;
             this.fourtwenty = fourtwenty;
             derivative = new TorDerivative(dt);
             derivative.reset();
@@ -55,6 +58,11 @@ public class ballArm {
 
     public void update(double targetAngle) {
         shootTalon.set(ControlMode.PercentOutput, intakeCurrentRunningPower);
+        if(topRollerLimelight) {
+            toprollerTalon.set(ControlMode.PercentOutput, intakeCurrentRunningPower);
+        } else {
+            toprollerTalon.set(ControlMode.PercentOutput, 0);
+        }
 
         currentAngle = (fourtwenty.get() - flatAngle) * polarity;
         SmartDashboard.putNumber("current angle", currentAngle);
@@ -88,6 +96,32 @@ public class ballArm {
     }
 
     public void setMode(int mode) {
+        topRollerLimelight = true;
+        currentTime = (long)(1000 * Timer.getFPGATimestamp());
+        if(mode == 0) {
+            if(currentTime - lastTime < 800) {
+                intakeCurrentRunningPower = -0.6;
+            } else {
+                intakeCurrentRunningPower = 0;
+            }
+        } else if(mode == 1) {
+            intakeCurrentRunningPower = outakePower;
+        } else if(mode == 2) {
+            intakeCurrentRunningPower = outakePower2;
+        } else if(mode == -1) {
+            lastTime = currentTime;
+            intakeCurrentRunningPower = intakePower;
+        } else if (mode == -2){
+            lastTime = currentTime;
+            intakeCurrentRunningPower = intakePower2;
+        } else if (mode == -3) {
+            lastTime = currentTime;
+            intakeCurrentRunningPower = -1;
+        }
+    }
+
+    public void setMode(int mode, boolean noTopRoller) {
+        topRollerLimelight = false;
         currentTime = (long)(1000 * Timer.getFPGATimestamp());
         if(mode == 0) {
             if(currentTime - lastTime < 800) {

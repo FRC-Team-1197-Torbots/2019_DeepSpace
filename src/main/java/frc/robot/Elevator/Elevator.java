@@ -46,6 +46,7 @@ public class Elevator {
     private CANSparkMax talon1;// this talon is the "drive talon for the elevator"
     private CANSparkMax talon2;// this is the second one
     private VictorSPX ballIntake1; //ball intake shooter
+    private VictorSPX toprollerTalon;
     private VictorSPX ballArm1;
     // private VictorSPX ballArm2;
     private VictorSPX climberTalon; // wheels on climber to move forware
@@ -96,9 +97,10 @@ public class Elevator {
         talon2.getEncoder();
         // talon1 = new TalonSRX(1);
         // talon2 = new TalonSRX(2);
-        talon2.follow(talon1);
+        // talon2.follow(talon1);
         ballIntake1 = new VictorSPX(9);
         ballArm1 = new VictorSPX(7);
+        toprollerTalon = new VictorSPX(15);
         // ballArm2 = new VictorSPX(8);
         climberTalon = new VictorSPX(13);
 
@@ -127,7 +129,7 @@ public class Elevator {
         autoBox = new Joystick(2);
 
     // Classes
-        ballArm = new ballArm(ballArm1, ballIntake1, fourtwenty);
+        ballArm = new ballArm(ballArm1, ballIntake1, toprollerTalon, fourtwenty);
         this.statusLights = statusLights;
         hatchElevator = new hatchElevator(talon1, talon2, encoder, player1, player2, talon2Inverted, ballArm, statusLights, 
             hatchLimitSwitch);
