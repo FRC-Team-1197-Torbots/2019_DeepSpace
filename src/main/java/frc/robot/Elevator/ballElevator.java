@@ -22,6 +22,7 @@ public class ballElevator {
 
     private long currentTime;
 	private long startTime = (long)(Timer.getFPGATimestamp() * 1000);
+    private long lastTimeNotCountedBreakBeam = startTime;
 	private double timeInterval = 0.005;
 	private double dt = timeInterval;
 	private long lastCountedTime;
@@ -55,7 +56,7 @@ public class ballElevator {
     private final double intakeBallPosition = 0.17;
     private final double highBallPosition = 0.835;
     private final double cargoBallPosition = 0.825;
-    private final double defaultPosition = 0.3;//should be low so limelight can see and center of gravity isn't too high
+    private final double defaultPosition = 0.1;//should be low so limelight can see and center of gravity isn't too high
     private final double absoluteMaxUpwardVelocity = 0.5;//don't make it higher than 1.0 POSITIVE
     private final double absoluteMaxDownwardVelocity = 1.0;//don't make it higher than 1.0 POSITIVE
 
@@ -194,7 +195,7 @@ public class ballElevator {
         
                 //this sets the current target
                 if(elevator == theElevator.IDLE) {
-                    currentTarget = intakeBallPosition;//this should just be greater than 0 so it doesn't hit anything
+                    currentTarget = defaultPosition;//this should just be greater than 0 so it doesn't hit anything
                 } else if(elevator == theElevator.lowBallPID) {
                     currentTarget = lowBallPosition;
                 } else if(elevator == theElevator.intakeBallPID) {
@@ -318,6 +319,9 @@ public class ballElevator {
     }
 
     public void stateRun() {
+        if(ballBreakBeam.get()) {
+            lastTimeNotCountedBreakBeam = currentTime;
+        }
         switch(elevator) {
             case IDLE:
                 break;
@@ -332,7 +336,7 @@ public class ballElevator {
                 break;
             case intakeBallPID:
                 setPercentSpeed(controlPower);
-                if(!ballBreakBeam.get() ||
+                if((currentTime - lastTimeNotCountedBreakBeam > 300) ||
                 player2.getRawButton(9)) {
                     elevator = theElevator.defaultPosition;
                 }

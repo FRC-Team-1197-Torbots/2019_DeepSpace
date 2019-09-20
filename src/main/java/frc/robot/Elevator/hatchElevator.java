@@ -47,6 +47,7 @@ public class hatchElevator {
 
     private final double encoderTicksPerMeter = 892;//this is how many ticks there are per meter the elevator goes up
 
+    private final double holdHatchPosition = 0.1;
     private final double intakeHatchPosition = 0.26;
     private final double lowHatchPosition = 0.24;
     private final double midHatchPosition = 0.835;
@@ -208,8 +209,10 @@ public class hatchElevator {
     public void handleElevatorPosition() {
         //this sets the current target
         //this should be low so that the elevator has a low "waiting" cg when you just enter hatch mode
-        if(elevator == theElevator.intakeHatchPID || elevator == theElevator.holdingPID || elevator == theElevator.IDLE) {
+        if(elevator == theElevator.intakeHatchPID) {
             currentTarget = intakeHatchPosition;
+        } else if(elevator == theElevator.holdingPID || elevator == theElevator.IDLE) {
+            currentTarget = holdHatchPosition;
         } else if(elevator == theElevator.lowHatchPID) {
             currentTarget = lowHatchPosition;
         } else if(elevator == theElevator.midHatchPID) {
