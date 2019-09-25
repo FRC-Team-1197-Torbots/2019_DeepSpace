@@ -183,7 +183,13 @@ public class ArcadeDriveController extends DriveController {
                 arcadeSteerAxis += speedChange;
                 arcadeSteerAxis *= kP * distanceFromTarget;
                 throttleAxis *= kP * distanceFromTarget;
-            } else {
+            } else if(Math.abs(getLeftTrigger()) > 0.3) {
+                arcadeSteerAxis *= 0.25;
+                throttleAxis *= 0.25;
+            } else if(Math.abs(getRightTrigger()) > 0.3) {
+                arcadeSteerAxis *= kP * distanceFromTarget;
+                throttleAxis *= kP * distanceFromTarget;
+            } else{
                NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
                NetworkTableInstance.getDefault().getTable("limelight-ball").getEntry("ledMode").setNumber(1);
 
@@ -267,5 +273,12 @@ public class ArcadeDriveController extends DriveController {
            return -(0.5) * (1 - Math.cos(Math.PI * (Math.pow(Math.abs(x), 1.75))));
        }
    }
+    public double getRightTrigger() {
+        return player1.getRawAxis(3);
+    }
+
+    public double getLeftTrigger() {
+        return player1.getRawAxis(2);
+    }
 }
 
