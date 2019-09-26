@@ -65,6 +65,7 @@ public class Climb {
     private TorDerivative tiltDerivative;
     private TorDerivative normalDerivative;
     private Joystick player2;
+    private Joystick player1;
 
     /*
      * tuneable
@@ -92,12 +93,16 @@ public class Climb {
     // ----------------- Elevator -----------------------------------------
 
     private final double startClimbPosition = 0.505;// this is where the elevator will go to first.
+    private final double startClimbPosition2 = 0.2;
     private final double elevatorBottomPosition = 0.0;//these are in meters from the first hall effect sensor
 
     // ----------------- Drive -----------------------------------------
     private final double climberTalonLiftSpeed = -0.35;
     private final double climberTalonDriveSpeed = -1.0;
+    private final double climberTalon2LiftSpeed = -0.35;
+    private final double climberTalon2DriveSpeed = -0.5;
     private final double drivetrainSpeed = -0.3;
+    private final double drivetrainSpeed2 = 0.4;
     private final long pistonRetractTime = 1500;
     private final long driveOnPlatformTime = 5;
 
@@ -126,16 +131,32 @@ public class Climb {
         }
     }
 
+    public static enum theClimb2 {
+        IDLE, // nothing
+        setUp, // ball intake up and go to set position where the climber wheel is on the hab
+               // platform
+        lift, // drives elevator down at the same speed as piston, all the way to the stop
+        driveForward, // drives climber wheels and drivetrain wheels at the same time until the
+                      // breakbeam activates
+        retractPiston, // when the breakbeam activates, retract the pistons
+        driveRobot; // drive robot forward a little bit
+
+        private theClimb2() {
+        }
+    }
+
     private theClimb climb = theClimb.setUp;
+    private theClimb2 climb2 = theClimb2.setUp;
 
     public Climb(CANSparkMax talon1, CANSparkMax talon2, VictorSPX climberTalon, Encoder encoder, AnalogGyro climbGyro,
             DigitalInput climbBreakBeam1, Solenoid climbPiston1, Solenoid climbPiston2, TorDrive drive, ballArm ballArm, statusLights statusLights,
-            Joystick player2) {
+            Joystick player2, Joystick player1) {
                 // talons
         this.talon1 = talon1;
         this.talon2 = talon2;
         this.climberTalon = climberTalon;
         this.player2 = player2;
+        this.player1 = player1;
 
         // sensors
         this.encoder = encoder;
@@ -161,7 +182,7 @@ public class Climb {
 
     }
 
-    public void update(boolean running) {
+    public void update(boolean running, boolean climber2) {
         SmartDashboard.putNumber("height in climb:", height());
         SmartDashboard.putString("Climb state", climb.toString());
         currentTime = (long) (Timer.getFPGATimestamp() * 1000);
@@ -185,20 +206,41 @@ public class Climb {
             lastCountedTime = currentTime;
 
             // this sets the current target
-                    
-            stateRun();
-            if (climb == theClimb.setUp) {
-                currentTarget = startClimbPosition;
-                normalPidRun();
-            } else if(climb == theClimb.IDLE) {
-                currentTarget = 0.05;
+            if(climber2) {
+                if(player1.getRawButton(1)) {
+                    climbPiston1.set(true);
+                    climbPiston2.set(true);
+                } else {
+                    climbPiston1.set(false);
+                    climbPiston2.set(false);
+                }
+                stateRun2();
+                if (climb2 == theClimb2.setUp) {
+                    currentTarget = startClimbPosition2;
+                    normalPidRun();
+                } else if(climb2 == theClimb2.IDLE) {
+                    currentTarget = 0.05;
+                } else {
+                    currentTarget = elevatorBottomPosition;
+                    gyroPidRun(true);
+                }
+                SmartDashboard.putString("Climb state", climb.toString());
+                SmartDashboard.putString("Climb state 2", climb2.toString());
             } else {
-                currentTarget = elevatorBottomPosition;
-                gyroPidRun();
-
+                stateRun();
+                if (climb == theClimb.setUp) {
+                    currentTarget = startClimbPosition;
+                    normalPidRun();
+                } else if(climb == theClimb.IDLE) {
+                    currentTarget = 0.05;
+                } else {
+                    currentTarget = elevatorBottomPosition;
+                    gyroPidRun(false);
+                }
+                SmartDashboard.putString("Climb state", climb.toString());
+                SmartDashboard.putString("Climb state 2", climb2.toString());
             }
 
-            SmartDashboard.putString("Climb state", climb.toString());
             if(running) {
                 statusLights.displayRainbowLights();
                 SmartDashboard.putBoolean("got here 2", true);
@@ -217,6 +259,62 @@ public class Climb {
     }
 
     // PID Run
+
+    public void stateRun2() {
+        switch (climb2) {
+            case IDLE:
+                break;
+            case setUp:
+                flatGyroValue = climbGyro.getAngle();//this is the value of the gyro you read when you are flat
+                // go to start climb position
+                if(Math.abs(height() - startClimbPosition2)  < 0.04) {
+                    lastTime = currentTime;
+                    climb2 = theClimb2.lift;
+                }
+                break;
+            case lift:
+    
+                climberTalon.set(ControlMode.PercentOutput, climberTalon2LiftSpeed);
+                // if the position of the elevator is at the bottom, go to drive forward
+                if (height() <= elevatorBottomPosition || ((currentTime - lastTime) > 8000)
+                    || player2.getRawButton(1)) {
+                    lastTime = currentTime;
+                    climb2 = theClimb2.driveForward;
+                }
+    
+                break;
+            case driveForward:
+                // run the drive motors and the climber motors
+                climberTalon.set(ControlMode.PercentOutput, climberTalon2DriveSpeed);
+                setDriveSpeed(drivetrainSpeed2);
+                if ((player2.getRawButton(1))) { 
+                // if((currentTime - lastTime) > 8000) {
+                    // set motor speeds to 0
+                    setDriveSpeed(0);
+                    // start retracting the pistons
+                    lastTime = currentTime;
+                    climb2 = theClimb2.retractPiston;
+                }
+                break;
+            case retractPiston:
+    
+                // delay time for piston to retract
+                if(currentTime - lastTime > pistonRetractTime) {
+                    lastTime = currentTime;
+                    setDriveSpeed(drivetrainSpeed2);
+                    climb2 = theClimb2.driveRobot;
+                }
+                break;
+            case driveRobot:
+                // drive robot forward a little bit to stay on platform
+                if(currentTime - lastTime > driveOnPlatformTime) {
+                    setDriveSpeed(0);
+                    climberTalon.set(ControlMode.PercentOutput, 0);
+                    climb2 = theClimb2.IDLE;
+                }
+                break;
+        }
+    }
 
     public void stateRun() {
         switch (climb) {
@@ -237,7 +335,8 @@ public class Climb {
 
             climberTalon.set(ControlMode.PercentOutput, climberTalonLiftSpeed);
             // if the position of the elevator is at the bottom, go to drive forward
-            if (height() <= elevatorBottomPosition || ((currentTime - lastTime) > 8000)) {
+            if (height() <= elevatorBottomPosition || ((currentTime - lastTime) > 8000)
+                || player2.getRawButton(1)) {
                 lastTime = currentTime;
                 climb = theClimb.driveForward;
             }
@@ -292,7 +391,7 @@ public class Climb {
         SmartDashboard.putNumber("control power normal", controlPower);
     }
 
-    public void gyroPidRun() {
+    public void gyroPidRun(boolean secondLevel) {
         currentAngleFromGyro = climbGyro.getAngle();
         tiltError = flatGyroValue - currentAngleFromGyro;
         tiltD = tiltDerivative.estimate(tiltError);
@@ -306,8 +405,12 @@ public class Climb {
         if(climb == theClimb.lift) {
             controlPower += normalTiltPower;
         }
+        if(secondLevel) {
+            controlPower = normalTiltPower;
+        }
         SmartDashboard.putNumber("control power gyro running", controlPower);
     }
+
 
     
     private void setDriveSpeed(double speed) {

@@ -83,6 +83,7 @@ public class Elevator {
     private Joystick autoBox;
 
 // Booleans
+    private boolean alreadyClimbed = false;
     private final boolean talon2Inverted = false;
     private final boolean intakeMotor2Inverted = false;
     private boolean starting = true;
@@ -137,7 +138,7 @@ public class Elevator {
         manualOverride = new manualOverride(talon1, talon2, player2, talon2Inverted, ballArm1, 
              elevatorShifter, climberPiston1, climberPiston2, climberTalon);
         climb = new Climb(talon1, talon2, climberTalon, encoder, climbGyro, climbSwitch1, climberPiston1, climberPiston2, 
-        drive, ballArm, statusLights, player2);
+        drive, ballArm, statusLights, player2, player1);
     }
 
     public boolean climbing() {
@@ -189,7 +190,7 @@ public class Elevator {
                 break;
             case RUNNING:
                 SmartDashboard.putString("state", "running");
-                if(autoBox.getRawButton(1)) {//climbing button
+                if(autoBox.getRawButton(1) && !alreadyClimbed) {//climbing button
                     climb.resetGyro();
                     elevatorStateMachine = elevatorState.CLIMBING;
                 } else {
@@ -218,11 +219,12 @@ public class Elevator {
                 }
                 break;
             case CLIMBING:
+                alreadyClimbed = true;
                 climberDownPiston.set(true);
                 SmartDashboard.putString("state", "climbing");
                 //UPDATE CLIMB 
-                climb.update(true);
-                if(climb.isDone() && (Math.abs(player1.getRawAxis(2)) > 0.3)) {
+                climb.update(true, autoBox.getRawButton(2));
+                if(climb.isDone() || (player1.getRawButton(7))) {
                     elevatorStateMachine = elevatorState.RUNNING;
                 }
                 break;

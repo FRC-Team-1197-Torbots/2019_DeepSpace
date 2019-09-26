@@ -180,8 +180,8 @@ public class ArcadeDriveController extends DriveController {
                 limeLightPID.updateCurrentValues(x, currentVelocity);
                 speedChange = limeLightPID.update();
                 SmartDashboard.putNumber("speedChanged right now:", speedChange);
-                arcadeSteerAxis += speedChange;
                 arcadeSteerAxis *= kP * distanceFromTarget;
+                arcadeSteerAxis += speedChange;
                 throttleAxis *= kP * distanceFromTarget;
             } else if(Math.abs(getLeftTrigger()) > 0.3) {
                 arcadeSteerAxis *= 0.25;
@@ -189,6 +189,8 @@ public class ArcadeDriveController extends DriveController {
             } else if(Math.abs(getRightTrigger()) > 0.3) {
                 arcadeSteerAxis *= kP * distanceFromTarget;
                 throttleAxis *= kP * distanceFromTarget;
+            } else if(player1.getRawButton(8)) {
+                throttleAxis *= 0.75;
             } else{
                NetworkTableInstance.getDefault().getTable("limelight").getEntry("ledMode").setNumber(1);
                NetworkTableInstance.getDefault().getTable("limelight-ball").getEntry("ledMode").setNumber(1);
